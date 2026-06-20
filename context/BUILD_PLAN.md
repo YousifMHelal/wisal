@@ -33,12 +33,12 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ## Phase 2 — App Shell (the chrome around every module)
 
-- [ ] **P2-1** `(dashboard)/layout.tsx` — grid: persistent sidebar + main (topbar + content).
-- [ ] **P2-2** Sidebar: product mark, 5 module links w/ icon + label + **live status dot** (server-computed worst condition per module), active-state, collapsible.
-- [ ] **P2-3** Top bar: cluster selector (All + 20), date-range selector (Live/Today/7d/30d/Custom), global search, theme toggle, lang toggle, account/role menu.
-- [ ] **P2-4** `lib/filters.ts` — parse `cluster`/`range`/`from`/`to` from searchParams; helpers reused by all module queries.
-- [ ] **P2-5** Global search server action (case IDs, agents, clusters).
-- [ ] **P2-6** Root `/` → redirect to `/live-operations`.
+- [x] **P2-1** `(dashboard)/layout.tsx` — grid: persistent sidebar + main (topbar + content).
+- [x] **P2-2** Sidebar: product mark, 5 module links w/ icon + label + **live status dot** (server-computed worst condition per module), active-state, collapsible.
+- [x] **P2-3** Top bar: cluster selector (All + 20), date-range selector (Live/Today/7d/30d/Custom), global search, theme toggle, lang toggle, account/role menu.
+- [x] **P2-4** `lib/filters.ts` — parse `cluster`/`range`/`from`/`to` from searchParams; helpers reused by all module queries.
+- [x] **P2-5** Global search server action (case IDs, agents, clusters).
+- [x] **P2-6** Root `/` → redirect to `/live-operations`.
 
 **Exit:** can navigate all 5 routes (empty content), filters update URL, dots reflect data.
 

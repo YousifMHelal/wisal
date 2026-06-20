@@ -4,7 +4,7 @@ Single source of truth for "what's done". The agent MUST update this after finis
 
 Status: `TODO` · `IN PROGRESS` · `DONE` · `BLOCKED`
 
-Last updated: 2026-06-21 — *Phase 1 DONE. DB up (Docker postgres:16-alpine), migrated, seeded, verified.*
+Last updated: 2026-06-21 — *Phase 2 DONE. App shell: layout grid, sidebar (collapsible rail + mobile Sheet drawer, live status dots), topbar (cluster/date dropdowns, global search, theme/lang/account), lib/filters.ts, global search action, root redirect.*
 
 ---
 
@@ -14,7 +14,7 @@ Last updated: 2026-06-21 — *Phase 1 DONE. DB up (Docker postgres:16-alpine), m
 |---|---|---|---|
 | 0 | Scaffold & Foundations | DONE | |
 | 1 | Data Model & Seed | DONE | Docker postgres:16-alpine, 35 tables, verified |
-| 2 | App Shell | TODO | |
+| 2 | App Shell | DONE | layout + sidebar + topbar + filters + search |
 | 3 | Module 01 Live Operations | TODO | default landing, vertical slice |
 | 4 | Module 02 Wisal Intelligence | TODO | RBAC + kill switch |
 | 5 | Module 03 Governance & Compliance | TODO | export + cross-links + KB |
@@ -50,12 +50,12 @@ Last updated: 2026-06-21 — *Phase 1 DONE. DB up (Docker postgres:16-alpine), m
 ### Phase 2 — Shell
 | ID | Task | Status |
 |---|---|---|
-| P2-1 | (dashboard)/layout grid | TODO |
-| P2-2 | Sidebar + live status dots | TODO |
-| P2-3 | Top bar (cluster, date, search, theme, lang, account) | TODO |
-| P2-4 | lib/filters.ts | TODO |
-| P2-5 | Global search action | TODO |
-| P2-6 | / → /live-operations redirect | TODO |
+| P2-1 | (dashboard)/layout grid | DONE |
+| P2-2 | Sidebar + live status dots | DONE |
+| P2-3 | Top bar (cluster, date, search, theme, lang, account) | DONE |
+| P2-4 | lib/filters.ts | DONE |
+| P2-5 | Global search action | DONE |
+| P2-6 | / → /live-operations redirect | DONE |
 
 ### Phase 3 — Live Operations
 | ID | Task | Status |
@@ -141,6 +141,7 @@ Last updated: 2026-06-21 — *Phase 1 DONE. DB up (Docker postgres:16-alpine), m
 ---
 
 ## Changelog (newest first)
+- **2026-06-21 (Phase 2 DONE)** — P2-1: `(dashboard)/layout.tsx` (sidebar + topbar + main grid, h-screen flex). P2-2: `SidebarRail` (256px rail lg+, collapsible to 64px, status dots) + `MobileNav` (Sheet drawer). P2-3: `TopBarClient` (cluster dropdown, date-range, global search with results, theme/lang/account) + `TopBar` RSC wrapper. P2-4: `lib/filters.ts` (parseFilters, resolveDateBounds, filtersToParams). P2-5: `lib/actions/search.ts` (globalSearch, clusters+agents+tickets). P2-6: root `/` already redirects. Also: `StatusBadge` shared component, `lib/module-status.ts` (worst-status per module, server-computed). 0 TS errors.
 - **2026-06-21 (Phase 1 partial)** — P1-1: full schema.prisma (all entities from ARCHITECTURE §5 + RFP-gap models, 40+ enums, polymorphic AuditLog via plain entity/entityId strings). P1-3: lib/kpi.ts (all 10 KPIs, status() fn, STATUS_CLASSES). P1-4: seed.ts (20 clusters, 5 roles, ~80 agents, 120 SLA snapshots, all entity types seeded with realistic mixed green/amber/red). tsx added as dev dep. Prisma client generated. 0 TS errors. P1-2/P1-5 blocked — Postgres not reachable at localhost:5432.
 - **2026-06-21 (Phase 0 done)** — Next.js 16 + Tailwind v4 + shadcn canary (base-ui) + next-themes (dark default) + i18n en/ar + Prisma v7 (adapter-pg) + NextAuth beta (Credentials, session role, middleware protection, signin page, RBAC helpers). Build clean, 0 TS errors. Key discoveries: Prisma v7 uses prisma.config.ts for URL (not schema.prisma); shadcn canary uses @base-ui/react (render prop, not asChild); generated client at lib/generated/prisma/client.ts.
 - **2026-06-21 (update)** — User updates: (1) UI work must use `ui-ux-pro-max` skill + `21st.dev` MCP; (2) added **Polish phase 10**; (3) **fully responsive** rule (UI §5b) across all pages; (4) **real auth via NextAuth** replaces stub; (5) RFP gap-check → added **Module 06** + gap widgets (Live Agent Status, Knowledge Base, Ticket queue, Campaign Results, SLA Penalty, Integration/NMR, System Health, Beneficiary 360) + **§6b RFP coverage matrix** + 9 gap data models. Hardening renumbered to Phase 9.
