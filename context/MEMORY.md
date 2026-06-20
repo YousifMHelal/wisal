@@ -39,6 +39,17 @@ SL 80%/20s (amber 78) · Abandoned ≤5% (amber ≤8) · AHT 5min · ASA ≤20s 
 - Export: CSV first; PDF/print "compliance pack" in P8-6.
 - Real external integrations (Nafath/Mawid/Sehhaty/HR) intentionally mocked.
 
+## Phase 0 — Technical Discoveries (critical for all future phases)
+| Discovery | Detail |
+|---|---|
+| Prisma v7 URL config | `url` removed from `schema.prisma`. Lives in `prisma.config.ts` (`datasource.url`). Schema datasource has no url. |
+| Prisma v7 client path | Generated to `lib/generated/prisma/client.ts` (not index.ts). Import as `@/lib/generated/prisma/client`. |
+| Prisma v7 adapter | `PrismaClient` requires adapter. Use `@prisma/adapter-pg` + `PrismaPg`. No direct connectionString in constructor. |
+| shadcn canary (base-ui) | Uses `@base-ui/react` not Radix. No `asChild` prop — use `render={<Element />}` instead. No `delayDuration` on TooltipProvider. |
+| NextAuth beta JWT augmentation | `next-auth/jwt` module augmentation fails in beta. Store role via `(token as Record<string, unknown>).role`. |
+| i18n Dict type | Don't use `as const` on en.ts — breaks AR translation assignability. Plain object, `typeof en` gives the type. |
+
 ## Change Log
+- **2026-06-21 (Phase 0 done)** — Build clean. All 6 P0 tasks done. See discoveries table above.
 - **2026-06-21 (update)** — Applied 5 user updates + RFP gap-check across ARCHITECTURE/BUILD_PLAN/UI_RULES/AGENT/TRACKER (NextAuth, ui tooling, responsive, Polish phase, Module 06 + gaps). No code yet.
 - **2026-06-21** — Initialized all context docs + AGENT.md. No code yet. Next action: Phase 0 scaffold.

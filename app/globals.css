@@ -7,6 +7,16 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  /* Status semantic colors — always derived via lib/kpi.ts, never hardcoded */
+  --color-status-green: var(--status-green);
+  --color-status-green-bg: var(--status-green-bg);
+  --color-status-green-fg: var(--status-green-fg);
+  --color-status-amber: var(--status-amber);
+  --color-status-amber-bg: var(--status-amber-bg);
+  --color-status-amber-fg: var(--status-amber-fg);
+  --color-status-red: var(--status-red);
+  --color-status-red-bg: var(--status-red-bg);
+  --color-status-red-fg: var(--status-red-fg);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
@@ -48,83 +58,152 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ─── Wisal Design System — Light theme (exec/compliance reading) ─── */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  /* Surfaces */
+  --background: oklch(0.981 0.002 247.84);       /* slate-50  #F8FAFC */
+  --foreground: oklch(0.129 0.042 264.7);         /* slate-900 #0F172A */
+  --card: oklch(1 0 0);                           /* white */
+  --card-foreground: oklch(0.129 0.042 264.7);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.129 0.042 264.7);
+
+  /* Brand / accent — teal-600 */
+  --primary: oklch(0.501 0.124 184.36);           /* teal-600 #0D9488 */
+  --primary-foreground: oklch(1 0 0);
+
+  /* Secondary / muted */
+  --secondary: oklch(0.944 0.007 247.9);          /* slate-100 */
+  --secondary-foreground: oklch(0.129 0.042 264.7);
+  --muted: oklch(0.944 0.007 247.9);
+  --muted-foreground: oklch(0.479 0.029 256.8);   /* slate-500 #64748B */
+  --accent: oklch(0.944 0.007 247.9);
+  --accent-foreground: oklch(0.129 0.042 264.7);
+
+  /* Borders / inputs */
+  --border: oklch(0.882 0.011 254.0);             /* slate-200 #E2E8F0 */
+  --input: oklch(0.882 0.011 254.0);
+  --ring: oklch(0.501 0.124 184.36);              /* teal-600 for focus */
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+
+  /* Status semantics (color + icon + label — never color alone) */
+  --status-green: oklch(0.476 0.141 142.5);       /* green-600 #16A34A */
+  --status-green-bg: oklch(0.962 0.044 145.6);    /* green-50  */
+  --status-green-fg: oklch(0.282 0.093 145.7);    /* green-900 */
+  --status-amber: oklch(0.643 0.171 70.08);       /* amber-600 #D97706 */
+  --status-amber-bg: oklch(0.986 0.046 81.29);    /* amber-50  */
+  --status-amber-fg: oklch(0.324 0.094 68.65);    /* amber-900 */
+  --status-red: oklch(0.576 0.211 27.32);         /* red-600   #DC2626 */
+  --status-red-bg: oklch(0.971 0.036 23.79);      /* red-50    */
+  --status-red-fg: oklch(0.305 0.121 27.11);      /* red-900   */
+
+  /* Charts — tier ramp (non-status, sequential) */
+  --chart-1: oklch(0.501 0.124 184.36);           /* teal-600  */
+  --chart-2: oklch(0.6   0.118 220.0);            /* sky-500   */
+  --chart-3: oklch(0.55  0.14  260.0);            /* indigo-500 */
+  --chart-4: oklch(0.65  0.13  300.0);            /* purple-400 */
+  --chart-5: oklch(0.7   0.1   320.0);            /* fuchsia-400 */
+
+  /* Radius */
+  --radius: 0.75rem;
+
+  /* Sidebar */
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.129 0.042 264.7);
+  --sidebar-primary: oklch(0.501 0.124 184.36);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.944 0.007 247.9);
+  --sidebar-accent-foreground: oklch(0.129 0.042 264.7);
+  --sidebar-border: oklch(0.882 0.011 254.0);
+  --sidebar-ring: oklch(0.501 0.124 184.36);
+
+  /* Font stacks */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-arabic: "IBM Plex Sans Arabic", "Noto Sans Arabic", ui-sans-serif, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
+/* ─── Wisal Design System — Dark theme (default: monitoring-wall/live-ops) ─── */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Surfaces */
+  --background: oklch(0.131 0.022 264.0);         /* near-black slate #0B0F14 */
+  --foreground: oklch(0.895 0.013 253.1);         /* slate-200 #E6EDF3 */
+  --card: oklch(0.165 0.022 263.0);              /* slate-900 #131A22 */
+  --card-foreground: oklch(0.895 0.013 253.1);
+  --popover: oklch(0.165 0.022 263.0);
+  --popover-foreground: oklch(0.895 0.013 253.1);
+
+  /* Brand / accent — teal-400 (brighter on dark) */
+  --primary: oklch(0.72  0.132 184.36);           /* teal-400  #2DD4BF */
+  --primary-foreground: oklch(0.131 0.022 264.0);
+
+  /* Secondary / muted */
+  --secondary: oklch(0.215 0.025 263.0);          /* slate-800 */
+  --secondary-foreground: oklch(0.895 0.013 253.1);
+  --muted: oklch(0.215 0.025 263.0);
+  --muted-foreground: oklch(0.575 0.027 255.0);   /* slate-400 #8B98A5 */
+  --accent: oklch(0.215 0.025 263.0);
+  --accent-foreground: oklch(0.895 0.013 253.1);
+
+  /* Borders / inputs */
+  --border: oklch(0.24  0.026 263.0);             /* slate-800 #1F2A35 */
+  --input: oklch(0.24  0.026 263.0 / 60%);
+  --ring: oklch(0.72  0.132 184.36);              /* teal-400 */
+  --destructive: oklch(0.643 0.211 27.32);
+
+  /* Status semantics (brighter on dark bg) */
+  --status-green: oklch(0.627 0.194 142.5);       /* green-500  #22C55E */
+  --status-green-bg: oklch(0.2   0.05  145.0);    /* dark green tint */
+  --status-green-fg: oklch(0.87  0.12  145.0);
+  --status-amber: oklch(0.726 0.187 70.08);       /* amber-400  #F59E0B */
+  --status-amber-bg: oklch(0.21  0.05  70.0);
+  --status-amber-fg: oklch(0.92  0.13  75.0);
+  --status-red: oklch(0.67  0.227 27.32);         /* red-500    #EF4444 */
+  --status-red-bg: oklch(0.22  0.07  27.0);
+  --status-red-fg: oklch(0.9   0.12  27.0);
+
+  /* Charts */
+  --chart-1: oklch(0.72  0.132 184.36);           /* teal-400  */
+  --chart-2: oklch(0.65  0.12  220.0);            /* sky-400   */
+  --chart-3: oklch(0.6   0.14  260.0);            /* indigo-400 */
+  --chart-4: oklch(0.7   0.13  300.0);            /* purple-400 */
+  --chart-5: oklch(0.75  0.1   320.0);            /* fuchsia-300 */
+
+  /* Sidebar */
+  --sidebar: oklch(0.165 0.022 263.0);
+  --sidebar-foreground: oklch(0.895 0.013 253.1);
+  --sidebar-primary: oklch(0.72  0.132 184.36);
+  --sidebar-primary-foreground: oklch(0.131 0.022 264.0);
+  --sidebar-accent: oklch(0.215 0.025 263.0);
+  --sidebar-accent-foreground: oklch(0.895 0.013 253.1);
+  --sidebar-border: oklch(0.24  0.026 263.0);
+  --sidebar-ring: oklch(0.72  0.132 184.36);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
     @apply font-sans;
   }
+  /* Arabic locale: swap to Arabic-optimised font stack */
+  html[dir="rtl"] {
+    font-family: var(--font-arabic);
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  /* Tabular numerics globally for metric displays */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Logical-props reminder: never use left/right in components — use ps/pe/ms/me/start/end */
+}
+
+@layer utilities {
+  /* Status badge helpers — used by StatusBadge component */
+  .status-green  { color: var(--status-green-fg); background: var(--status-green-bg); }
+  .status-amber  { color: var(--status-amber-fg); background: var(--status-amber-bg); }
+  .status-red    { color: var(--status-red-fg);   background: var(--status-red-bg);   }
 }

@@ -8,14 +8,14 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ## Phase 0 — Project Scaffold & Foundations
 
-- [ ] **P0-1** Init Next.js (App Router, TS, **no src**), Tailwind v4, ESLint.
-- [ ] **P0-2** Install + init shadcn/ui (`components.json`), add base primitives (button, card, dialog, table, badge, tabs, tooltip, dropdown-menu, select, input, sheet, scroll-area, separator, skeleton).
-- [ ] **P0-3** `next-themes` provider, dark default; CSS variable tokens for light/dark in `globals.css`.
-- [ ] **P0-4** i18n scaffold: `lib/i18n/` dictionaries (`en.ts`, `ar.ts`), `useDict()` helper, `dir` flip wired in root layout, locale in cookie/URL.
-- [ ] **P0-5** Prisma init, Postgres connection, `lib/prisma.ts` singleton, Zod-validated `lib/env.ts`.
-- [ ] **P0-6** **NextAuth (Auth.js)** setup: `auth.ts` config (Credentials provider, hashed pw against `User`), `app/api/auth/[...nextauth]`, `middleware.ts` route protection, role on session. `lib/auth.ts` = `auth()` + `requireRole()` RBAC helpers. Sign-in page `(auth)/signin`. Dev role switcher (seeded users per role).
+- [x] **P0-1** Init Next.js (App Router, TS, **no src**), Tailwind v4, ESLint.
+- [x] **P0-2** Install + init shadcn/ui (`components.json`), add base primitives (button, card, dialog, table, badge, tabs, tooltip, dropdown-menu, select, input, sheet, scroll-area, separator, skeleton).
+- [x] **P0-3** `next-themes` provider, dark default; CSS variable tokens for light/dark in `globals.css`.
+- [x] **P0-4** i18n scaffold: `lib/i18n/` dictionaries (`en.ts`, `ar.ts`), `useDict()` helper, `dir` flip wired in root layout, locale in cookie/URL.
+- [x] **P0-5** Prisma init, Postgres connection, `lib/prisma.ts` singleton, Zod-validated `lib/env.ts`.
+- [x] **P0-6** **NextAuth (Auth.js)** setup: `auth.ts` config (Credentials provider, hashed pw against `User`), `app/api/auth/[...nextauth]`, `middleware.ts` route protection, role on session. `lib/auth.ts` = `auth()` + `requireRole()` RBAC helpers. Sign-in page `(auth)/signin`. Dev role switcher (seeded users per role).
 
-**Exit:** app boots, theme + lang toggles work, empty DB connects, sign-in works + protects routes.
+**Exit:** ✅ app boots, theme + lang toggles work, empty DB connects, sign-in works + protects routes.
 
 ---
 

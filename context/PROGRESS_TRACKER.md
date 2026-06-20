@@ -4,7 +4,7 @@ Single source of truth for "what's done". The agent MUST update this after finis
 
 Status: `TODO` · `IN PROGRESS` · `DONE` · `BLOCKED`
 
-Last updated: 2026-06-21 — *docs updated (NextAuth, responsive, ui tooling, Module 06 + RFP gaps, Polish phase). No code yet.*
+Last updated: 2026-06-21 — *Phase 0 complete. Build clean, 0 TS errors.*
 
 ---
 
@@ -12,7 +12,7 @@ Last updated: 2026-06-21 — *docs updated (NextAuth, responsive, ui tooling, Mo
 
 | Phase | Title | Status | Notes |
 |---|---|---|---|
-| 0 | Scaffold & Foundations | TODO | |
+| 0 | Scaffold & Foundations | DONE | |
 | 1 | Data Model & Seed | TODO | |
 | 2 | App Shell | TODO | |
 | 3 | Module 01 Live Operations | TODO | default landing, vertical slice |
@@ -31,12 +31,12 @@ Last updated: 2026-06-21 — *docs updated (NextAuth, responsive, ui tooling, Mo
 ### Phase 0 — Scaffold
 | ID | Task | Status |
 |---|---|---|
-| P0-1 | Init Next.js (no src) + Tailwind + ESLint | TODO |
-| P0-2 | shadcn/ui init + base primitives | TODO |
-| P0-3 | next-themes + CSS var tokens (light/dark) | TODO |
-| P0-4 | i18n scaffold (en/ar) + dir flip | TODO |
-| P0-5 | Prisma + Postgres + env (zod) | TODO |
-| P0-6 | NextAuth setup + RBAC helpers + signin + dev role switcher | TODO |
+| P0-1 | Init Next.js (no src) + Tailwind + ESLint | DONE |
+| P0-2 | shadcn/ui init + base primitives | DONE |
+| P0-3 | next-themes + CSS var tokens (light/dark) | DONE |
+| P0-4 | i18n scaffold (en/ar) + dir flip | DONE |
+| P0-5 | Prisma + Postgres + env (zod) | DONE |
+| P0-6 | NextAuth setup + RBAC helpers + signin + dev role switcher | DONE |
 
 ### Phase 1 — Data
 | ID | Task | Status |
@@ -141,5 +141,6 @@ Last updated: 2026-06-21 — *docs updated (NextAuth, responsive, ui tooling, Mo
 ---
 
 ## Changelog (newest first)
+- **2026-06-21 (Phase 0 done)** — Next.js 16 + Tailwind v4 + shadcn canary (base-ui) + next-themes (dark default) + i18n en/ar + Prisma v7 (adapter-pg) + NextAuth beta (Credentials, session role, middleware protection, signin page, RBAC helpers). Build clean, 0 TS errors. Key discoveries: Prisma v7 uses prisma.config.ts for URL (not schema.prisma); shadcn canary uses @base-ui/react (render prop, not asChild); generated client at lib/generated/prisma/client.ts.
 - **2026-06-21 (update)** — User updates: (1) UI work must use `ui-ux-pro-max` skill + `21st.dev` MCP; (2) added **Polish phase 10**; (3) **fully responsive** rule (UI §5b) across all pages; (4) **real auth via NextAuth** replaces stub; (5) RFP gap-check → added **Module 06** + gap widgets (Live Agent Status, Knowledge Base, Ticket queue, Campaign Results, SLA Penalty, Integration/NMR, System Health, Beneficiary 360) + **§6b RFP coverage matrix** + 9 gap data models. Hardening renumbered to Phase 9.
 - **2026-06-21** — Read 3 requirement docs. Created context docs: ARCHITECTURE, BUILD_PLAN, UI_DESIGN_RULES, PROGRESS_TRACKER, MEMORY, AGENT. Decisions: theme toggle (dark default), bilingual+RTL, full Prisma+seed, all 5 modules full depth. No code yet.
