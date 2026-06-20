@@ -21,11 +21,11 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ## Phase 1 — Data Model & Seed
 
-- [ ] **P1-1** Write full `schema.prisma` (all entities in ARCHITECTURE §5).
-- [ ] **P1-2** Migrate.
-- [ ] **P1-3** `lib/kpi.ts` — KPI targets + `status()` derivation (single source of truth).
-- [ ] **P1-4** `prisma/seed.ts` — 20 real clusters (names/populations from RFP Appendix 1.i), users-per-role (for NextAuth login), agents, channel pulses, SLA snapshots, incidents, tier/drift/resolution/caregiver data, governance logs, workforce data, exec rollup data, **+ RFP-gap data**: beneficiaries+interactions, tickets, knowledge articles, agent live-status, campaigns, penalty records, integration/NMR status, system health. Realistic, mixed green/amber/red.
-- [ ] **P1-5** Run seed, verify counts.
+- [x] **P1-1** Write full `schema.prisma` (all entities in ARCHITECTURE §5).
+- [x] **P1-2** Migrate.
+- [x] **P1-3** `lib/kpi.ts` — KPI targets + `status()` derivation (single source of truth).
+- [x] **P1-4** `prisma/seed.ts` — 20 real clusters (names/populations from RFP Appendix 1.i), users-per-role (for NextAuth login), agents, channel pulses, SLA snapshots, incidents, tier/drift/resolution/caregiver data, governance logs, workforce data, exec rollup data, **+ RFP-gap data**: beneficiaries+interactions, tickets, knowledge articles, agent live-status, campaigns, penalty records, integration/NMR status, system health. Realistic, mixed green/amber/red.
+- [x] **P1-5** Run seed, verify counts.
 
 **Exit:** DB full of realistic data; `status()` unit-checked.
 

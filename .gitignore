@@ -19,9 +19,7 @@
 
 # production
 /build
-context/*
-requirement/*
-AGENTS.md
+
 
 # misc
 .DS_Store
@@ -44,3 +42,9 @@ yarn-error.log*
 next-env.d.ts
 
 /lib/generated/prisma
+
+# project docs / AI context (not for source control)
+/context/
+/requirement/
+AGENTS.md
+CLAUDE.md

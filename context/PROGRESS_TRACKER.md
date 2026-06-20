@@ -4,7 +4,7 @@ Single source of truth for "what's done". The agent MUST update this after finis
 
 Status: `TODO` · `IN PROGRESS` · `DONE` · `BLOCKED`
 
-Last updated: 2026-06-21 — *Phase 0 complete. Build clean, 0 TS errors.*
+Last updated: 2026-06-21 — *Phase 1 DONE. DB up (Docker postgres:16-alpine), migrated, seeded, verified.*
 
 ---
 
@@ -13,7 +13,7 @@ Last updated: 2026-06-21 — *Phase 0 complete. Build clean, 0 TS errors.*
 | Phase | Title | Status | Notes |
 |---|---|---|---|
 | 0 | Scaffold & Foundations | DONE | |
-| 1 | Data Model & Seed | TODO | |
+| 1 | Data Model & Seed | DONE | Docker postgres:16-alpine, 35 tables, verified |
 | 2 | App Shell | TODO | |
 | 3 | Module 01 Live Operations | TODO | default landing, vertical slice |
 | 4 | Module 02 Wisal Intelligence | TODO | RBAC + kill switch |
@@ -41,11 +41,11 @@ Last updated: 2026-06-21 — *Phase 0 complete. Build clean, 0 TS errors.*
 ### Phase 1 — Data
 | ID | Task | Status |
 |---|---|---|
-| P1-1 | Full schema.prisma | TODO |
-| P1-2 | Migrate | TODO |
-| P1-3 | lib/kpi.ts (targets + status derivation) | TODO |
-| P1-4 | seed.ts (20 clusters + users-per-role + all entities + RFP-gap data) | TODO |
-| P1-5 | Run seed + verify | TODO |
+| P1-1 | Full schema.prisma | DONE |
+| P1-2 | Migrate | DONE |
+| P1-3 | lib/kpi.ts (targets + status derivation) | DONE |
+| P1-4 | seed.ts (20 clusters + users-per-role + all entities + RFP-gap data) | DONE |
+| P1-5 | Run seed + verify | DONE |
 
 ### Phase 2 — Shell
 | ID | Task | Status |
@@ -141,6 +141,7 @@ Last updated: 2026-06-21 — *Phase 0 complete. Build clean, 0 TS errors.*
 ---
 
 ## Changelog (newest first)
+- **2026-06-21 (Phase 1 partial)** — P1-1: full schema.prisma (all entities from ARCHITECTURE §5 + RFP-gap models, 40+ enums, polymorphic AuditLog via plain entity/entityId strings). P1-3: lib/kpi.ts (all 10 KPIs, status() fn, STATUS_CLASSES). P1-4: seed.ts (20 clusters, 5 roles, ~80 agents, 120 SLA snapshots, all entity types seeded with realistic mixed green/amber/red). tsx added as dev dep. Prisma client generated. 0 TS errors. P1-2/P1-5 blocked — Postgres not reachable at localhost:5432.
 - **2026-06-21 (Phase 0 done)** — Next.js 16 + Tailwind v4 + shadcn canary (base-ui) + next-themes (dark default) + i18n en/ar + Prisma v7 (adapter-pg) + NextAuth beta (Credentials, session role, middleware protection, signin page, RBAC helpers). Build clean, 0 TS errors. Key discoveries: Prisma v7 uses prisma.config.ts for URL (not schema.prisma); shadcn canary uses @base-ui/react (render prop, not asChild); generated client at lib/generated/prisma/client.ts.
 - **2026-06-21 (update)** — User updates: (1) UI work must use `ui-ux-pro-max` skill + `21st.dev` MCP; (2) added **Polish phase 10**; (3) **fully responsive** rule (UI §5b) across all pages; (4) **real auth via NextAuth** replaces stub; (5) RFP gap-check → added **Module 06** + gap widgets (Live Agent Status, Knowledge Base, Ticket queue, Campaign Results, SLA Penalty, Integration/NMR, System Health, Beneficiary 360) + **§6b RFP coverage matrix** + 9 gap data models. Hardening renumbered to Phase 9.
 - **2026-06-21** — Read 3 requirement docs. Created context docs: ARCHITECTURE, BUILD_PLAN, UI_DESIGN_RULES, PROGRESS_TRACKER, MEMORY, AGENT. Decisions: theme toggle (dark default), bilingual+RTL, full Prisma+seed, all 5 modules full depth. No code yet.

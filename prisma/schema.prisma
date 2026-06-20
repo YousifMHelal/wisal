@@ -1,6 +1,4 @@
-// Wisal Command Center — Prisma Schema
-// Full schema built in Phase 1 (P1-1). This stub allows the client to generate
-// so TypeScript can resolve @/lib/generated/prisma during Phase 0.
+// Wisal Command Center — Full Prisma Schema (Phase 1 P1-1)
 
 generator client {
   provider = "prisma-client"
@@ -11,7 +9,7 @@ datasource db {
   provider = "postgresql"
 }
 
-// ── Users & Auth ─────────────────────────────────────────────────────────────
+// ── Enums ────────────────────────────────────────────────────────────────────
 
 enum UserRole {
   OPERATOR
@@ -20,6 +18,159 @@ enum UserRole {
   EXECUTIVE
   PLATFORM_ADMIN
 }
+
+enum ChannelType {
+  VOICE
+  WHATSAPP
+  LIVE_CHAT
+  EMAIL
+  SIGN_LANGUAGE_VIDEO
+  SOCIAL
+}
+
+enum IncidentSeverity {
+  CRITICAL
+  WARNING
+}
+
+enum CaregiverAction {
+  COMPLETED_WITH_CONSENT
+  FAILCLOSED_HANDOFF
+}
+
+enum ProxyConfirmed {
+  YES
+  NO
+  AMBIGUOUS
+}
+
+enum KillSwitchState {
+  ARMED
+  ACTIVE
+}
+
+enum KillSwitchScope {
+  ALL
+  CHANNEL
+  CLUSTER
+}
+
+enum ApprovalStatus {
+  APPROVED
+  PENDING
+  REJECTED
+}
+
+enum ComplianceFramework {
+  NCA
+  PDPL
+  DGA
+  NDMO
+}
+
+enum ComplianceStatus {
+  COMPLIANT
+  PARTIAL
+  NON_COMPLIANT
+}
+
+enum ShiftSwapStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum KpiMetric {
+  SERVICE_LEVEL
+  ABANDONED_CALLS
+  AHT
+  ASA
+  FCR
+  CSAT
+  AI_COMPLETION_RATE
+}
+
+enum AgentState {
+  AVAILABLE
+  ON_CALL
+  WRAP
+  AFTER_CALL
+  BREAK
+  OFFLINE
+}
+
+enum TicketType {
+  COMPLAINT
+  REQUEST
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  ESCALATED
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+  UNPUBLISHED
+}
+
+enum CampaignType {
+  REMINDER
+  SURVEY
+  AWARENESS
+  RESCHEDULE
+}
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  PAUSED
+}
+
+enum IntegrationSystem {
+  NAFATH
+  MAWID
+  SEHHATY
+  HR
+  NMR
+}
+
+enum IntegrationState {
+  UP
+  DEGRADED
+  DOWN
+}
+
+enum IntegrationPattern {
+  SYNC
+  EVENT
+}
+
+enum ConsentStatus {
+  GIVEN
+  WITHDRAWN
+  PENDING
+}
+
+enum BeneficiaryTier {
+  T1
+  T2
+  T3
+}
+
+// ── Core Reference ───────────────────────────────────────────────────────────
 
 model User {
   id           String   @id @default(cuid())
@@ -32,5 +183,570 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  cluster              Cluster?            @relation(fields: [clusterId], references: [id])
+  auditLogs            AuditLog[]
+  shiftSwapApprovals   ShiftSwapRequest[]  @relation("SwapApprover")
+  assignedTickets      Ticket[]            @relation("AssignedAgent")
+  articlePublishRights KnowledgeArticle[]
+
   @@map("users")
+}
+
+model Cluster {
+  id                String  @id @default(cuid())
+  name              String
+  nameAr            String
+  region            String
+  catchmentPopulation Int
+  agentEstimate     Int
+  lat               Float
+  lng               Float
+  svgRegionId       String  @unique
+
+  createdAt DateTime @default(now())
+
+  users            User[]
+  agents           Agent[]
+  slaSnapshots     SlaSnapshot[]
+  channelPulses    ChannelPulse[]
+  incidents        Incident[]
+  tierSnapshots    TierSnapshot[]
+  caregiverCases   CaregiverCase[]
+  resolutionSplits ResolutionSplit[]
+  driftSnapshots   DriftSnapshot[]
+  shiftCoverages   ShiftCoverage[]
+  qaItems          QaSampleItem[]
+  clusterRankings  ClusterRanking[]
+  savingsPoints    SavingsPoint[]
+  beneficiaries    Beneficiary[]
+  tickets          Ticket[]
+  campaigns        Campaign[]
+  penaltyRecords   PenaltyRecord[]
+  agentStatuses    AgentStatus[]
+  interactions     Interaction[]
+  medicalApprovals MedicalContentApproval[]
+
+  @@map("clusters")
+}
+
+model Channel {
+  id   String      @id @default(cuid())
+  type ChannelType @unique
+
+  channelPulses    ChannelPulse[]
+  incidents        Incident[]
+  resolutionSplits ResolutionSplit[]
+  interactions     Interaction[]
+
+  @@map("channels")
+}
+
+model Agent {
+  id           String  @id @default(cuid())
+  name         String
+  nameAr       String
+  team         String
+  clusterId    String
+  aht          Float   // seconds
+  fcr          Float   // 0-1
+  qaScore      Float   // 0-100
+  csat         Float   // 0-100
+  absenteeism  Float   // 0-1
+
+  createdAt DateTime @default(now())
+
+  cluster         Cluster          @relation(fields: [clusterId], references: [id])
+  agentStatus     AgentStatus?
+  trainingRecords TrainingRecord[]
+  shiftSwaps      ShiftSwapRequest[]
+  assignedTickets Ticket[]         @relation("TicketAgent")
+  interactions    Interaction[]
+
+  @@map("agents")
+}
+
+// ── Live Operations ──────────────────────────────────────────────────────────
+
+model SlaSnapshot {
+  id               String  @id @default(cuid())
+  clusterId        String
+  serviceLevelPct  Float
+  callVolume       Int
+  abandonedPct     Float
+  aht              Float   // seconds
+  fcr              Float   // 0-1
+  asa              Float   // seconds
+  timestamp        DateTime @default(now())
+
+  cluster Cluster @relation(fields: [clusterId], references: [id])
+
+  @@index([clusterId, timestamp])
+  @@map("sla_snapshots")
+}
+
+model ChannelPulse {
+  id          String      @id @default(cuid())
+  channelId   String
+  clusterId   String?
+  volume      Int
+  avgWaitSec  Float
+  timestamp   DateTime    @default(now())
+
+  channel  Channel  @relation(fields: [channelId], references: [id])
+  cluster  Cluster? @relation(fields: [clusterId], references: [id])
+
+  @@index([channelId, timestamp])
+  @@map("channel_pulses")
+}
+
+model Incident {
+  id             String           @id @default(cuid())
+  severity       IncidentSeverity
+  type           String
+  description    String
+  clusterId      String?
+  channelId      String?
+  triggeredAt    DateTime         @default(now())
+  acknowledgedAt DateTime?
+  metricTrend    Json             @default("[]")
+
+  cluster  Cluster?  @relation(fields: [clusterId], references: [id])
+  channel  Channel?  @relation(fields: [channelId], references: [id])
+
+  @@index([severity, triggeredAt])
+  @@map("incidents")
+}
+
+model AgentStatus {
+  id        String     @id @default(cuid())
+  agentId   String     @unique
+  clusterId String
+  state     AgentState
+  since     DateTime   @default(now())
+
+  agent   Agent   @relation(fields: [agentId], references: [id])
+  cluster Cluster @relation(fields: [clusterId], references: [id])
+
+  @@index([clusterId, state])
+  @@map("agent_statuses")
+}
+
+// ── Wisal Intelligence ───────────────────────────────────────────────────────
+
+model TierSnapshot {
+  id                   String   @id @default(cuid())
+  clusterId            String?
+  tier1Pct             Float
+  tier2Pct             Float
+  tier3Pct             Float
+  tier1AutocorrectRate Float
+  timestamp            DateTime @default(now())
+
+  cluster Cluster? @relation(fields: [clusterId], references: [id])
+
+  @@index([clusterId, timestamp])
+  @@map("tier_snapshots")
+}
+
+model CaregiverCase {
+  id               String         @id @default(cuid())
+  caseId           String         @unique
+  clusterId        String
+  proxyConfirmed   ProxyConfirmed
+  action           CaregiverAction
+  auditTrail       Json           @default("[]")
+  timestamp        DateTime       @default(now())
+
+  cluster           Cluster            @relation(fields: [clusterId], references: [id])
+  consentDisclosure ConsentDisclosure?
+
+  @@index([clusterId, timestamp])
+  @@map("caregiver_cases")
+}
+
+model ResolutionSplit {
+  id           String  @id @default(cuid())
+  clusterId    String?
+  channelId    String?
+  aiFullPct    Float
+  aiPartialPct Float
+  humanPct     Float
+  volume       Int
+  timestamp    DateTime @default(now())
+
+  cluster Cluster? @relation(fields: [clusterId], references: [id])
+  channel Channel? @relation(fields: [channelId], references: [id])
+
+  @@index([clusterId, timestamp])
+  @@map("resolution_splits")
+}
+
+model DriftSnapshot {
+  id               String   @id @default(cuid())
+  clusterId        String
+  dialect          String
+  date             DateTime
+  nluConfidence    Float
+  intentConfidence Float
+  flagged          Boolean  @default(false)
+  message          String?
+
+  cluster Cluster @relation(fields: [clusterId], references: [id])
+
+  @@index([clusterId, date])
+  @@map("drift_snapshots")
+}
+
+model KillSwitch {
+  id              String          @id @default(cuid())
+  state           KillSwitchState @default(ARMED)
+  lastTriggeredAt DateTime?
+  scope           KillSwitchScope @default(ALL)
+  scopeRef        String?
+  updatedAt       DateTime        @updatedAt
+
+  @@map("kill_switch")
+}
+
+// ── Governance & Compliance ──────────────────────────────────────────────────
+
+model MedicalContentApproval {
+  id          String         @id @default(cuid())
+  caseId      String
+  clusterId   String?
+  content     String
+  status      ApprovalStatus @default(PENDING)
+  approvedBy  String?
+  timestamp   DateTime       @default(now())
+
+  cluster Cluster? @relation(fields: [clusterId], references: [id])
+
+  @@index([status, timestamp])
+  @@map("medical_content_approvals")
+}
+
+model ConsentDisclosure {
+  id               String  @id @default(cuid())
+  caseId           String
+  caregiverCaseId  String  @unique
+  consentOnFile    Boolean
+  timestamp        DateTime @default(now())
+
+  caregiverCase CaregiverCase @relation(fields: [caregiverCaseId], references: [id])
+
+  @@index([timestamp])
+  @@map("consent_disclosures")
+}
+
+model ForbiddenIntentEvent {
+  id            String   @id @default(cuid())
+  caseId        String
+  pattern       String
+  wisalResponse String
+  timestamp     DateTime @default(now())
+
+  @@index([timestamp])
+  @@map("forbidden_intent_events")
+}
+
+model ComplianceScore {
+  id          String              @id @default(cuid())
+  framework   ComplianceFramework
+  status      ComplianceStatus
+  score       Float               // 0-100
+  refreshedAt DateTime            @default(now())
+  evidenceRefs Json               @default("[]")
+
+  @@unique([framework])
+  @@map("compliance_scores")
+}
+
+model KnowledgeArticle {
+  id          String        @id @default(cuid())
+  titleEn     String
+  titleAr     String
+  bodyEn      String
+  bodyAr      String
+  version     Int           @default(1)
+  status      ArticleStatus @default(DRAFT)
+  publishAt   DateTime?
+  publishedBy String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  publisher User? @relation(fields: [publishedBy], references: [id])
+
+  @@index([status])
+  @@map("knowledge_articles")
+}
+
+// ── Workforce & Quality ───────────────────────────────────────────────────────
+
+model ShiftCoverage {
+  id              String   @id @default(cuid())
+  clusterId       String
+  hour            Int      // 0-23
+  date            DateTime
+  forecastDemand  Int
+  staffed         Int
+
+  cluster Cluster @relation(fields: [clusterId], references: [id])
+
+  @@unique([clusterId, date, hour])
+  @@index([clusterId, date])
+  @@map("shift_coverages")
+}
+
+model ShiftSwapRequest {
+  id         String          @id @default(cuid())
+  agentId    String
+  fromShift  DateTime
+  toShift    DateTime
+  status     ShiftSwapStatus @default(PENDING)
+  approvedBy String?
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  agent    Agent @relation(fields: [agentId], references: [id])
+  approver User? @relation("SwapApprover", fields: [approvedBy], references: [id])
+
+  @@map("shift_swap_requests")
+}
+
+model QaSampleItem {
+  id             String   @id @default(cuid())
+  interactionId  String
+  clusterId      String
+  sentimentScore Float    // -1 to 1
+  botConfidence  Float    // 0-1
+  priority       Int      // higher = more urgent
+  reviewed       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  cluster Cluster @relation(fields: [clusterId], references: [id])
+
+  @@index([reviewed, priority])
+  @@map("qa_sample_items")
+}
+
+model TrainingRecord {
+  id            String   @id @default(cuid())
+  agentId       String
+  module        String
+  completedAt   DateTime @default(now())
+  qaScoreBefore Float
+  qaScoreAfter  Float
+
+  agent Agent @relation(fields: [agentId], references: [id])
+
+  @@index([agentId])
+  @@map("training_records")
+}
+
+// ── Executive Rollup ─────────────────────────────────────────────────────────
+
+model KpiScorecard {
+  id          String     @id @default(cuid())
+  metric      KpiMetric  @unique
+  thisWeek    Float
+  target      Float
+  lastWeek    Float
+  ownerModule String
+  updatedAt   DateTime   @updatedAt
+
+  @@map("kpi_scorecards")
+}
+
+model ClusterRanking {
+  id             String   @id @default(cuid())
+  clusterId      String
+  compositeScore Float
+  perKpi         Json     @default("{}")
+  period         DateTime
+
+  cluster Cluster @relation(fields: [clusterId], references: [id])
+
+  @@unique([clusterId, period])
+  @@index([period])
+  @@map("cluster_rankings")
+}
+
+model SavingsPoint {
+  id                String   @id @default(cuid())
+  clusterId         String?
+  date              DateTime
+  agentHoursSaved   Float
+  aiResolvedVolume  Int
+  avgHandleTimeSaved Float
+
+  cluster Cluster? @relation(fields: [clusterId], references: [id])
+
+  @@index([date])
+  @@map("savings_points")
+}
+
+model BeneficiaryVoiceTheme {
+  id           String   @id @default(cuid())
+  theme        String
+  themeAr      String
+  plainSummary String
+  plainSummaryAr String
+  sentiment    Float    // -1 to 1
+  weekTrend    Json     @default("[]")
+  examples     Json     @default("[]")
+  updatedAt    DateTime @updatedAt
+
+  @@map("beneficiary_voice_themes")
+}
+
+// ── RFP-Gap Entities ─────────────────────────────────────────────────────────
+
+model Beneficiary {
+  id            String         @id @default(cuid())
+  name          String
+  nameAr        String
+  nationalId    String         @unique
+  dateOfBirth   DateTime
+  gender        String
+  clusterId     String
+  consentStatus ConsentStatus  @default(PENDING)
+  tier          BeneficiaryTier @default(T1)
+  phone         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  cluster      Cluster       @relation(fields: [clusterId], references: [id])
+  interactions Interaction[]
+  tickets      Ticket[]
+
+  @@index([clusterId])
+  @@index([nationalId])
+  @@map("beneficiaries")
+}
+
+model Interaction {
+  id          String      @id @default(cuid())
+  beneficiaryId String
+  channelId   String
+  clusterId   String
+  agentId     String?
+  startedAt   DateTime    @default(now())
+  durationSec Int
+  intent      String
+  sentiment   Float       // -1 to 1
+  resolution  String
+
+  beneficiary Beneficiary @relation(fields: [beneficiaryId], references: [id])
+  channel     Channel     @relation(fields: [channelId], references: [id])
+  cluster     Cluster     @relation(fields: [clusterId], references: [id])
+  agent       Agent?      @relation(fields: [agentId], references: [id])
+
+  @@index([beneficiaryId, startedAt])
+  @@index([clusterId, startedAt])
+  @@map("interactions")
+}
+
+model Ticket {
+  id              String         @id @default(cuid())
+  beneficiaryId   String
+  clusterId       String
+  type            TicketType
+  status          TicketStatus   @default(OPEN)
+  priority        TicketPriority @default(MEDIUM)
+  description     String
+  slaDueAt        DateTime
+  escalationPath  String?
+  assignedAgentId String?
+  assignedUserId  String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  beneficiary   Beneficiary @relation(fields: [beneficiaryId], references: [id])
+  cluster       Cluster     @relation(fields: [clusterId], references: [id])
+  assignedAgent Agent?      @relation("TicketAgent", fields: [assignedAgentId], references: [id])
+  assignedUser  User?       @relation("AssignedAgent", fields: [assignedUserId], references: [id])
+
+  @@index([status, priority])
+  @@index([clusterId, status])
+  @@map("tickets")
+}
+
+model Campaign {
+  id             String         @id @default(cuid())
+  name           String
+  nameAr         String
+  type           CampaignType
+  clusterId      String?
+  status         CampaignStatus @default(DRAFT)
+  sent           Int            @default(0)
+  delivered      Int            @default(0)
+  responded      Int            @default(0)
+  outcomeMetrics Json           @default("{}")
+  startedAt      DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime       @default(now())
+
+  cluster Cluster? @relation(fields: [clusterId], references: [id])
+
+  @@index([type, status])
+  @@map("campaigns")
+}
+
+model PenaltyRecord {
+  id                  String   @id @default(cuid())
+  clusterId           String
+  period              DateTime
+  kpi                 String
+  failurePct          Float
+  permissibleTolerance Float
+  breached            Boolean
+  penaltyAmount       Float
+  basis               String
+  createdAt           DateTime @default(now())
+
+  cluster Cluster @relation(fields: [clusterId], references: [id])
+
+  @@index([clusterId, period])
+  @@map("penalty_records")
+}
+
+model IntegrationStatus {
+  id          String             @id @default(cuid())
+  system      IntegrationSystem  @unique
+  state       IntegrationState   @default(UP)
+  lastSyncAt  DateTime?
+  latencyMs   Int?
+  pattern     IntegrationPattern @default(SYNC)
+  updatedAt   DateTime           @updatedAt
+
+  @@map("integration_statuses")
+}
+
+model SystemHealth {
+  id              String   @id @default(cuid())
+  availabilityPct Float    // target 99.9999%
+  dr              Json     @default("{}")  // RTO/RPO per channel
+  lastDrTestAt    DateTime?
+  region          String   @default("KSA")
+  updatedAt       DateTime @updatedAt
+
+  @@map("system_health")
+}
+
+// ── Cross-Cutting ────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actor     String
+  action    String
+  entity    String
+  entityId  String
+  meta      Json     @default("{}")
+  timestamp DateTime @default(now())
+
+  actorUser User? @relation(fields: [actor], references: [id])
+
+  @@index([entity, entityId])
+  @@index([actor, timestamp])
+  @@map("audit_logs")
 }

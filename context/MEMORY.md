@@ -50,6 +50,8 @@ SL 80%/20s (amber 78) · Abandoned ≤5% (amber ≤8) · AHT 5min · ASA ≤20s 
 | i18n Dict type | Don't use `as const` on en.ts — breaks AR translation assignability. Plain object, `typeof en` gives the type. |
 
 ## Change Log
+- **2026-06-21 (Phase 1 DONE)** — DB: `docker run -d --name wisal-postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=password -e POSTGRES_DB=wisal -p 5432:5432 postgres:16-alpine`. Prisma seed config: `migrations.seed` in `prisma.config.ts` (not root-level, not package.json in v7). 35 tables, largest: shift_coverages 6720, sla_snapshots 2400, resolution_splits/drift_snapshots/tier_snapshots 600 each.
+- **2026-06-21 (Phase 1 partial)** — Schema done (P1-1), kpi.ts done (P1-3), seed.ts done (P1-4). AuditLog is polymorphic via plain `entity`/`entityId` strings — no FK relations (avoids duplicate constraint collision). Prisma `seed` config goes in `package.json` `"prisma"` key, not `prisma.config.ts` (no `seed` field in `PrismaConfig` type in v7). P1-2/P1-5 blocked on Postgres.
 - **2026-06-21 (Phase 0 done)** — Build clean. All 6 P0 tasks done. See discoveries table above.
 - **2026-06-21 (update)** — Applied 5 user updates + RFP gap-check across ARCHITECTURE/BUILD_PLAN/UI_RULES/AGENT/TRACKER (NextAuth, ui tooling, responsive, Polish phase, Module 06 + gaps). No code yet.
 - **2026-06-21** — Initialized all context docs + AGENT.md. No code yet. Next action: Phase 0 scaffold.
