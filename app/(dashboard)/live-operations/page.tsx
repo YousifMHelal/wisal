@@ -40,11 +40,11 @@ export default async function LiveOperationsPage({ searchParams }: PageProps) {
         </div>
 
         {/* Row 3: SLA Heatmap (full width) */}
-        <SlaHeatmapWidget filters={filters} />
+        {/* <SlaHeatmapWidget filters={filters} /> */}
 
         {/* Row 4: Live Agent Status Board — full width */}
         <AgentStatusBoardWidget filters={filters} />
       </div>
     </>
-  )
+  );
 }
