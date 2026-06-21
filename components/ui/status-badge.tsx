@@ -4,19 +4,25 @@ import type { KpiStatus } from "@/lib/kpi"
 const ICON: Record<KpiStatus, React.ReactNode> = {
   green: <span aria-hidden="true">●</span>,
   amber: <span aria-hidden="true">▲</span>,
-  red: <span aria-hidden="true">■</span>,
+  red:   <span aria-hidden="true">■</span>,
 }
 
-const LABEL: Record<KpiStatus, string> = {
-  green: "On target",
-  amber: "At tolerance",
-  red: "Breaching",
+const LABEL: Record<KpiStatus, { en: string; ar: string }> = {
+  green: { en: "On target",    ar: "في الهدف" },
+  amber: { en: "At tolerance", ar: "عند الحد" },
+  red:   { en: "Breaching",    ar: "خرق" },
 }
 
-const CLASS: Record<KpiStatus, string> = {
+const DOT_CLASS: Record<KpiStatus, string> = {
+  green: "bg-status-green",
+  amber: "bg-status-amber",
+  red:   "bg-status-red",
+}
+
+const BADGE_CLASS: Record<KpiStatus, string> = {
   green: "status-green",
   amber: "status-amber",
-  red: "status-red",
+  red:   "status-red",
 }
 
 interface StatusBadgeProps {
@@ -27,17 +33,14 @@ interface StatusBadgeProps {
 }
 
 export function StatusBadge({ status, label, dot = false, className }: StatusBadgeProps) {
-  const text = label ?? LABEL[status]
+  const enText = label ?? LABEL[status].en
+  const arText = LABEL[status].ar
 
   if (dot) {
     return (
       <span
-        className={cn("inline-flex h-2.5 w-2.5 rounded-full shrink-0", {
-          "bg-[var(--status-green)]": status === "green",
-          "bg-[var(--status-amber)]": status === "amber",
-          "bg-[var(--status-red)]": status === "red",
-        }, className)}
-        aria-label={text}
+        className={cn("inline-flex size-2.5 rounded-full shrink-0", DOT_CLASS[status], className)}
+        aria-label={enText}
         role="img"
       />
     )
@@ -47,13 +50,14 @@ export function StatusBadge({ status, label, dot = false, className }: StatusBad
     <span
       className={cn(
         "inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium tabular",
-        CLASS[status],
+        BADGE_CLASS[status],
         className
       )}
       role="status"
     >
-      <span className="text-[10px] leading-none">{ICON[status]}</span>
-      <span>{text}</span>
+      <span className="text-[10px] leading-none" aria-hidden="true">{ICON[status]}</span>
+      <span lang="en" className="[html[dir=rtl]_&]:hidden">{enText}</span>
+      <span lang="ar" className="hidden [html[dir=rtl]_&]:inline">{arText}</span>
     </span>
   )
 }

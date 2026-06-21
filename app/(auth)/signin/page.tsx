@@ -15,21 +15,25 @@ export default async function SignInPage({
   const { callbackUrl } = await searchParams;
 
   return (
-    <div className="w-full max-w-sm px-4">
+    <div className="w-full">
       {/* Logo / wordmark */}
       <div className="mb-8 text-center">
-        <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground text-xl font-bold mb-4">
+        <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground text-2xl font-bold mb-5 shadow-lg shadow-primary/25">
           W
         </div>
-        <h1 className="text-2xl font-semibold tracking-tight">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           Wisal Command Center
         </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Sign in to your account
+        <p className="text-sm text-muted-foreground mt-1.5">
+          Sign in to continue
         </p>
       </div>
 
       <SignInForm callbackUrl={callbackUrl ?? "/live-operations"} />
+
+      <p className="mt-6 text-center text-xs text-muted-foreground/60">
+        HHC Operations Dashboard · Confidential
+      </p>
     </div>
   );
 }

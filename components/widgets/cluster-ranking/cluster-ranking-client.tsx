@@ -135,9 +135,9 @@ export function ClusterRankingClient({ rows }: Props) {
                     {st ? (
                       <span className={cn(
                         "text-xs",
-                        st === "green" && "text-[var(--status-green-fg)]",
-                        st === "amber" && "text-[var(--status-amber-fg)]",
-                        st === "red" && "text-[var(--status-red-fg)]",
+                        st === "green" && "text-status-green-fg",
+                        st === "amber" && "text-status-amber-fg",
+                        st === "red"   && "text-status-red-fg",
                       )}>
                         {formatKpi(col.kpiKey, val)}
                       </span>

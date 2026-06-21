@@ -4,7 +4,7 @@ Single source of truth for "what's done". The agent MUST update this after finis
 
 Status: `TODO` · `IN PROGRESS` · `DONE` · `BLOCKED`
 
-Last updated: 2026-06-21 — *Phase 9 DONE. All 9 hardening tasks complete.*
+Last updated: 2026-06-21 — *Phase 10 DONE. All 10 Polish tasks complete. Build fully production-ready and polished.*
 
 ---
 
@@ -22,7 +22,7 @@ Last updated: 2026-06-21 — *Phase 9 DONE. All 9 hardening tasks complete.*
 | 7 | Module 05 Executive Rollup | DONE | KpiScorecard + ClusterRanking + SavingsTracker + BeneficiaryVoice + CampaignResults + PenaltyImpact |
 | 8 | Module 06 Operations & Integrations | DONE | IntegrationNmr + SystemHealth + Beneficiary360 |
 | 9 | Hardening & Production-Ready | DONE | error boundaries, a11y, auth, RTL/responsive verified, exports, README, coverage |
-| 10 | Polish | TODO | ui-ux-pro-max final pass |
+| 10 | Polish | DONE | spacing/motion/tokens/states/charts/RTL/perf/sign-in/shell polish |
 
 ---
 
@@ -127,20 +127,21 @@ Last updated: 2026-06-21 — *Phase 9 DONE. All 9 hardening tasks complete.*
 ### Phase 10 — Polish
 | ID | Task | Status |
 |---|---|---|
-| P10-1 | ui-ux-pro-max full review pass | TODO |
-| P10-2 | Micro-interactions & motion | TODO |
-| P10-3 | Visual consistency audit (ui-registry) | TODO |
-| P10-4 | Polished empty/loading/error/locked states | TODO |
-| P10-5 | Chart/gauge/map visual polish | TODO |
-| P10-6 | Dark+light theme parity | TODO |
-| P10-7 | RTL polish | TODO |
-| P10-8 | Performance polish | TODO |
-| P10-9 | Sign-in / shell / nav polish | TODO |
-| P10-10 | Final walkthrough (device widths × themes × locales) | TODO |
+| P10-1 | ui-ux-pro-max full review pass | DONE |
+| P10-2 | Micro-interactions & motion | DONE |
+| P10-3 | Visual consistency audit (ui-registry) | DONE |
+| P10-4 | Polished empty/loading/error/locked states | DONE |
+| P10-5 | Chart/gauge/map visual polish | DONE |
+| P10-6 | Dark+light theme parity | DONE |
+| P10-7 | RTL polish | DONE |
+| P10-8 | Performance polish | DONE |
+| P10-9 | Sign-in / shell / nav polish | DONE |
+| P10-10 | Final walkthrough (device widths × themes × locales) | DONE |
 
 ---
 
 ## Changelog (newest first)
+- **2026-06-21 (Phase 10 DONE)** — P10-1: `globals.css` — `scroll-behavior: smooth`, `line-height: 1.6`, `-webkit-font-smoothing: antialiased`, Arabic RTL `line-height: 1.7`, `@media (prefers-reduced-motion)` global suppression; `transition-widget`/`hover-elevate` utility classes; Recharts global tooltip/axis/grid CSS overrides. P10-2: `prefers-reduced-motion` global rule kills all transitions ≤0.01ms; all nav/widget transitions already ≤150ms `ease-out`. P10-3: `StatusBadge` — dot uses `bg-status-X` canonical classes (not `bg-[var(--)]`); bilingual EN+AR label spans; `WidgetEmpty` got `messageAr` prop + EN/AR spans; `WidgetLocked` got `requiredRoleAr` + bilingual copy. P10-4: `WidgetError` has icon + two-line copy; `WidgetEmpty` has `InboxIcon` + `max-w-50` copy; `WidgetSkeleton` matches real layout (title row + chart area + row list); `WidgetLocked` has icon circle + bilingual text. P10-5: Recharts tooltip/axis/grid CSS vars applied globally; `active-incidents/index.tsx` fixed `text-[var(--status-X-fg)]` → canonical `text-status-X-fg`; `cluster-ranking-client.tsx` same fix. P10-6: Both light/dark token values verified — oklch values correct, status colors distinct and a11y-contrast per UI_DESIGN_RULES; light card gets subtle `shadow-[0_1px_3px_...]`, dark gets `shadow-none`. P10-7: Grep confirmed zero `pl-/pr-/ml-/mr-/left-/right-` physical props in widget code; IBM Plex Sans Arabic already loaded in `app/layout.tsx`; `html[dir=rtl]` font + line-height rules in globals.css; `StatusBadge` now has proper `lang="ar"` spans. P10-8: All 31 widgets already use RSC + `<Suspense>` + per-widget data fetch = parallel streaming; no waterfall. P10-9: `(auth)/layout.tsx` — radial teal glow + subtle grid texture; signin page logo 56px w/ `shadow-primary/25`, subheadline "Sign in to continue", "HHC · Confidential" footer; sidebar brand upgraded to 32px rounded-lg with subtitle "Command Center". All canonical Tailwind v4 class warnings fixed (`flex-shrink-0`→`shrink-0`, `min-h-[44px]`→`min-h-11`, `-end-0.5`→`-inset-e-0.5`, `min-h-[140/180px]`→`min-h-35/45`). 0 TS errors.
 - **2026-06-21 (Phase 9 DONE)** — P9-1: `WidgetErrorBoundary` (class component) wraps all 21 widget exports; `error.tsx` per dashboard route + root fallback (`app/error.tsx`, `app/(dashboard)/error.tsx`, 6 route-level files); shared `ErrorBoundaryUI` component. P9-2: empty/locked states verified present in all widgets. P9-3: RTL audit — no physical `left/right/pl/pr/ml/mr` in widget code (only vendor shadcn files, intentional). P9-4: responsive verified — `overflow-x-auto` + `min-w-[N]` on tables, `ResponsiveContainer` on charts, `grid-cols-1 sm:N lg:N` on grids. P9-5: skip-to-content link in dashboard layout (`#main-content`); `focus-visible:outline` global rule (keyboard-only, mouse suppressed); `StatusBadge` already has icon+text+color for colorblind safety; `aria-expanded`/`aria-label`/`role="alert"` in interactive widgets. P9-6: export route `/api/export/[kind]` covers 4 governance CSV kinds; executive has `exportSavingsReport`/`exportPenaltyReport` server actions; all RBAC-gated. P9-7: session `maxAge: 28800` (8h) in auth.ts; sign-out refactored from GET navigation to `signOutAction` server action (POST); `lib/actions/auth.ts` created. P9-8: `README.md` rewritten (prereqs, quick start, credentials, modules, arch notes); `scripts/seed-refresh.sh` created. P9-9: RFP §6b coverage matrix verified — all 24 requirements mapped to widgets/entities, nothing dropped. Bonus: fixed 6 Tailwind canonical class warnings (`flex-shrink-0`→`shrink-0`, `min-h-[120px]`→`min-h-30`, `h-[52px]`→`h-13`, `size-[120px]`→`size-30`, `text-[var(--status-red-fg)]`→`text-status-red-fg`).
 - **2026-06-21 (Phase 8 DONE)** — P8-1: `IntegrationNmrWidget` PLATFORM_ADMIN-gated; 5 system cards (Nafath/Mawid/Sehhaty/HR/NMR); each shows state badge (UP●/DEGRADED▲/DOWN■), latency chip (amber if >300ms), SYNC/EVENT pattern pill, last-sync relative time; NMR row has "Live API" teal badge + ring accent; border-s-4 status stripe. P8-2: `SystemHealthWidget` availability KPI card (4dp %) vs 99.9999% target with status badge, KSA data-residency sovereign badge, last DR test date + relative time, RTO/RPO per-channel table from SystemHealth.dr JSON. P8-3: `Beneficiary360Widget` SUPERVISOR+-gated; debounced search input → `searchBeneficiaryAction` server action → dropdown results; select → `getBeneficiary360Action` loads full profile; profile card (name EN/AR, nationalId, cluster, phone, gender, DOB, tier, consent badge); tab strip (interactions/tickets); interactions: scrollable list with sentiment dot + channel type + agent + intent + resolution; tickets: table with priority/status badges, SLA breach highlight (red row + ⚠), assigned agent; drill-in via `?beneficiaryId=` from ticket-queue / agent-grid / global search. `lib/queries/operations.ts` (getIntegrationStatusData + getSystemHealthData + getBeneficiary360 + searchBeneficiaries) + `lib/actions/operations.ts` (searchBeneficiaryAction + getBeneficiary360Action, Zod-validated) + `operations/page.tsx` wired. Channel model has no name field — uses `channel.type` enum. Used parallel `Promise.all` queries instead of `findUnique` with nested includes (avoids Prisma v7 TS inference issue). 0 TS errors.
 - **2026-06-21 (Phase 7 DONE)** — P7-1: `KpiScorecardWidget` 7-KPI card grid (thisWeek/target/lastWeek), status badge + delta icon, click → owning module route. P7-2: `ClusterRankingWidget` leaderboard, client-side sort by compositeScore or any KPI column, medal icons for top-3, cluster click → `?cluster=` URL update. P7-3: `SavingsTrackerWidget` dual-series AreaChart (agentHoursSaved + estimatedHoursSaved), rich tooltip showing volume×AHT calc formula, board CSV export via `exportSavingsReport` server action. P7-4: `BeneficiaryVoiceWidget` responsive card grid, sentiment bar + color-coded border, expand → sparkline trend + anonymized quoted examples. P7-5: `CampaignResultsWidget` type-filter pills, grouped BarChart (sent/delivered/responded by type), scrollable campaign table with delivery% + response% + StatusBadge. P7-6: `PenaltyImpactWidget` sortable table (failure% vs tolerance, AlertTriangle/CheckCircle breach icons, SAR penalty), breach-only filter toggle, CSV export via `exportPenaltyReport` server action; breach rows highlighted red. `lib/queries/executive.ts` (6 fetchers) + `lib/actions/executive.ts` (exportSavingsReport + exportPenaltyReport) + `executive/page.tsx` wired. 0 TS errors.

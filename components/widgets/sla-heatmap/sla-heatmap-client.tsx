@@ -9,8 +9,8 @@ import type { SlaAdminRegion } from "@/lib/queries/live-operations"
 import type { KpiStatus } from "@/lib/kpi"
 
 const GEO_URL = "/geo/ksa-regions.json"
-const MAP_W = 800
-const MAP_H = 600
+const MAP_W = 900
+const MAP_H = 700
 
 // Status fills via CSS var tokens (resolve at runtime — never hardcoded hex).
 const STATUS_FILL: Record<KpiStatus, string> = {
@@ -166,20 +166,24 @@ export function SlaHeatmapClient({ data, selectedCluster }: Props) {
       </div>
 
       {/* Map container */}
-      <div ref={mapRef} className="relative w-full select-none">
+      <div ref={mapRef} className="relative w-full select-none" style={{ maxHeight: "480px" }}>
         <svg
           viewBox={`0 0 ${MAP_W} ${MAP_H}`}
           preserveAspectRatio="xMidYMid meet"
           role="img"
           aria-label="Saudi Arabia administrative regions SLA heatmap"
-          style={{ display: "block", width: "100%", height: "auto" }}
+          style={{ display: "block", width: "100%", height: "auto", maxHeight: "480px" }}
         >
+          {/* Map background */}
+          <rect
+            x={0} y={0} width={MAP_W} height={MAP_H}
+            fill="var(--muted)"
+            fillOpacity={0.3}
+          />
           {paths.map(({ iso, d, name }) => {
             const region = regionByIso.get(iso)
             const isSelected = selectedCluster === iso
             const isDimmed = hasSelection && !isSelected
-            // Regions with no matching data render as muted (shouldn't happen for the
-            // 13 admin regions, but guards against unexpected GeoJSON features).
             const status: KpiStatus | null = region?.status ?? null
             const fill = status
               ? (isDimmed ? STATUS_FILL_DIM[status] : STATUS_FILL[status])
@@ -190,14 +194,16 @@ export function SlaHeatmapClient({ data, selectedCluster }: Props) {
                 key={iso}
                 d={d}
                 fill={fill}
-                fillOpacity={0.85}
+                fillOpacity={isDimmed ? 0.4 : 0.85}
+                stroke="var(--card)"
+                strokeWidth={1.5}
                 tabIndex={region ? 0 : -1}
                 role={region ? "button" : undefined}
                 aria-label={region ? `${region.regionName}: ${region.serviceLevelPct.toFixed(1)}% service level` : name}
                 style={{
                   cursor: region ? "pointer" : "default",
-                  filter: isSelected ? "drop-shadow(0 0 4px var(--primary))" : undefined,
-                  transition: "fill 150ms ease-out, filter 150ms ease-out",
+                  filter: isSelected ? "drop-shadow(0 0 6px var(--primary))" : undefined,
+                  transition: "fill 150ms ease-out, fill-opacity 150ms ease-out, filter 150ms ease-out",
                   outline: "none",
                 }}
                 onClick={() => region && handleSelect(iso)}

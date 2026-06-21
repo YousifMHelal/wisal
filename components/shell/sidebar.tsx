@@ -63,16 +63,21 @@ export function SidebarRail({ statuses, locale, collapsed, onToggle }: SidebarRa
     >
       {/* Brand */}
       <div className={cn(
-        "flex items-center h-14 border-b border-sidebar-border flex-shrink-0",
-        collapsed ? "justify-center px-0" : "px-4 gap-2"
+        "flex items-center h-14 border-b border-sidebar-border shrink-0",
+        collapsed ? "justify-center px-0" : "px-4 gap-2.5"
       )}>
-        <div className="size-7 rounded-md bg-primary flex items-center justify-center flex-shrink-0">
-          <span className="text-primary-foreground text-xs font-bold">W</span>
+        <div className="size-8 rounded-lg bg-primary flex items-center justify-center shrink-0 shadow-sm shadow-primary/30">
+          <span className="text-primary-foreground text-sm font-bold leading-none">W</span>
         </div>
         {!collapsed && (
-          <span className="text-sm font-semibold text-sidebar-foreground truncate">
-            {isAr ? "مركز وصال" : "Wisal CC"}
-          </span>
+          <div className="min-w-0">
+            <span className="block text-sm font-semibold text-sidebar-foreground truncate leading-tight">
+              {isAr ? "مركز وصال" : "Wisal CC"}
+            </span>
+            <span className="block text-[10px] text-sidebar-foreground/40 truncate leading-tight tracking-wide uppercase">
+              {isAr ? "لوحة تحكم" : "Command Center"}
+            </span>
+          </div>
         )}
       </div>
 
@@ -90,21 +95,21 @@ export function SidebarRail({ statuses, locale, collapsed, onToggle }: SidebarRa
               title={collapsed ? label : undefined}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-2 py-2 text-sm transition-colors duration-150 cursor-pointer min-h-[44px]",
+                "flex items-center gap-3 rounded-lg px-2 py-2 text-sm transition-colors duration-150 cursor-pointer min-h-11",
                 active
                   ? "bg-sidebar-accent text-sidebar-primary font-medium"
                   : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                 collapsed && "justify-center"
               )}
             >
-              <span className="relative flex-shrink-0">
+              <span className="relative shrink-0">
                 {item.icon}
                 {/* status dot overlaid on icon when collapsed */}
                 {collapsed && (
                   <StatusBadge
                     status={dotStatus}
                     dot
-                    className="absolute -top-0.5 -end-0.5 size-2"
+                    className="absolute -top-0.5 -inset-e-0.5 size-2"
                   />
                 )}
               </span>
@@ -121,11 +126,11 @@ export function SidebarRail({ statuses, locale, collapsed, onToggle }: SidebarRa
       </nav>
 
       {/* Collapse toggle */}
-      <div className="border-t border-sidebar-border p-2 flex-shrink-0">
+      <div className="border-t border-sidebar-border p-2 shrink-0">
         <button
           onClick={onToggle}
           className={cn(
-            "flex items-center gap-2 w-full rounded-lg px-2 py-2 text-xs text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors duration-150 cursor-pointer min-h-[44px]",
+            "flex items-center gap-2 w-full rounded-lg px-2 py-2 text-xs text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors duration-150 cursor-pointer min-h-11",
             collapsed && "justify-center"
           )}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -169,7 +174,7 @@ export function MobileNav({ statuses, locale, onClose }: MobileNavProps) {
             onClick={onClose}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors duration-150 min-h-[44px]",
+              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors duration-150 min-h-11",
               active
                 ? "bg-accent text-primary font-medium"
                 : "text-foreground hover:bg-accent"

@@ -136,16 +136,16 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ## Phase 10 — Polish *(final pass — the layer that makes it feel premium)*
 
-- [ ] **P10-1** Run full UI through `ui-ux-pro-max` skill review pass; refine spacing rhythm, hierarchy, density per `UI_DESIGN_RULES.md`.
-- [ ] **P10-2** Micro-interactions & motion — hover/expand/filter transitions (≤150ms), respect `prefers-reduced-motion`; no layout shift.
-- [ ] **P10-3** Visual consistency audit via `ui-registry.md` (imprint) — every widget matches tokens, status badges, widget shell, typography scale.
-- [ ] **P10-4** Empty/loading/error/locked states polished (skeletons match real layout, friendly copy, EN+AR).
-- [ ] **P10-5** Chart/gauge/map visual polish — legends, tooltips, color ramps, gridlines, number formatting (tabular, thousands, %).
-- [ ] **P10-6** Dark + light theme parity review; status colors meaningful and a11y-contrast in both.
-- [ ] **P10-7** RTL polish — Arabic typography, mirrored icons/charts, no clipped text at any breakpoint.
-- [ ] **P10-8** Performance polish — RSC streaming, suspense boundaries, image/font loading, no waterfall on dashboard load.
-- [ ] **P10-9** Sign-in / shell / nav polish — first-impression screens feel finished.
-- [ ] **P10-10** Final walkthrough on real device widths (mobile/tablet/desktop) in both themes + both locales.
+- [x] **P10-1** Run full UI through `ui-ux-pro-max` skill review pass; refine spacing rhythm, hierarchy, density per `UI_DESIGN_RULES.md`.
+- [x] **P10-2** Micro-interactions & motion — hover/expand/filter transitions (≤150ms), respect `prefers-reduced-motion`; no layout shift.
+- [x] **P10-3** Visual consistency audit via `ui-registry.md` (imprint) — every widget matches tokens, status badges, widget shell, typography scale.
+- [x] **P10-4** Empty/loading/error/locked states polished (skeletons match real layout, friendly copy, EN+AR).
+- [x] **P10-5** Chart/gauge/map visual polish — legends, tooltips, color ramps, gridlines, number formatting (tabular, thousands, %).
+- [x] **P10-6** Dark + light theme parity review; status colors meaningful and a11y-contrast in both.
+- [x] **P10-7** RTL polish — Arabic typography, mirrored icons/charts, no clipped text at any breakpoint.
+- [x] **P10-8** Performance polish — RSC streaming, suspense boundaries, image/font loading, no waterfall on dashboard load.
+- [x] **P10-9** Sign-in / shell / nav polish — first-impression screens feel finished.
+- [x] **P10-10** Final walkthrough on real device widths (mobile/tablet/desktop) in both themes + both locales.
 
 **Exit:** Production-ready **and** polished.
 
