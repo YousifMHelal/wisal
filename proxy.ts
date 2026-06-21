@@ -19,6 +19,10 @@ export default auth((req) => {
 });
 
 export const config = {
-  // Run on all routes except static files and _next internals
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
+  // Run on all routes except static files and _next internals.
+  // Note: extension list must include json/geojson so static files under public/
+  // (e.g. /geo/ksa-regions.json) are served directly, not routed through auth.
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|json|geojson|ico|txt|woff|woff2)$).*)",
+  ],
 };

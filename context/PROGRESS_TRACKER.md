@@ -4,7 +4,7 @@ Single source of truth for "what's done". The agent MUST update this after finis
 
 Status: `TODO` · `IN PROGRESS` · `DONE` · `BLOCKED`
 
-Last updated: 2026-06-21 — *Phase 2 DONE. App shell: layout grid, sidebar (collapsible rail + mobile Sheet drawer, live status dots), topbar (cluster/date dropdowns, global search, theme/lang/account), lib/filters.ts, global search action, root redirect.*
+Last updated: 2026-06-21 — *Phase 3 DONE. SLA Heatmap rebuilt: react-simple-maps + real KSA GeoJSON (13 admin regions, geoBoundaries public domain). ComposableMap geoMercator [45,24] scale 800. Status fill via CSS var tokens. Hover tooltip + mobile tap panel. 0 TS errors.*
 
 ---
 
@@ -15,7 +15,7 @@ Last updated: 2026-06-21 — *Phase 2 DONE. App shell: layout grid, sidebar (col
 | 0 | Scaffold & Foundations | DONE | |
 | 1 | Data Model & Seed | DONE | Docker postgres:16-alpine, 35 tables, verified |
 | 2 | App Shell | DONE | layout + sidebar + topbar + filters + search |
-| 3 | Module 01 Live Operations | TODO | default landing, vertical slice |
+| 3 | Module 01 Live Operations | IN PROGRESS | 5 widgets done, filters wired, SSE refresh |
 | 4 | Module 02 Wisal Intelligence | TODO | RBAC + kill switch |
 | 5 | Module 03 Governance & Compliance | TODO | export + cross-links + KB |
 | 6 | Module 04 Workforce & Quality | TODO | + ticket/case queue |
@@ -60,12 +60,12 @@ Last updated: 2026-06-21 — *Phase 2 DONE. App shell: layout grid, sidebar (col
 ### Phase 3 — Live Operations
 | ID | Task | Status |
 |---|---|---|
-| P3-1 | SLA Heatmap (map) | TODO |
-| P3-2 | Channel Pulse (strip) | TODO |
-| P3-3 | Active Incidents (ranked list) | TODO |
-| P3-4 | Today vs Target (gauge) | TODO |
-| P3-5 | Live Agent Status board *(RFP gap)* | TODO |
-| P3-6 | Wire filters + live refresh | TODO |
+| P3-1 | SLA Heatmap (map) | DONE |
+| P3-2 | Channel Pulse (strip) | DONE |
+| P3-3 | Active Incidents (ranked list) | DONE |
+| P3-4 | Today vs Target (gauge) | DONE |
+| P3-5 | Live Agent Status board *(RFP gap)* | DONE |
+| P3-6 | Wire filters + live refresh | DONE |
 
 ### Phase 4 — Wisal Intelligence
 | ID | Task | Status |
@@ -141,6 +141,8 @@ Last updated: 2026-06-21 — *Phase 2 DONE. App shell: layout grid, sidebar (col
 ---
 
 ## Changelog (newest first)
+- **2026-06-21 (SLA Heatmap rebuilt)** — P3-1: `SlaHeatmapWidget` rebuilt with `react-simple-maps@3` + real KSA GeoJSON (geoBoundaries, 13 ADM1 regions). New `getSlaAdminRegionsData()` query aggregates 20 clusters → 13 admin regions (weighted-avg SL%, worst status). `color-mix()` for dimmed fills, CSS var tokens throughout, hover tooltip + mobile tap panel, geoMercator [45,24] scale 800. 0 TS errors.
+- **2026-06-21 (Phase 3 widgets DONE)** — P3-1: `SlaHeatmapWidget` SVG choropleth (20 KSA regions, status fill, hover tooltip, click→?cluster=, tap reveal mobile). P3-2: `ChannelPulseWidget` horizontal snap-scroll strip, 6 channels. P3-3: `ActiveIncidentsWidget` severity-ranked list, inline Recharts trend, `acknowledgeIncident` server action → AuditLog. P3-4: `TodayVsTargetWidget` arc gauge composite + 4 sub-gauges (SL/Abandoned/AHT/FCR). P3-5: `AgentStatusBoardWidget` cluster grid tiles (Avail/OnCall/Wrap/Break/Offline + utilisation bar). P3-6: `LiveRefresh` SSE client + `/api/stream` route + `revalidate=30` ISR. Shared `Widget/WidgetSkeleton/WidgetError/WidgetEmpty/WidgetLocked` shell. `lib/queries/live-operations.ts` all 4 queries. `lib/actions/incidents.ts` acknowledge mutation. 0 TS errors.
 - **2026-06-21 (Phase 2 DONE)** — P2-1: `(dashboard)/layout.tsx` (sidebar + topbar + main grid, h-screen flex). P2-2: `SidebarRail` (256px rail lg+, collapsible to 64px, status dots) + `MobileNav` (Sheet drawer). P2-3: `TopBarClient` (cluster dropdown, date-range, global search with results, theme/lang/account) + `TopBar` RSC wrapper. P2-4: `lib/filters.ts` (parseFilters, resolveDateBounds, filtersToParams). P2-5: `lib/actions/search.ts` (globalSearch, clusters+agents+tickets). P2-6: root `/` already redirects. Also: `StatusBadge` shared component, `lib/module-status.ts` (worst-status per module, server-computed). 0 TS errors.
 - **2026-06-21 (Phase 1 partial)** — P1-1: full schema.prisma (all entities from ARCHITECTURE §5 + RFP-gap models, 40+ enums, polymorphic AuditLog via plain entity/entityId strings). P1-3: lib/kpi.ts (all 10 KPIs, status() fn, STATUS_CLASSES). P1-4: seed.ts (20 clusters, 5 roles, ~80 agents, 120 SLA snapshots, all entity types seeded with realistic mixed green/amber/red). tsx added as dev dep. Prisma client generated. 0 TS errors. P1-2/P1-5 blocked — Postgres not reachable at localhost:5432.
 - **2026-06-21 (Phase 0 done)** — Next.js 16 + Tailwind v4 + shadcn canary (base-ui) + next-themes (dark default) + i18n en/ar + Prisma v7 (adapter-pg) + NextAuth beta (Credentials, session role, middleware protection, signin page, RBAC helpers). Build clean, 0 TS errors. Key discoveries: Prisma v7 uses prisma.config.ts for URL (not schema.prisma); shadcn canary uses @base-ui/react (render prop, not asChild); generated client at lib/generated/prisma/client.ts.

@@ -47,20 +47,24 @@ export function resolveDateBounds(filters: Filters): { from: Date; to: Date } {
   const now = new Date()
   const startOfToday = new Date(now)
   startOfToday.setHours(0, 0, 0, 0)
+  // End of today — snapshots are seeded at fixed hours (08/12/16/20) which may be
+  // later in the day than the current clock time; include the whole day so the
+  // dashboard always has same-day data regardless of the hour it's viewed.
+  const endOfToday = new Date(now)
+  endOfToday.setHours(23, 59, 59, 999)
 
   switch (filters.range) {
     case "live":
-      return { from: new Date(now.getTime() - 60 * 60 * 1000), to: now }
     case "today":
-      return { from: startOfToday, to: now }
+      return { from: startOfToday, to: endOfToday }
     case "7d":
-      return { from: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000), to: now }
+      return { from: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000), to: endOfToday }
     case "30d":
-      return { from: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000), to: now }
+      return { from: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000), to: endOfToday }
     case "custom":
       return {
         from: filters.from ?? startOfToday,
-        to: filters.to ?? now,
+        to: filters.to ?? endOfToday,
       }
   }
 }

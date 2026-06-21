@@ -48,12 +48,12 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ## Phase 3 — Module 01: Live Operations *(default landing — vertical slice first)*
 
-- [ ] **P3-1** `widgets/sla-heatmap` — SVG Saudi map, 20 regions shaded by live SL status, hover tooltip (name, SL%, volume), click → sets `?cluster=`.
-- [ ] **P3-2** `widgets/channel-pulse` — horizontal card strip per channel (volume, avg wait, status); click → incidents filtered to channel.
-- [ ] **P3-3** `widgets/active-incidents` — ranked-by-severity list; expand inline to metric trend; acknowledge action (mutation + AuditLog).
-- [ ] **P3-4** `widgets/today-vs-target` — composite gauge + sub-gauges (SL, Abandoned, AHT, FCR) on hover/click.
-- [ ] **P3-5** `widgets/agent-status-board` *(RFP gap)* — live agent state tiles per cluster (Available/On-Call/Wrap/Break/Offline), counts + status.
-- [ ] **P3-6** Wire all to cluster + date filters. Live refresh (SSE or poll).
+- [x] **P3-1** `widgets/sla-heatmap` — SVG Saudi map, 20 regions shaded by live SL status, hover tooltip (name, SL%, volume), click → sets `?cluster=`.
+- [x] **P3-2** `widgets/channel-pulse` — horizontal card strip per channel (volume, avg wait, status); click → incidents filtered to channel.
+- [x] **P3-3** `widgets/active-incidents` — ranked-by-severity list; expand inline to metric trend; acknowledge action (mutation + AuditLog).
+- [x] **P3-4** `widgets/today-vs-target` — composite gauge + sub-gauges (SL, Abandoned, AHT, FCR) on hover/click.
+- [x] **P3-5** `widgets/agent-status-board` *(RFP gap)* — live agent state tiles per cluster (Available/On-Call/Wrap/Break/Offline), counts + status.
+- [x] **P3-6** Wire all to cluster + date filters. Live refresh (SSE or poll).
 
 **Exit:** Module 01 production-quality, filter-driven, live-feeling.
 

@@ -64,8 +64,11 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
   const { theme, setTheme } = useTheme()
   const isAr = locale === "ar"
 
+  const [mounted, setMounted] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [filterOpen, setFilterOpen] = useState(false)
+
+  useEffect(() => { setMounted(true) }, [])
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [searchOpen, setSearchOpen] = useState(false)
@@ -235,7 +238,7 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
           className="flex items-center justify-center size-9 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors cursor-pointer min-h-11 min-w-11"
           aria-label={isAr ? "تبديل المظهر" : "Toggle theme"}
         >
-          {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+          {mounted ? (theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />) : <Sun className="size-4 opacity-0" />}
         </button>
 
         {/* Language toggle */}
