@@ -90,9 +90,7 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
         </form>
 
         {/* Dev role switcher — seeded users */}
-        {process.env.NODE_ENV === "development" && (
-          <DevRoleSwitcher />
-        )}
+        <DevRoleSwitcher />
       </CardContent>
     </Card>
   );
@@ -103,10 +101,6 @@ function DevRoleSwitcher() {
   const [isPending, startTransition] = useTransition();
 
   const devUsers = [
-    { label: "Operator", email: "operator@wisal.sa", password: "password123" },
-    { label: "Supervisor", email: "supervisor@wisal.sa", password: "password123" },
-    { label: "Compliance", email: "compliance@wisal.sa", password: "password123" },
-    { label: "Executive", email: "executive@wisal.sa", password: "password123" },
     { label: "Admin", email: "admin@wisal.sa", password: "password123" },
   ];
 
