@@ -182,7 +182,14 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
+  }
+  /* Keyboard-only focus ring — suppressed on mouse clicks */
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
+  }
+  *:focus:not(:focus-visible) {
+    outline: none;
   }
   html {
     @apply font-sans;

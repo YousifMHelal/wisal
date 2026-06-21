@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getTrainingImpactData, getTrainingModuleList } from "@/lib/queries/workforce"
 import { TrainingImpactClient } from "./training-impact-client"
@@ -53,8 +54,10 @@ function TrainingImpactSkeleton() {
 
 export function TrainingImpactWidget({ filters, moduleFilter }: Props) {
   return (
-    <Suspense fallback={<TrainingImpactSkeleton />}>
-      <TrainingImpactBody filters={filters} moduleFilter={moduleFilter} />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="Training Impact">
+      <Suspense fallback={<TrainingImpactSkeleton />}>
+        <TrainingImpactBody filters={filters} moduleFilter={moduleFilter} />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

@@ -32,7 +32,7 @@ export function StatusBadge({ status, label, dot = false, className }: StatusBad
   if (dot) {
     return (
       <span
-        className={cn("inline-flex h-2.5 w-2.5 rounded-full flex-shrink-0", {
+        className={cn("inline-flex h-2.5 w-2.5 rounded-full shrink-0", {
           "bg-[var(--status-green)]": status === "green",
           "bg-[var(--status-amber)]": status === "amber",
           "bg-[var(--status-red)]": status === "red",

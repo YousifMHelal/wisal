@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget, WidgetSkeleton, WidgetEmpty } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getSystemHealthData } from "@/lib/queries/operations"
 import { SystemHealthClient } from "./system-health-client"
@@ -33,8 +34,8 @@ function SystemHealthSkeleton() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <Skeleton className="h-28 w-full rounded-lg sm:col-span-2" />
           <div className="flex flex-col gap-3">
-            <Skeleton className="h-[52px] w-full rounded-lg" />
-            <Skeleton className="h-[52px] w-full rounded-lg" />
+            <Skeleton className="h-13 w-full rounded-lg" />
+            <Skeleton className="h-13 w-full rounded-lg" />
           </div>
         </div>
         <Skeleton className="h-32 w-full rounded-lg" />
@@ -45,8 +46,10 @@ function SystemHealthSkeleton() {
 
 export function SystemHealthWidget() {
   return (
-    <Suspense fallback={<SystemHealthSkeleton />}>
-      <SystemHealthBody />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="System Health & DR">
+      <Suspense fallback={<SystemHealthSkeleton />}>
+        <SystemHealthBody />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

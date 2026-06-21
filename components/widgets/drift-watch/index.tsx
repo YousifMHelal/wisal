@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget, WidgetSkeleton } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getDriftWatchData } from "@/lib/queries/intelligence"
 import { getAssignableUsers } from "@/lib/actions/intelligence"
 import { DriftWatchClient } from "./drift-watch-client"
@@ -50,8 +51,10 @@ function DriftWatchSkeleton() {
 
 export function DriftWatchWidget({ filters }: Props) {
   return (
-    <Suspense fallback={<DriftWatchSkeleton />}>
-      <DriftWatchBody filters={filters} />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="Drift Watch">
+      <Suspense fallback={<DriftWatchSkeleton />}>
+        <DriftWatchBody filters={filters} />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

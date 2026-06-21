@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget, WidgetSkeleton, WidgetLocked } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { checkRole } from "@/lib/auth"
 import { getKpiScorecardData } from "@/lib/queries/executive"
@@ -42,8 +43,10 @@ function KpiScorecardSkeleton() {
 
 export function KpiScorecardWidget() {
   return (
-    <Suspense fallback={<KpiScorecardSkeleton />}>
-      <KpiScorecardBody />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="National KPI Scorecard">
+      <Suspense fallback={<KpiScorecardSkeleton />}>
+        <KpiScorecardBody />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

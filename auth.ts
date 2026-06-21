@@ -27,7 +27,7 @@ const signInSchema = z.object({
 });
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt", maxAge: 28800 },
   pages: {
     signIn: "/signin",
   },

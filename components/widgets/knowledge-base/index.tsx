@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget, WidgetSkeleton } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getKnowledgeBaseData } from "@/lib/queries/governance"
 import { checkRole } from "@/lib/auth"
 import { KnowledgeBaseClient } from "./knowledge-base-client"
@@ -54,8 +55,10 @@ function KnowledgeBaseSkeleton() {
 
 export function KnowledgeBaseWidget({ filters }: Props) {
   return (
-    <Suspense fallback={<KnowledgeBaseSkeleton />}>
-      <KnowledgeBaseBody filters={filters} />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="Knowledge Base">
+      <Suspense fallback={<KnowledgeBaseSkeleton />}>
+        <KnowledgeBaseBody filters={filters} />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

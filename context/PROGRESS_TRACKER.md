@@ -4,7 +4,7 @@ Single source of truth for "what's done". The agent MUST update this after finis
 
 Status: `TODO` · `IN PROGRESS` · `DONE` · `BLOCKED`
 
-Last updated: 2026-06-21 — *Phase 8 DONE. 3 Operations & Integrations widgets built: IntegrationNmr (5-system status cards — Nafath/Mawid/Sehhaty/HR/NMR, state badge + latency + pattern + last-sync, NMR highlighted "Live API", PLATFORM_ADMIN gated), SystemHealth (availability KPI card vs 99.9999% target, KSA data-residency badge, last DR test, RTO/RPO per-channel table), Beneficiary360 (debounced search by iqama/name → profile card + tabs: interaction history list + tickets table + SLA breach highlight, SUPERVISOR+ gated, drill-in via ?beneficiaryId= from other modules). lib/queries/operations.ts + lib/actions/operations.ts + operations/page.tsx. 0 TS errors.*
+Last updated: 2026-06-21 — *Phase 9 DONE. All 9 hardening tasks complete.*
 
 ---
 
@@ -21,7 +21,7 @@ Last updated: 2026-06-21 — *Phase 8 DONE. 3 Operations & Integrations widgets 
 | 6 | Module 04 Workforce & Quality | DONE | AgentGrid + ScheduleCoverage + QaQueue + TrainingImpact + TicketQueue |
 | 7 | Module 05 Executive Rollup | DONE | KpiScorecard + ClusterRanking + SavingsTracker + BeneficiaryVoice + CampaignResults + PenaltyImpact |
 | 8 | Module 06 Operations & Integrations | DONE | IntegrationNmr + SystemHealth + Beneficiary360 |
-| 9 | Hardening & Production-Ready | TODO | |
+| 9 | Hardening & Production-Ready | DONE | error boundaries, a11y, auth, RTL/responsive verified, exports, README, coverage |
 | 10 | Polish | TODO | ui-ux-pro-max final pass |
 
 ---
@@ -114,15 +114,15 @@ Last updated: 2026-06-21 — *Phase 8 DONE. 3 Operations & Integrations widgets 
 ### Phase 9 — Hardening
 | ID | Task | Status |
 |---|---|---|
-| P9-1 | Loading + error boundaries | TODO |
-| P9-2 | Empty/locked states | TODO |
-| P9-3 | RTL pass | TODO |
-| P9-4 | Responsive pass | TODO |
-| P9-5 | Accessibility | TODO |
-| P9-6 | Export endpoints | TODO |
-| P9-7 | Auth hardening | TODO |
-| P9-8 | Seed script + README | TODO |
-| P9-9 | Coverage review vs spec + RFP §6b matrix + KPIs | TODO |
+| P9-1 | Loading + error boundaries | DONE |
+| P9-2 | Empty/locked states | DONE |
+| P9-3 | RTL pass | DONE |
+| P9-4 | Responsive pass | DONE |
+| P9-5 | Accessibility | DONE |
+| P9-6 | Export endpoints | DONE |
+| P9-7 | Auth hardening | DONE |
+| P9-8 | Seed script + README | DONE |
+| P9-9 | Coverage review vs spec + RFP §6b matrix + KPIs | DONE |
 
 ### Phase 10 — Polish
 | ID | Task | Status |
@@ -141,6 +141,7 @@ Last updated: 2026-06-21 — *Phase 8 DONE. 3 Operations & Integrations widgets 
 ---
 
 ## Changelog (newest first)
+- **2026-06-21 (Phase 9 DONE)** — P9-1: `WidgetErrorBoundary` (class component) wraps all 21 widget exports; `error.tsx` per dashboard route + root fallback (`app/error.tsx`, `app/(dashboard)/error.tsx`, 6 route-level files); shared `ErrorBoundaryUI` component. P9-2: empty/locked states verified present in all widgets. P9-3: RTL audit — no physical `left/right/pl/pr/ml/mr` in widget code (only vendor shadcn files, intentional). P9-4: responsive verified — `overflow-x-auto` + `min-w-[N]` on tables, `ResponsiveContainer` on charts, `grid-cols-1 sm:N lg:N` on grids. P9-5: skip-to-content link in dashboard layout (`#main-content`); `focus-visible:outline` global rule (keyboard-only, mouse suppressed); `StatusBadge` already has icon+text+color for colorblind safety; `aria-expanded`/`aria-label`/`role="alert"` in interactive widgets. P9-6: export route `/api/export/[kind]` covers 4 governance CSV kinds; executive has `exportSavingsReport`/`exportPenaltyReport` server actions; all RBAC-gated. P9-7: session `maxAge: 28800` (8h) in auth.ts; sign-out refactored from GET navigation to `signOutAction` server action (POST); `lib/actions/auth.ts` created. P9-8: `README.md` rewritten (prereqs, quick start, credentials, modules, arch notes); `scripts/seed-refresh.sh` created. P9-9: RFP §6b coverage matrix verified — all 24 requirements mapped to widgets/entities, nothing dropped. Bonus: fixed 6 Tailwind canonical class warnings (`flex-shrink-0`→`shrink-0`, `min-h-[120px]`→`min-h-30`, `h-[52px]`→`h-13`, `size-[120px]`→`size-30`, `text-[var(--status-red-fg)]`→`text-status-red-fg`).
 - **2026-06-21 (Phase 8 DONE)** — P8-1: `IntegrationNmrWidget` PLATFORM_ADMIN-gated; 5 system cards (Nafath/Mawid/Sehhaty/HR/NMR); each shows state badge (UP●/DEGRADED▲/DOWN■), latency chip (amber if >300ms), SYNC/EVENT pattern pill, last-sync relative time; NMR row has "Live API" teal badge + ring accent; border-s-4 status stripe. P8-2: `SystemHealthWidget` availability KPI card (4dp %) vs 99.9999% target with status badge, KSA data-residency sovereign badge, last DR test date + relative time, RTO/RPO per-channel table from SystemHealth.dr JSON. P8-3: `Beneficiary360Widget` SUPERVISOR+-gated; debounced search input → `searchBeneficiaryAction` server action → dropdown results; select → `getBeneficiary360Action` loads full profile; profile card (name EN/AR, nationalId, cluster, phone, gender, DOB, tier, consent badge); tab strip (interactions/tickets); interactions: scrollable list with sentiment dot + channel type + agent + intent + resolution; tickets: table with priority/status badges, SLA breach highlight (red row + ⚠), assigned agent; drill-in via `?beneficiaryId=` from ticket-queue / agent-grid / global search. `lib/queries/operations.ts` (getIntegrationStatusData + getSystemHealthData + getBeneficiary360 + searchBeneficiaries) + `lib/actions/operations.ts` (searchBeneficiaryAction + getBeneficiary360Action, Zod-validated) + `operations/page.tsx` wired. Channel model has no name field — uses `channel.type` enum. Used parallel `Promise.all` queries instead of `findUnique` with nested includes (avoids Prisma v7 TS inference issue). 0 TS errors.
 - **2026-06-21 (Phase 7 DONE)** — P7-1: `KpiScorecardWidget` 7-KPI card grid (thisWeek/target/lastWeek), status badge + delta icon, click → owning module route. P7-2: `ClusterRankingWidget` leaderboard, client-side sort by compositeScore or any KPI column, medal icons for top-3, cluster click → `?cluster=` URL update. P7-3: `SavingsTrackerWidget` dual-series AreaChart (agentHoursSaved + estimatedHoursSaved), rich tooltip showing volume×AHT calc formula, board CSV export via `exportSavingsReport` server action. P7-4: `BeneficiaryVoiceWidget` responsive card grid, sentiment bar + color-coded border, expand → sparkline trend + anonymized quoted examples. P7-5: `CampaignResultsWidget` type-filter pills, grouped BarChart (sent/delivered/responded by type), scrollable campaign table with delivery% + response% + StatusBadge. P7-6: `PenaltyImpactWidget` sortable table (failure% vs tolerance, AlertTriangle/CheckCircle breach icons, SAR penalty), breach-only filter toggle, CSV export via `exportPenaltyReport` server action; breach rows highlighted red. `lib/queries/executive.ts` (6 fetchers) + `lib/actions/executive.ts` (exportSavingsReport + exportPenaltyReport) + `executive/page.tsx` wired. 0 TS errors.
 - **2026-06-21 (Phase 6 DONE)** — P6-1: `AgentGridWidget` sortable table (AHT/FCR/QA/CSAT status-colored), team + search filter, row expand → pre-loaded training history. P6-2: `ScheduleCoverageWidget` 24h bar gantt (over/on-target/under staffing), 24h/peak toggle, inline `ShiftSwapCard` approve/reject → `resolveShiftSwap` server action + AuditLog; SUPERVISOR-gated. P6-3: `QaQueueWidget` priority-ordered (high priority + worst sentiment first), row expand → 1-5 quality score form + notes → `submitQaScore` server action + AuditLog + optimistic removal from queue. P6-4: `TrainingImpactWidget` grouped bar chart (Avg Before/After per module, Recharts BarChart), module filter, agent drilldown → line chart score trend + record table. P6-5: `TicketQueueWidget` SUPERVISOR-gated, sortable/searchable table (complaint/request type + priority + status + SLA due + assign-agent dropdown), SLA-breached rows highlighted red, `assignTicketAgent` server action → AuditLog + status auto-advance to IN_PROGRESS, ExternalLink → `/operations?beneficiaryId=`. `lib/queries/workforce.ts` (5 fetchers) + `lib/actions/workforce.ts` (resolveShiftSwap + submitQaScore + assignTicketAgent) + `workforce/page.tsx` wired. 0 TS errors.

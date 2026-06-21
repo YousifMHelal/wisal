@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget, WidgetSkeleton, WidgetLocked } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getComplianceScorecardData } from "@/lib/queries/governance"
 import { checkRole } from "@/lib/auth"
 import { ComplianceScorecardClient } from "./compliance-scorecard-client"
@@ -68,8 +69,10 @@ function ComplianceScorecardSkeleton() {
 
 export function ComplianceScorecardWidget({ filters }: Props) {
   return (
-    <Suspense fallback={<ComplianceScorecardSkeleton />}>
-      <ComplianceScorecardBody filters={filters} />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="Compliance Scorecard">
+      <Suspense fallback={<ComplianceScorecardSkeleton />}>
+        <ComplianceScorecardBody filters={filters} />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

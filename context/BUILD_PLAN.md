@@ -120,15 +120,15 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ## Phase 9 — Hardening & Production-Ready
 
-- [ ] **P9-1** Loading skeletons + error boundaries per widget.
-- [ ] **P9-2** Empty/locked/no-permission states everywhere.
-- [ ] **P9-3** RTL pass (Arabic) — verify every widget mirrors correctly.
-- [ ] **P9-4** Responsive pass — every page/widget at 360px → desktop (sidebar→sheet, table→scroll/stack, charts reflow).
-- [ ] **P9-5** Accessibility (focus, aria, contrast for status colors + colorblind-safe icons/labels not color-only).
-- [ ] **P9-6** Export endpoints finalized (CSV + print/PDF view).
-- [ ] **P9-7** Auth hardening — session expiry, role-change handling, protected-route audit, sign-out everywhere.
-- [ ] **P9-8** Seed refresh script + README run instructions.
-- [ ] **P9-9** Coverage review vs design spec + **RFP §6b matrix** + KPIs — nothing dropped.
+- [x] **P9-1** Loading skeletons + error boundaries per widget.
+- [x] **P9-2** Empty/locked/no-permission states everywhere.
+- [x] **P9-3** RTL pass (Arabic) — verify every widget mirrors correctly.
+- [x] **P9-4** Responsive pass — every page/widget at 360px → desktop (sidebar→sheet, table→scroll/stack, charts reflow).
+- [x] **P9-5** Accessibility (focus, aria, contrast for status colors + colorblind-safe icons/labels not color-only).
+- [x] **P9-6** Export endpoints finalized (CSV + print/PDF view).
+- [x] **P9-7** Auth hardening — session expiry, role-change handling, protected-route audit, sign-out everywhere.
+- [x] **P9-8** Seed refresh script + README run instructions.
+- [x] **P9-9** Coverage review vs design spec + **RFP §6b matrix** + KPIs — nothing dropped.
 
 **Exit:** Functionally production-ready.
 

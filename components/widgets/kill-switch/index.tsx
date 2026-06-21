@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget, WidgetSkeleton, WidgetLocked } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getKillSwitchData } from "@/lib/queries/intelligence"
 import { checkRole } from "@/lib/auth"
 import { KillSwitchClient } from "./kill-switch-client"
@@ -21,7 +22,7 @@ async function KillSwitchBody() {
   if (!killSwitch) {
     return (
       <Widget title="Kill Switch" titleAr="مفتاح الإيقاف الطارئ">
-        <div className="flex items-center justify-center min-h-[120px]">
+        <div className="flex items-center justify-center min-h-30">
           <p className="text-sm text-muted-foreground">Kill switch record not initialised.</p>
         </div>
       </Widget>
@@ -60,8 +61,10 @@ function KillSwitchSkeleton() {
 
 export function KillSwitchWidget() {
   return (
-    <Suspense fallback={<KillSwitchSkeleton />}>
-      <KillSwitchBody />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="Kill Switch">
+      <Suspense fallback={<KillSwitchSkeleton />}>
+        <KillSwitchBody />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

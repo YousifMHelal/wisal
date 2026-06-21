@@ -15,6 +15,7 @@ import {
   MapPin,
   Calendar,
 } from "lucide-react"
+import { signOutAction } from "@/lib/actions/auth"
 import { cn } from "@/lib/utils"
 import {
   DropdownMenu,
@@ -274,7 +275,7 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
               {isAr ? "الملف الشخصي" : "Profile"}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive" onSelect={() => router.push("/api/auth/signout")}>
+            <DropdownMenuItem variant="destructive" onSelect={() => void signOutAction()}>
               <LogOut className="size-4" />
               {isAr ? "تسجيل الخروج" : "Sign out"}
             </DropdownMenuItem>

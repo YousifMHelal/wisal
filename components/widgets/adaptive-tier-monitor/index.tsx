@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget, WidgetSkeleton } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getTierMonitorData } from "@/lib/queries/intelligence"
 import { AdaptiveTierMonitorClient } from "./adaptive-tier-monitor-client"
 import type { Filters } from "@/lib/filters"
@@ -52,8 +53,10 @@ function TierMonitorSkeleton() {
 
 export function AdaptiveTierMonitorWidget({ filters }: Props) {
   return (
-    <Suspense fallback={<TierMonitorSkeleton />}>
-      <TierMonitorBody filters={filters} />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="Adaptive Tier Monitor">
+      <Suspense fallback={<TierMonitorSkeleton />}>
+        <TierMonitorBody filters={filters} />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

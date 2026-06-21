@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget, WidgetLocked } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { checkRole } from "@/lib/auth"
 import { getBeneficiaryVoiceData } from "@/lib/queries/executive"
@@ -42,8 +43,10 @@ function BeneficiaryVoiceSkeleton() {
 
 export function BeneficiaryVoiceWidget() {
   return (
-    <Suspense fallback={<BeneficiaryVoiceSkeleton />}>
-      <BeneficiaryVoiceBody />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="Beneficiary Voice">
+      <Suspense fallback={<BeneficiaryVoiceSkeleton />}>
+        <BeneficiaryVoiceBody />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

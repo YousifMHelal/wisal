@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget, WidgetSkeleton, WidgetLocked, WidgetEmpty } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { checkRole } from "@/lib/auth"
 import { getClusterRankingData } from "@/lib/queries/executive"
@@ -27,7 +28,7 @@ async function ClusterRankingBody({ filters }: Props) {
       footer="Composite score · sortable by any KPI · click cluster → filter dashboard"
     >
       {rows.length === 0 ? (
-        <div className="flex items-center justify-center min-h-[120px]">
+        <div className="flex items-center justify-center min-h-30">
           <p className="text-sm text-muted-foreground">No ranking data for this period.</p>
         </div>
       ) : (
@@ -52,8 +53,10 @@ function ClusterRankingSkeleton() {
 
 export function ClusterRankingWidget({ filters }: Props) {
   return (
-    <Suspense fallback={<ClusterRankingSkeleton />}>
-      <ClusterRankingBody filters={filters} />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="Cluster Ranking">
+      <Suspense fallback={<ClusterRankingSkeleton />}>
+        <ClusterRankingBody filters={filters} />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

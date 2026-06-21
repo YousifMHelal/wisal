@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget, WidgetSkeleton, WidgetLocked } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { checkRole } from "@/lib/auth"
 import { getIntegrationStatusData } from "@/lib/queries/operations"
@@ -42,8 +43,10 @@ function IntegrationNmrSkeleton() {
 
 export function IntegrationNmrWidget() {
   return (
-    <Suspense fallback={<IntegrationNmrSkeleton />}>
-      <IntegrationNmrBody />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="Integration & NMR Status">
+      <Suspense fallback={<IntegrationNmrSkeleton />}>
+        <IntegrationNmrBody />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

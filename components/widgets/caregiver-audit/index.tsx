@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget, WidgetSkeleton, WidgetLocked } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getCaregiverAuditData } from "@/lib/queries/intelligence"
 import { checkRole } from "@/lib/auth"
 import { CaregiverAuditClient } from "./caregiver-audit-client"
@@ -54,8 +55,10 @@ function CaregiverAuditSkeleton() {
 
 export function CaregiverAuditWidget({ filters }: Props) {
   return (
-    <Suspense fallback={<CaregiverAuditSkeleton />}>
-      <CaregiverAuditBody filters={filters} />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="Caregiver Mode Audit">
+      <Suspense fallback={<CaregiverAuditSkeleton />}>
+        <CaregiverAuditBody filters={filters} />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

@@ -1,8 +1,8 @@
 import { Suspense } from "react"
-import { Widget } from "@/components/widgets/widget"
+import { Widget, WidgetLocked } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { checkRole } from "@/lib/auth"
-import { WidgetLocked } from "@/components/widgets/widget"
 import { getScheduleCoverageData } from "@/lib/queries/workforce"
 import { ScheduleCoverageClient } from "./schedule-coverage-client"
 import type { Filters } from "@/lib/filters"
@@ -57,8 +57,10 @@ function ScheduleCoverageSkeleton() {
 
 export function ScheduleCoverageWidget({ filters }: Props) {
   return (
-    <Suspense fallback={<ScheduleCoverageSkeleton />}>
-      <ScheduleCoverageBody filters={filters} />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="Schedule & Coverage">
+      <Suspense fallback={<ScheduleCoverageSkeleton />}>
+        <ScheduleCoverageBody filters={filters} />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

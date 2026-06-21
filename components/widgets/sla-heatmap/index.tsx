@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget, WidgetSkeleton, WidgetEmpty } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getSlaAdminRegionsData } from "@/lib/queries/live-operations"
 import { SlaHeatmapClient } from "./sla-heatmap-client"
 import type { Filters } from "@/lib/filters"
@@ -36,8 +37,10 @@ async function HeatmapBody({ filters }: Props) {
 
 export function SlaHeatmapWidget({ filters }: Props) {
   return (
-    <Suspense fallback={<WidgetSkeleton className="min-h-105" />}>
-      <HeatmapBody filters={filters} />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="National SLA Heatmap">
+      <Suspense fallback={<WidgetSkeleton className="min-h-105" />}>
+        <HeatmapBody filters={filters} />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

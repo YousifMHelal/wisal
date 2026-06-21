@@ -1,8 +1,8 @@
 import { Suspense } from "react"
-import { Widget } from "@/components/widgets/widget"
+import { Widget, WidgetLocked } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { checkRole } from "@/lib/auth"
-import { WidgetLocked } from "@/components/widgets/widget"
 import { getTicketQueueData, getAssignableAgents } from "@/lib/queries/workforce"
 import { TicketQueueClient } from "./ticket-queue-client"
 import type { Filters } from "@/lib/filters"
@@ -66,8 +66,10 @@ function TicketQueueSkeleton() {
 
 export function TicketQueueWidget({ filters }: Props) {
   return (
-    <Suspense fallback={<TicketQueueSkeleton />}>
-      <TicketQueueBody filters={filters} />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="Ticket / Case Queue">
+      <Suspense fallback={<TicketQueueSkeleton />}>
+        <TicketQueueBody filters={filters} />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

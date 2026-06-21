@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget, WidgetSkeleton, WidgetLocked } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getForbiddenIntentData } from "@/lib/queries/governance"
 import { checkRole } from "@/lib/auth"
 import { ForbiddenIntentClient } from "./forbidden-intent-client"
@@ -64,8 +65,10 @@ function ForbiddenIntentSkeleton() {
 
 export function ForbiddenIntentWidget({ filters }: Props) {
   return (
-    <Suspense fallback={<ForbiddenIntentSkeleton />}>
-      <ForbiddenIntentBody filters={filters} />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="Forbidden-Intent Triggers">
+      <Suspense fallback={<ForbiddenIntentSkeleton />}>
+        <ForbiddenIntentBody filters={filters} />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget, WidgetLocked } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { checkRole } from "@/lib/auth"
 import { getPenaltyImpactData } from "@/lib/queries/executive"
@@ -28,7 +29,7 @@ async function PenaltyImpactBody({ filters }: Props) {
       titleAr="غرامات مستوى الخدمة / الأثر المالي"
       actions={
         breachedCount > 0 ? (
-          <span className="text-xs font-medium text-[var(--status-red-fg)] tabular-nums">
+          <span className="text-xs font-medium text-status-red-fg tabular-nums">
             {breachedCount} breach{breachedCount > 1 ? "es" : ""} · SAR {totalPenalty.toLocaleString(undefined, { maximumFractionDigits: 0 })}
           </span>
         ) : undefined
@@ -55,8 +56,10 @@ function PenaltyImpactSkeleton() {
 
 export function PenaltyImpactWidget({ filters }: Props) {
   return (
-    <Suspense fallback={<PenaltyImpactSkeleton />}>
-      <PenaltyImpactBody filters={filters} />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="SLA Penalty / Financial Impact">
+      <Suspense fallback={<PenaltyImpactSkeleton />}>
+        <PenaltyImpactBody filters={filters} />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

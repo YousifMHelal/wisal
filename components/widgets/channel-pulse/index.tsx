@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget, WidgetSkeleton, WidgetEmpty } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getChannelPulseData } from "@/lib/queries/live-operations"
 import { ChannelPulseClient } from "./channel-pulse-client"
 import type { Filters } from "@/lib/filters"
@@ -46,8 +47,10 @@ function PulseSkeleton() {
 
 export function ChannelPulseWidget({ filters, locale }: Props) {
   return (
-    <Suspense fallback={<PulseSkeleton />}>
-      <PulseBody filters={filters} locale={locale} />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="Channel Pulse">
+      <Suspense fallback={<PulseSkeleton />}>
+        <PulseBody filters={filters} locale={locale} />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

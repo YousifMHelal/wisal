@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget, WidgetSkeleton } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getTodayVsTargetData } from "@/lib/queries/live-operations"
 import { CompositeGauge } from "./gauge"
 import type { Filters } from "@/lib/filters"
@@ -32,7 +33,7 @@ function GaugeSkeleton() {
   return (
     <Widget title="Today vs Target">
       <div className="flex flex-col items-center gap-4">
-        <Skeleton className="size-[120px] rounded-full" />
+        <Skeleton className="size-30 rounded-full" />
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full">
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-32 rounded-xl" />
@@ -45,8 +46,10 @@ function GaugeSkeleton() {
 
 export function TodayVsTargetWidget({ filters }: Props) {
   return (
-    <Suspense fallback={<GaugeSkeleton />}>
-      <GaugeBody filters={filters} />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="Today vs Target">
+      <Suspense fallback={<GaugeSkeleton />}>
+        <GaugeBody filters={filters} />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

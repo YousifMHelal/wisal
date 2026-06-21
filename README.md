@@ -1,36 +1,121 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Wisal Command Center
 
-## Getting Started
+CRM/governance admin dashboard for HHC (Saudi Health Holding Company), Tender PR-00786.
 
-First, run the development server:
+**Stack:** Next.js 16 (App Router) · TypeScript · Tailwind v4 · shadcn/ui (base-ui) · Prisma v7 · PostgreSQL · NextAuth (Auth.js)
+
+---
+
+## Prerequisites
+
+- Node.js ≥ 20
+- Docker (for Postgres) or an existing PostgreSQL instance
+- `tsx` (installed as dev dependency)
+
+---
+
+## Quick start
+
+### 1. Clone and install
+
+```bash
+npm install
+```
+
+### 2. Start Postgres
+
+```bash
+docker run -d \
+  --name wisal-postgres \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=password \
+  -e POSTGRES_DB=wisal \
+  -p 5432:5432 \
+  postgres:16-alpine
+```
+
+### 3. Configure environment
+
+Copy `.env.example` to `.env.local` (or set directly):
+
+```bash
+DATABASE_URL="postgresql://postgres:password@localhost:5432/wisal"
+NEXTAUTH_SECRET="your-secret-here"   # generate: openssl rand -base64 32
+NEXTAUTH_URL="http://localhost:3000"
+```
+
+### 4. Run migrations
+
+```bash
+npx prisma migrate deploy
+```
+
+### 5. Seed the database
+
+```bash
+npm run seed
+```
+
+Seeds: 20 HHC clusters, 5 role users, ~80 agents, SLA snapshots, incidents, AI metrics, audit logs, tickets, campaigns, integration status, system health, beneficiaries.
+
+### 6. Start dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) — redirects to `/live-operations`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Test credentials (seeded)
 
-## Learn More
+| Role | Email | Password |
+|---|---|---|
+| Operator | `operator@wisal.sa` | `password123` |
+| Supervisor | `supervisor@wisal.sa` | `password123` |
+| Compliance | `compliance@wisal.sa` | `password123` |
+| Executive | `executive@wisal.sa` | `password123` |
+| Platform Admin | `admin@wisal.sa` | `password123` |
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Seed refresh
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+To reset and re-seed the database:
 
-## Deploy on Vercel
+```bash
+./scripts/seed-refresh.sh
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Or manually:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npx prisma migrate reset --force
+npm run seed
+```
+
+---
+
+## Modules
+
+| Route | Module |
+|---|---|
+| `/live-operations` | 01 Live Operations (default) |
+| `/intelligence` | 02 Wisal Intelligence |
+| `/governance` | 03 Governance & Compliance |
+| `/workforce` | 04 Workforce & Quality |
+| `/executive` | 05 Executive Rollup |
+| `/operations` | 06 Operations & Integrations |
+
+---
+
+## Key architecture notes
+
+- **No `src/` folder** — `app/` lives at repo root.
+- **Middleware** is `proxy.ts` (Next 16 rename). Matcher excludes static asset extensions.
+- **Prisma v7** — config in `prisma.config.ts`, client at `lib/generated/prisma/client.ts`.
+- **shadcn/ui canary** — uses `@base-ui/react` (not Radix). No `asChild` prop; use `render={<Element />}`.
+- **RTL** — all components use logical CSS props (`ps/pe/ms/me/start/end`). Toggle locale via top-bar button.
+- **Status colors** — always derived from `lib/kpi.ts`. Never hardcoded hex in components.
+- **RBAC** — enforced server-side at data layer. Elevated widgets render locked state, never silently hidden.

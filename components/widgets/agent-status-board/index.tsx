@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget, WidgetSkeleton } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getAgentStatusBoard } from "@/lib/queries/live-operations"
 import { AgentStatusBoardClient } from "./agent-status-board-client"
 import type { Filters } from "@/lib/filters"
@@ -70,8 +71,10 @@ function BoardSkeleton() {
 
 export function AgentStatusBoardWidget({ filters, locale }: Props) {
   return (
-    <Suspense fallback={<BoardSkeleton />}>
-      <BoardBody filters={filters} locale={locale} />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="Live Agent Status">
+      <Suspense fallback={<BoardSkeleton />}>
+        <BoardBody filters={filters} locale={locale} />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

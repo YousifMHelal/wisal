@@ -1,8 +1,8 @@
 import { Suspense } from "react"
-import { Widget } from "@/components/widgets/widget"
+import { Widget, WidgetLocked } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { checkRole } from "@/lib/auth"
-import { WidgetLocked } from "@/components/widgets/widget"
 import { getQaQueueData } from "@/lib/queries/workforce"
 import { QaQueueClient } from "./qa-queue-client"
 import type { Filters } from "@/lib/filters"
@@ -54,8 +54,10 @@ function QaQueueSkeleton() {
 
 export function QaQueueWidget({ filters }: Props) {
   return (
-    <Suspense fallback={<QaQueueSkeleton />}>
-      <QaQueueBody filters={filters} />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="QA Sampling Queue">
+      <Suspense fallback={<QaQueueSkeleton />}>
+        <QaQueueBody filters={filters} />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

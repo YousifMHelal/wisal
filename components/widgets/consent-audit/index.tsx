@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget, WidgetSkeleton, WidgetLocked } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getConsentAuditData } from "@/lib/queries/governance"
 import { checkRole } from "@/lib/auth"
 import { ConsentAuditClient } from "./consent-audit-client"
@@ -65,8 +66,10 @@ function ConsentAuditSkeleton() {
 
 export function ConsentAuditWidget({ filters }: Props) {
   return (
-    <Suspense fallback={<ConsentAuditSkeleton />}>
-      <ConsentAuditBody filters={filters} />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="Consent & Disclosure Audit">
+      <Suspense fallback={<ConsentAuditSkeleton />}>
+        <ConsentAuditBody filters={filters} />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

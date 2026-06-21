@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget, WidgetLocked } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { checkRole } from "@/lib/auth"
 import { getSavingsTrackerData } from "@/lib/queries/executive"
@@ -41,8 +42,10 @@ function SavingsTrackerSkeleton() {
 
 export function SavingsTrackerWidget({ filters }: Props) {
   return (
-    <Suspense fallback={<SavingsTrackerSkeleton />}>
-      <SavingsTrackerBody filters={filters} />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="Savings & Efficiency">
+      <Suspense fallback={<SavingsTrackerSkeleton />}>
+        <SavingsTrackerBody filters={filters} />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

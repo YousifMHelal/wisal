@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget, WidgetSkeleton, WidgetLocked } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getMedicalApprovalData } from "@/lib/queries/governance"
 import { checkRole } from "@/lib/auth"
 import { MedicalApprovalLogClient } from "./medical-approval-log-client"
@@ -60,8 +61,10 @@ function MedicalApprovalLogSkeleton() {
 
 export function MedicalApprovalLogWidget({ filters }: Props) {
   return (
-    <Suspense fallback={<MedicalApprovalLogSkeleton />}>
-      <MedicalApprovalLogBody filters={filters} />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="Medical Content Approval Log">
+      <Suspense fallback={<MedicalApprovalLogSkeleton />}>
+        <MedicalApprovalLogBody filters={filters} />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

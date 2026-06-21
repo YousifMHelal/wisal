@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getAgentGridData, getAgentTrainingHistory } from "@/lib/queries/workforce"
 import { AgentGridClient } from "./agent-grid-client"
@@ -46,8 +47,10 @@ function AgentGridSkeleton() {
 
 export function AgentGridWidget({ filters }: Props) {
   return (
-    <Suspense fallback={<AgentGridSkeleton />}>
-      <AgentGridBody filters={filters} />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="Agent Performance Grid">
+      <Suspense fallback={<AgentGridSkeleton />}>
+        <AgentGridBody filters={filters} />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

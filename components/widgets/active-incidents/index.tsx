@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget, WidgetSkeleton } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getActiveIncidents } from "@/lib/queries/live-operations"
 import { ActiveIncidentsClient } from "./active-incidents-client"
 import type { Filters } from "@/lib/filters"
@@ -53,8 +54,10 @@ function IncidentsSkeleton() {
 
 export function ActiveIncidentsWidget({ filters }: Props) {
   return (
-    <Suspense fallback={<IncidentsSkeleton />}>
-      <IncidentsBody filters={filters} />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="Active Incidents">
+      <Suspense fallback={<IncidentsSkeleton />}>
+        <IncidentsBody filters={filters} />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }

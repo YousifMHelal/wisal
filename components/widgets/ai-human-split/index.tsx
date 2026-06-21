@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { Widget, WidgetSkeleton } from "@/components/widgets/widget"
+import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getAiHumanSplitData } from "@/lib/queries/intelligence"
 import { AiHumanSplitClient } from "./ai-human-split-client"
 import type { Filters } from "@/lib/filters"
@@ -37,7 +38,7 @@ function AiHumanSplitSkeleton() {
   return (
     <Widget title="AI vs Human Split">
       <div className="flex gap-4">
-        <Skeleton className="size-44 rounded-full flex-shrink-0" />
+        <Skeleton className="size-44 rounded-full shrink-0" />
         <div className="flex-1 space-y-2">
           <Skeleton className="h-4 w-full" />
           <Skeleton className="h-4 w-3/4" />
@@ -50,8 +51,10 @@ function AiHumanSplitSkeleton() {
 
 export function AiHumanSplitWidget({ filters }: Props) {
   return (
-    <Suspense fallback={<AiHumanSplitSkeleton />}>
-      <AiHumanSplitBody filters={filters} />
-    </Suspense>
+    <WidgetErrorBoundary widgetTitle="AI vs Human Split">
+      <Suspense fallback={<AiHumanSplitSkeleton />}>
+        <AiHumanSplitBody filters={filters} />
+      </Suspense>
+    </WidgetErrorBoundary>
   )
 }
