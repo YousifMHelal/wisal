@@ -22,7 +22,7 @@ async function KpiScorecardBody() {
     <Widget
       title="National KPI Scorecard"
       titleAr="مؤشرات الأداء الوطنية"
-      footer="This week vs target vs last week · click card → owning module"
+      footer="هذا الأسبوع مقابل الهدف مقابل الأسبوع الماضي · انقر على البطاقة للوحدة المسؤولة"
     >
       <KpiScorecardClient rows={rows} />
     </Widget>

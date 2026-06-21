@@ -48,7 +48,7 @@ export default async function RootLayout({
       <body className="min-h-full bg-background text-foreground" suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="light"
           enableSystem={false}
           disableTransitionOnChange
         >

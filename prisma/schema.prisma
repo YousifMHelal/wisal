@@ -737,14 +737,14 @@ model SystemHealth {
 
 model AuditLog {
   id        String   @id @default(cuid())
-  actor     String
+  actor     String?
   action    String
   entity    String
   entityId  String
   meta      Json     @default("{}")
   timestamp DateTime @default(now())
 
-  actorUser User? @relation(fields: [actor], references: [id])
+  actorUser User? @relation(fields: [actor], references: [id], onDelete: SetNull)
 
   @@index([entity, entityId])
   @@index([actor, timestamp])

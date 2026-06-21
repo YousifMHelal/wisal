@@ -72,18 +72,18 @@ export function KillSwitchClient({ killSwitch }: Props) {
                 isActive ? "text-[var(--status-red-fg)]" : "text-[var(--status-green-fg)]",
               ].join(" ")}
             >
-              {isActive ? "KILL SWITCH ACTIVE" : "System Armed (Normal)"}
+              {isActive ? "مفتاح الإيقاف الطارئ مفعّل" : "النظام في وضع الاستعداد"}
             </span>
             <StatusBadge status={isActive ? "red" : "green"} />
           </div>
 
           <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-muted-foreground">
-            <span>Scope: {killSwitch.scope}</span>
-            {killSwitch.scopeRef && <span>Ref: {killSwitch.scopeRef}</span>}
+            <span>النطاق: {killSwitch.scope}</span>
+            {killSwitch.scopeRef && <span>المرجع: {killSwitch.scopeRef}</span>}
             {killSwitch.lastTriggeredAt && (
               <span className="flex items-center gap-1">
                 <Clock className="size-3" aria-hidden />
-                Last triggered:{" "}
+                آخر تفعيل:{" "}
                 {killSwitch.lastTriggeredAt.toLocaleString([], {
                   month: "short",
                   day: "numeric",
@@ -112,7 +112,7 @@ export function KillSwitchClient({ killSwitch }: Props) {
           aria-label={isActive ? "Disarm kill switch" : "Activate kill switch"}
         >
           <ShieldAlert className="size-4" aria-hidden />
-          {isActive ? "Disarm Kill Switch" : "Activate Kill Switch"}
+          {isActive ? "تعطيل مفتاح الإيقاف" : "تفعيل مفتاح الإيقاف الطارئ"}
         </button>
       ) : (
         /* Confirmation step — deliberately heavy */
@@ -124,12 +124,11 @@ export function KillSwitchClient({ killSwitch }: Props) {
             />
             <div className="space-y-1">
               <p className="text-sm font-semibold text-[var(--status-red-fg)]">
-                {isActive ? "Confirm: Disarm kill switch" : "Confirm: Activate kill switch"}
+                {isActive ? "تأكيد: تعطيل مفتاح الإيقاف" : "تأكيد: تفعيل مفتاح الإيقاف الطارئ"}
               </p>
               {!isActive && (
                 <p className="text-xs text-muted-foreground">
-                  This will immediately halt all AI-assisted interactions. Human agents remain
-                  active. This action is audited and cannot be undone without re-arming.
+                  سيؤدي هذا إلى إيقاف جميع تفاعلات الذكاء الاصطناعي فوراً. يبقى الموظفون البشريون نشطين. هذا الإجراء مُدقَّق ولا يمكن التراجع عنه دون إعادة التهيئة.
                 </p>
               )}
             </div>
@@ -142,11 +141,11 @@ export function KillSwitchClient({ killSwitch }: Props) {
                 htmlFor="kill-switch-confirm"
                 className="text-xs text-muted-foreground"
               >
-                Type{" "}
+                اكتب{" "}
                 <code className="font-mono font-semibold text-foreground">
                   {CONFIRM_PHRASE}
                 </code>{" "}
-                to confirm:
+                للتأكيد:
               </label>
               <input
                 id="kill-switch-confirm"
@@ -177,10 +176,10 @@ export function KillSwitchClient({ killSwitch }: Props) {
               ].join(" ")}
             >
               {isPending
-                ? "Processing…"
+                ? "جارٍ المعالجة…"
                 : isActive
-                ? "Confirm Disarm"
-                : "Confirm Activate"}
+                ? "تأكيد التعطيل"
+                : "تأكيد التفعيل"}
             </button>
             <button
               onClick={() => {
@@ -190,14 +189,14 @@ export function KillSwitchClient({ killSwitch }: Props) {
               }}
               className="flex-1 sm:flex-none rounded-md border px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             >
-              Cancel
+              إلغاء
             </button>
           </div>
         </div>
       )}
 
       <p className="text-xs text-muted-foreground">
-        Every state change writes an immutable audit log entry.
+        كل تغيير في الحالة يُسجَّل في سجل تدقيق غير قابل للتعديل.
       </p>
     </div>
   )

@@ -25,11 +25,11 @@ async function ClusterRankingBody({ filters }: Props) {
     <Widget
       title="Cluster Ranking"
       titleAr="تصنيف المجموعات"
-      footer="Composite score · sortable by any KPI · click cluster → filter dashboard"
+      footer="النتيجة المركبة · قابل للترتيب حسب أي مؤشر · انقر على التجمع لتصفية لوحة التحكم"
     >
       {rows.length === 0 ? (
         <div className="flex items-center justify-center min-h-30">
-          <p className="text-sm text-muted-foreground">No ranking data for this period.</p>
+          <p className="text-sm text-muted-foreground">لا توجد بيانات ترتيب لهذه الفترة.</p>
         </div>
       ) : (
         <ClusterRankingClient rows={rows} />

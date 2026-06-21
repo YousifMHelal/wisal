@@ -33,7 +33,7 @@ function QaRow({ item, onReviewed }: QaRowProps) {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!score) { setError("Select a quality score."); return }
+    if (!score) { setError("اختر درجة الجودة."); return }
     setError(null)
     startTransition(async () => {
       const fd = new FormData()
@@ -89,12 +89,12 @@ function QaRow({ item, onReviewed }: QaRowProps) {
           <td colSpan={7} className="px-4 py-4 bg-muted/20">
             <form onSubmit={handleSubmit} className="flex flex-col gap-3 max-w-lg">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Score Interaction — {item.interactionId}
+                تقييم التفاعل — {item.interactionId}
               </p>
 
               {/* Quality score 1–5 */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-muted-foreground">Quality Score</label>
+                <label className="text-xs text-muted-foreground">درجة الجودة</label>
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map((v) => (
                     <button
@@ -118,7 +118,7 @@ function QaRow({ item, onReviewed }: QaRowProps) {
               {/* Notes */}
               <div className="flex flex-col gap-1.5">
                 <label htmlFor={`notes-${item.id}`} className="text-xs text-muted-foreground">
-                  Notes (optional)
+                  ملاحظات (اختياري)
                 </label>
                 <textarea
                   id={`notes-${item.id}`}
@@ -126,7 +126,7 @@ function QaRow({ item, onReviewed }: QaRowProps) {
                   onChange={(e) => setNotes(e.target.value)}
                   rows={2}
                   maxLength={1000}
-                  placeholder="Add reviewer notes…"
+                  placeholder="أضف ملاحظات المراجع…"
                   className="w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-none"
                 />
               </div>
@@ -139,14 +139,14 @@ function QaRow({ item, onReviewed }: QaRowProps) {
                   disabled={isPending || !score}
                   className="inline-flex items-center gap-1.5 h-8 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isPending ? "Submitting…" : "Submit Score"}
+                  {isPending ? "جارٍ الإرسال…" : "إرسال الدرجة"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
                   className="h-8 px-3 rounded-md border border-border text-sm text-muted-foreground hover:bg-muted transition-colors duration-150 cursor-pointer"
                 >
-                  Cancel
+                  إلغاء
                 </button>
               </div>
             </form>
@@ -171,7 +171,7 @@ export function QaQueueClient({ items: initialItems }: Props) {
   if (items.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[120px]">
-        <p className="text-sm text-muted-foreground">QA queue empty — all items reviewed.</p>
+        <p className="text-sm text-muted-foreground">طابور مراجعة الجودة فارغ — كل العناصر راجعت.</p>
       </div>
     )
   }
@@ -180,9 +180,9 @@ export function QaQueueClient({ items: initialItems }: Props) {
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <p className="text-xs text-muted-foreground tabular-nums">
-          {items.length} item{items.length !== 1 ? "s" : ""} pending review
+          {items.length} عنصر بانتظار المراجعة
         </p>
-        <p className="text-xs text-muted-foreground">Sorted by priority · worst sentiment first</p>
+        <p className="text-xs text-muted-foreground">مرتب حسب الأولوية · أسوأ شعور أولاً</p>
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-border">
@@ -190,12 +190,12 @@ export function QaQueueClient({ items: initialItems }: Props) {
           <thead>
             <tr className="border-b border-border bg-muted/40">
               <th className="py-2 ps-3 pe-1 w-8" />
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">Interaction</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden sm:table-cell">Cluster</th>
-              <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">Sentiment</th>
-              <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">Confidence</th>
-              <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden md:table-cell">Priority</th>
-              <th className="py-2 ps-2 pe-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden lg:table-cell">Created</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">التفاعل</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden sm:table-cell">التجمع</th>
+              <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">الشعور</th>
+              <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">الثقة</th>
+              <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden md:table-cell">الأولوية</th>
+              <th className="py-2 ps-2 pe-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden lg:table-cell">تاريخ الإنشاء</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">

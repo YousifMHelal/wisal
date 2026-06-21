@@ -42,7 +42,7 @@ function TimeAgo({ date }: { date: Date }) {
 function TrendMiniChart({ trend }: { trend: { label: string; value: number }[] }) {
   if (!trend.length) {
     return (
-      <p className="text-xs text-muted-foreground italic py-2">No trend data.</p>
+      <p className="text-xs text-muted-foreground italic py-2">لا توجد بيانات اتجاه.</p>
     )
   }
 
@@ -150,7 +150,7 @@ function IncidentItem({ incident }: IncidentItemProps) {
               aria-controls={`trend-${incident.id}`}
             >
               {expanded ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
-              {expanded ? "Hide trend" : "Show trend"}
+              {expanded ? "إخفاء الاتجاه" : "عرض الاتجاه"}
             </button>
 
             {!acknowledged && !incident.acknowledgedAt && (
@@ -163,13 +163,13 @@ function IncidentItem({ incident }: IncidentItemProps) {
                   className="h-6 text-xs px-2 cursor-pointer"
                   aria-label={`Acknowledge incident: ${incident.type}`}
                 >
-                  {pending ? "Acknowledging…" : "Acknowledge"}
+                  {pending ? "جارٍ الإقرار…" : "إقرار"}
                 </Button>
               </form>
             )}
 
             {(acknowledged || incident.acknowledgedAt) && (
-              <span className="text-xs text-status-green-fg">✓ Acknowledged</span>
+              <span className="text-xs text-status-green-fg">✓ تم الإقرار</span>
             )}
           </div>
 
@@ -192,7 +192,7 @@ export function ActiveIncidentsClient({ data }: Props) {
   if (!data.length) {
     return (
       <div className="flex items-center justify-center min-h-30">
-        <p className="text-sm text-status-green-fg">✓ No active incidents</p>
+        <p className="text-sm text-status-green-fg">✓ لا توجد حوادث نشطة</p>
       </div>
     )
   }
@@ -202,7 +202,7 @@ export function ActiveIncidentsClient({ data }: Props) {
   const sorted = [...critical, ...warnings]
 
   return (
-    <ul className="space-y-2" aria-label="Active incidents ranked by severity">
+    <ul className="space-y-2" aria-label="الحوادث النشطة مرتبة حسب الخطورة">
       {sorted.map((inc) => (
         <IncidentItem key={inc.id} incident={inc} />
       ))}

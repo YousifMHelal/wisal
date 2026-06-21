@@ -74,7 +74,7 @@ function SwapCard({ swap }: SwapCardProps) {
           ? <Check className="size-3.5 text-[var(--status-green-fg)]" />
           : <X className="size-3.5 text-[var(--status-red-fg)]" />
         }
-        <span>{swap.agentName} — swap {resolved === "APPROVE" ? "approved" : "rejected"}</span>
+        <span>{swap.agentName} — تبديل {resolved === "APPROVE" ? "موافق عليه" : "مرفوض"}</span>
       </div>
     )
   }
@@ -97,20 +97,20 @@ function SwapCard({ swap }: SwapCardProps) {
           disabled={isPending}
           onClick={() => handleAction("REJECT")}
           className="inline-flex items-center gap-1 h-7 px-2.5 rounded-md border border-[var(--status-red)] text-xs font-medium text-[var(--status-red-fg)] bg-[var(--status-red-bg)] hover:bg-[var(--status-red)]/20 transition-colors duration-150 cursor-pointer disabled:opacity-50"
-          aria-label={`Reject swap for ${swap.agentName}`}
+          aria-label={`رفض تبديل ${swap.agentName}`}
         >
           <X className="size-3" aria-hidden />
-          Reject
+          رفض
         </button>
         <button
           type="button"
           disabled={isPending}
           onClick={() => handleAction("APPROVE")}
           className="inline-flex items-center gap-1 h-7 px-2.5 rounded-md border border-[var(--status-green)] text-xs font-medium text-[var(--status-green-fg)] bg-[var(--status-green-bg)] hover:bg-[var(--status-green)]/20 transition-colors duration-150 cursor-pointer disabled:opacity-50"
-          aria-label={`Approve swap for ${swap.agentName}`}
+          aria-label={`الموافقة على تبديل ${swap.agentName}`}
         >
           <Check className="size-3" aria-hidden />
-          Approve
+          موافقة
         </button>
       </div>
     </div>
@@ -139,15 +139,15 @@ export function ScheduleCoverageClient({ slots, swaps }: Props) {
       <div className="flex flex-wrap items-center gap-3 justify-between">
         <div className="flex items-center gap-4 text-sm">
           <div>
-            <span className="text-muted-foreground text-xs uppercase tracking-wide">Coverage</span>
+            <span className="text-muted-foreground text-xs uppercase tracking-wide">التغطية</span>
             <p className="text-lg font-semibold tabular-nums text-foreground">{coveragePct}%</p>
           </div>
           <div>
-            <span className="text-muted-foreground text-xs uppercase tracking-wide">Staffed</span>
+            <span className="text-muted-foreground text-xs uppercase tracking-wide">الموظفون</span>
             <p className="text-lg font-semibold tabular-nums text-foreground">{totalStaffed}</p>
           </div>
           <div>
-            <span className="text-muted-foreground text-xs uppercase tracking-wide">Forecast</span>
+            <span className="text-muted-foreground text-xs uppercase tracking-wide">التوقع</span>
             <p className="text-lg font-semibold tabular-nums text-muted-foreground">{totalForecast}</p>
           </div>
         </div>
@@ -163,7 +163,7 @@ export function ScheduleCoverageClient({ slots, swaps }: Props) {
                   : "bg-card text-muted-foreground hover:bg-muted"
               }`}
             >
-              {v === "day" ? "24h" : "Peak (7–22)"}
+              {v === "day" ? "٢٤ ساعة" : "ذروة (٧–٢٢)"}
             </button>
           ))}
         </div>
@@ -173,15 +173,15 @@ export function ScheduleCoverageClient({ slots, swaps }: Props) {
       <div className="flex items-center gap-4 text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5">
           <span className="size-2.5 rounded-sm bg-[var(--status-green)] inline-block" />
-          Over-staffed
+          فائض توظيف
         </span>
         <span className="flex items-center gap-1.5">
           <span className="size-2.5 rounded-sm bg-[var(--status-amber)] inline-block" />
-          On target
+          في الهدف
         </span>
         <span className="flex items-center gap-1.5">
           <span className="size-2.5 rounded-sm bg-[var(--status-red)] inline-block" />
-          Under-staffed
+          نقص توظيف
         </span>
       </div>
 
@@ -204,7 +204,7 @@ export function ScheduleCoverageClient({ slots, swaps }: Props) {
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Pending Shift Swaps
+              طلبات تبديل الوردية المعلقة
             </h3>
             <Badge variant="outline" className="text-xs">
               {swaps.length}

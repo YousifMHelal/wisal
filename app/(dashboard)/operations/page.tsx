@@ -1,40 +1,30 @@
 import type { Metadata } from "next"
-import { parseFilters } from "@/lib/filters"
 import { IntegrationNmrWidget } from "@/components/widgets/integration-nmr"
 import { SystemHealthWidget } from "@/components/widgets/system-health"
-import { Beneficiary360Widget } from "@/components/widgets/beneficiary-360"
+import { PageHeader } from "@/components/shell/page-header"
 
-export const metadata: Metadata = { title: "Operations & Integrations" }
+export const metadata: Metadata = { title: "Integration & Health — Wisal Command Center" }
+export const revalidate = 60
 
-interface Props {
-  searchParams: Promise<Record<string, string | string[] | undefined>>
-}
-
-export default async function OperationsPage({ searchParams }: Props) {
-  const params = await searchParams
-  const beneficiaryId =
-    typeof params.beneficiaryId === "string" ? params.beneficiaryId : undefined
-
+export default function OperationsPage() {
   return (
-    <div className="flex flex-col gap-4 p-4 md:p-6">
-      <div>
-        <h1 className="text-xl font-semibold text-foreground">
-          <span lang="en" className="[html[dir=rtl]_&]:hidden">Operations &amp; Integrations</span>
-          <span lang="ar" className="hidden [html[dir=rtl]_&]:inline">العمليات والتكاملات</span>
-        </h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Integration health · System availability · Beneficiary 360 lookup
-        </p>
+    <>
+      <PageHeader
+        titleEn="Integration & System Health"
+        titleAr="التكاملات وصحة النظام"
+        subtitleEn="NMR live feed, integration matrix status, availability SLA and DR readiness"
+        subtitleAr="التغذية الحية لـ NMR وحالة مصفوفة التكاملات وتوفر مستوى الخدمة وجاهزية التعافي"
+        crumbs={[
+          { labelEn: "Operations", labelAr: "العمليات والتكاملات" },
+          { labelEn: "Integration & Health", labelAr: "التكاملات وصحة النظام" },
+        ]}
+      />
+      <div className="space-y-4 md:space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+          <IntegrationNmrWidget />
+          <SystemHealthWidget />
+        </div>
       </div>
-
-      {/* Top row: integration matrix + system health */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <IntegrationNmrWidget />
-        <SystemHealthWidget />
-      </div>
-
-      {/* Full-width: Beneficiary 360 */}
-      <Beneficiary360Widget beneficiaryId={beneficiaryId} />
-    </div>
+    </>
   )
 }

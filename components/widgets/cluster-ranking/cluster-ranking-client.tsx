@@ -87,7 +87,7 @@ export function ClusterRankingClient({ rows }: Props) {
                 onClick={() => toggleSort("compositeScore")}
                 className="flex items-center gap-1 hover:text-foreground transition-colors cursor-pointer"
               >
-                Cluster <SortIcon active={sortKey === "compositeScore"} dir={sortDir} />
+                التجمع <SortIcon active={sortKey === "compositeScore"} dir={sortDir} />
               </button>
             </th>
             <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -95,7 +95,7 @@ export function ClusterRankingClient({ rows }: Props) {
                 onClick={() => toggleSort("compositeScore")}
                 className="flex items-center gap-1 ms-auto hover:text-foreground transition-colors cursor-pointer"
               >
-                Score <SortIcon active={sortKey === "compositeScore"} dir={sortDir} />
+                النتيجة <SortIcon active={sortKey === "compositeScore"} dir={sortDir} />
               </button>
             </th>
             {KPI_COLUMNS.map((col) => (

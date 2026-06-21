@@ -9,5 +9,5 @@ export default function DashboardError({
   error: Error & { digest?: string }
   reset: () => void
 }) {
-  return <ErrorBoundaryUI error={error} reset={reset} title="Dashboard error" />
+  return <ErrorBoundaryUI error={error} reset={reset} title="خطأ في لوحة التحكم" />
 }

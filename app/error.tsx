@@ -9,11 +9,5 @@ export default function GlobalError({
   error: Error & { digest?: string }
   reset: () => void
 }) {
-  return (
-    <html>
-      <body>
-        <ErrorBoundaryUI error={error} reset={reset} title="Application error" />
-      </body>
-    </html>
-  )
+  return <ErrorBoundaryUI error={error} reset={reset} title="خطأ في التطبيق" />
 }

@@ -76,7 +76,7 @@ export function PenaltyImpactClient({ rows, filters }: Props) {
   if (!rows.length) {
     return (
       <div className="flex items-center justify-center min-h-[120px]">
-        <p className="text-sm text-muted-foreground">No penalty records for this period.</p>
+        <p className="text-sm text-muted-foreground">لا توجد سجلات غرامات لهذه الفترة.</p>
       </div>
     )
   }
@@ -94,7 +94,7 @@ export function PenaltyImpactClient({ rows, filters }: Props) {
               : "bg-muted text-muted-foreground hover:bg-muted/80"
           )}
         >
-          {showBreachedOnly ? "Showing breaches only" : "Show breaches only"}
+          {showBreachedOnly ? "عرض الخروقات فقط" : "إظهار الخروقات فقط"}
         </button>
         <Button
           variant="outline"
@@ -104,7 +104,7 @@ export function PenaltyImpactClient({ rows, filters }: Props) {
           className="gap-2 cursor-pointer"
         >
           {isPending ? <Loader2 className="size-3.5 animate-spin" /> : <Download className="size-3.5" />}
-          Export
+          تصدير
         </Button>
       </div>
 
@@ -115,28 +115,28 @@ export function PenaltyImpactClient({ rows, filters }: Props) {
             <tr className="border-b border-border">
               <th className="py-2 ps-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 <button onClick={() => toggleSort("clusterName")} className="flex items-center gap-1 hover:text-foreground transition-colors cursor-pointer">
-                  Cluster <SortIcon active={sortKey === "clusterName"} dir={sortDir} />
+                  التجمع <SortIcon active={sortKey === "clusterName"} dir={sortDir} />
                 </button>
               </th>
               <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 <button onClick={() => toggleSort("kpi")} className="flex items-center gap-1 hover:text-foreground transition-colors cursor-pointer">
-                  KPI <SortIcon active={sortKey === "kpi"} dir={sortDir} />
+                  المؤشر <SortIcon active={sortKey === "kpi"} dir={sortDir} />
                 </button>
               </th>
               <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 <button onClick={() => toggleSort("failurePct")} className="flex items-center gap-1 ms-auto hover:text-foreground transition-colors cursor-pointer">
-                  Failure % <SortIcon active={sortKey === "failurePct"} dir={sortDir} />
+                  % الإخفاق <SortIcon active={sortKey === "failurePct"} dir={sortDir} />
                 </button>
               </th>
               <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide hidden md:table-cell">
                 <button onClick={() => toggleSort("permissibleTolerance")} className="flex items-center gap-1 ms-auto hover:text-foreground transition-colors cursor-pointer">
-                  Tolerance <SortIcon active={sortKey === "permissibleTolerance"} dir={sortDir} />
+                  الهامش <SortIcon active={sortKey === "permissibleTolerance"} dir={sortDir} />
                 </button>
               </th>
-              <th className="py-2 px-2 text-center text-xs font-medium text-muted-foreground uppercase tracking-wide">Breach</th>
+              <th className="py-2 px-2 text-center text-xs font-medium text-muted-foreground uppercase tracking-wide">خرق</th>
               <th className="py-2 pe-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 <button onClick={() => toggleSort("penaltyAmount")} className="flex items-center gap-1 ms-auto hover:text-foreground transition-colors cursor-pointer">
-                  Penalty (SAR) <SortIcon active={sortKey === "penaltyAmount"} dir={sortDir} />
+                  الغرامة (ريال) <SortIcon active={sortKey === "penaltyAmount"} dir={sortDir} />
                 </button>
               </th>
             </tr>
@@ -191,7 +191,7 @@ export function PenaltyImpactClient({ rows, filters }: Props) {
         </table>
         {sorted.length > 50 && (
           <p className="text-xs text-muted-foreground text-center py-2">
-            Showing 50 of {sorted.length} records · export for full dataset
+            عرض ٥٠ من {sorted.length} سجل · صدّر للحصول على كامل البيانات
           </p>
         )}
       </div>

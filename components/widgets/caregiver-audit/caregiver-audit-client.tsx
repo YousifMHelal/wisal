@@ -7,14 +7,14 @@ import { WidgetEmpty } from "@/components/widgets/widget"
 import type { CaregiverCaseRow } from "@/lib/queries/intelligence"
 
 const PROXY_LABELS: Record<string, { label: string; color: string }> = {
-  CONFIRMED: { label: "Confirmed", color: "var(--status-green-fg)" },
-  DENIED: { label: "Denied", color: "var(--status-red-fg)" },
-  AMBIGUOUS: { label: "Ambiguous", color: "var(--status-amber-fg)" },
+  CONFIRMED: { label: "مؤكد", color: "var(--status-green-fg)" },
+  DENIED: { label: "مرفوض", color: "var(--status-red-fg)" },
+  AMBIGUOUS: { label: "غامض", color: "var(--status-amber-fg)" },
 }
 
 const ACTION_LABELS: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
-  COMPLETED_WITH_CONSENT: { label: "Completed w/ Consent", variant: "outline" },
-  FAILCLOSED_HANDOFF: { label: "Fail-Closed Handoff", variant: "destructive" },
+  COMPLETED_WITH_CONSENT: { label: "مكتمل بموافقة", variant: "outline" },
+  FAILCLOSED_HANDOFF: { label: "تحويل آمن مغلق", variant: "destructive" },
 }
 
 interface Props {
@@ -32,14 +32,14 @@ export function CaregiverAuditClient({ rows }: Props) {
       r.clusterName.toLowerCase().includes(search.toLowerCase())
   )
 
-  if (!rows.length) return <WidgetEmpty message="No caregiver audit cases for this period." />
+  if (!rows.length) return <WidgetEmpty message="لا توجد حالات تدقيق مقدم الرعاية لهذه الفترة." />
 
   return (
     <div className="space-y-3">
       {/* Search */}
       <input
         type="search"
-        placeholder="Search case ID or cluster…"
+        placeholder="ابحث برقم الحالة أو التجمع…"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="w-full rounded-md border bg-transparent px-3 py-1.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
@@ -52,19 +52,19 @@ export function CaregiverAuditClient({ rows }: Props) {
           <thead>
             <tr className="border-b bg-muted/40">
               <th className="text-start py-2 ps-3 pe-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Case ID
+                رقم الحالة
               </th>
               <th className="text-start py-2 px-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Cluster
+                التجمع
               </th>
               <th className="text-start py-2 px-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Proxy
+                الوكيل
               </th>
               <th className="text-start py-2 px-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Action
+                الإجراء
               </th>
               <th className="text-start py-2 px-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Time
+                الوقت
               </th>
               <th className="w-8" />
             </tr>
@@ -73,7 +73,7 @@ export function CaregiverAuditClient({ rows }: Props) {
             {filtered.length === 0 && (
               <tr>
                 <td colSpan={6} className="py-8 text-center text-muted-foreground text-xs">
-                  No results match your search.
+                  لا توجد نتائج تطابق بحثك.
                 </td>
               </tr>
             )}
@@ -136,10 +136,10 @@ export function CaregiverAuditClient({ rows }: Props) {
                       <td colSpan={6} className="py-3 ps-6 pe-3">
                         <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground mb-2">
                           <ShieldCheck className="size-3.5" aria-hidden />
-                          Audit Trail
+                          سجل التدقيق
                         </div>
                         {row.auditTrail.length === 0 ? (
-                          <p className="text-xs text-muted-foreground">No audit trail recorded.</p>
+                          <p className="text-xs text-muted-foreground">لا يوجد سجل تدقيق مسجّل.</p>
                         ) : (
                           <ol className="space-y-1.5 border-s-2 border-[var(--border)] ps-3">
                             {row.auditTrail.map((step, idx) => (
@@ -174,7 +174,7 @@ export function CaregiverAuditClient({ rows }: Props) {
       </div>
 
       <p className="text-xs text-muted-foreground">
-        {filtered.length} of {rows.length} cases · Click row to expand audit trail
+        {filtered.length} من {rows.length} حالة · انقر على الصف لعرض سجل التدقيق
       </p>
     </div>
   )

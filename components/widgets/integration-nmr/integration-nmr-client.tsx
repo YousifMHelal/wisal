@@ -20,9 +20,9 @@ function StateIcon({ state }: { state: string }) {
 }
 
 function StateLabel({ state }: { state: string }) {
-  if (state === "UP") return <span className="text-[var(--status-green-fg)] font-medium text-xs">Online</span>
-  if (state === "DEGRADED") return <span className="text-[var(--status-amber-fg)] font-medium text-xs">Degraded</span>
-  return <span className="text-[var(--status-red-fg)] font-medium text-xs">Down</span>
+  if (state === "UP") return <span className="text-[var(--status-green-fg)] font-medium text-xs">متصل</span>
+  if (state === "DEGRADED") return <span className="text-[var(--status-amber-fg)] font-medium text-xs">متدهور</span>
+  return <span className="text-[var(--status-red-fg)] font-medium text-xs">منقطع</span>
 }
 
 function stateBg(state: string) {
@@ -90,7 +90,7 @@ export function IntegrationNmrClient({ rows }: Props) {
                   <span className={row.latencyMs > 300 ? "text-[var(--status-amber-fg)]" : "text-foreground"}>
                     {row.latencyMs}ms
                   </span>
-                  {" latency"}
+                  {" زمن استجابة"}
                 </span>
               ) : (
                 "—"
@@ -105,7 +105,7 @@ export function IntegrationNmrClient({ rows }: Props) {
                   {formatDistanceToNow(row.lastSyncAt, { addSuffix: true })}
                 </span>
               ) : (
-                <span>Never synced</span>
+                <span>لم يتزامن مطلقًا</span>
               )}
             </div>
           </div>
@@ -113,11 +113,11 @@ export function IntegrationNmrClient({ rows }: Props) {
       })}
 
       {rows.length === 0 && (
-        <p className="text-sm text-muted-foreground text-center py-6">No integration data available.</p>
+        <p className="text-sm text-muted-foreground text-center py-6">لا توجد بيانات تكامل متاحة.</p>
       )}
 
       <p className="text-xs text-muted-foreground text-end">
-        Updated {formatDistanceToNow(now, { addSuffix: true })} · No point-to-point connections
+        تحديث {formatDistanceToNow(now, { addSuffix: true })} · لا اتصالات مباشرة بين الأنظمة
       </p>
     </div>
   )

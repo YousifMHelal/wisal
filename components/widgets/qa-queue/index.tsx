@@ -29,10 +29,10 @@ async function QaQueueBody({ filters }: Props) {
       titleAr="قائمة انتظار مراجعة الجودة"
       actions={
         <span className="text-xs text-muted-foreground tabular-nums">
-          {items.length} unreviewed
+          {items.length} غير مراجَع
         </span>
       }
-      footer="Priority ordered · low sentiment or low bot confidence surfaced first"
+      footer="مرتّب حسب الأولوية · المشاعر السلبية أو انخفاض ثقة الروبوت يُعرض أولاً"
     >
       <QaQueueClient items={items} />
     </Widget>

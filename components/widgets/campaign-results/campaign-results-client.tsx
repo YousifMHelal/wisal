@@ -73,7 +73,7 @@ export function CampaignResultsClient({ campaigns }: Props) {
   if (!campaigns.length) {
     return (
       <div className="flex items-center justify-center min-h-[120px]">
-        <p className="text-sm text-muted-foreground">No campaign data for this period.</p>
+        <p className="text-sm text-muted-foreground">لا توجد بيانات حملات لهذه الفترة.</p>
       </div>
     )
   }
@@ -91,7 +91,7 @@ export function CampaignResultsClient({ campaigns }: Props) {
               : "bg-muted text-muted-foreground hover:bg-muted/80"
           )}
         >
-          All
+          الكل
         </button>
         {CAMPAIGN_TYPES.map((t) => (
           <button
@@ -104,7 +104,7 @@ export function CampaignResultsClient({ campaigns }: Props) {
                 : "bg-muted text-muted-foreground hover:bg-muted/80"
             )}
           >
-            {TYPE_LABELS[t]?.label ?? t}
+            {TYPE_LABELS[t]?.labelAr ?? t}
           </button>
         ))}
       </div>
@@ -134,9 +134,9 @@ export function CampaignResultsClient({ campaigns }: Props) {
             }}
           />
           <Legend wrapperStyle={{ fontSize: 11, color: "var(--color-muted-foreground)" }} />
-          <Bar dataKey="sent" name="Sent" fill="var(--color-muted-foreground)" radius={[3, 3, 0, 0]} />
-          <Bar dataKey="delivered" name="Delivered" fill="var(--color-primary)" radius={[3, 3, 0, 0]} />
-          <Bar dataKey="responded" name="Responded" fill="var(--status-green)" radius={[3, 3, 0, 0]} />
+          <Bar dataKey="sent" name="مُرسَل" fill="var(--color-muted-foreground)" radius={[3, 3, 0, 0]} />
+          <Bar dataKey="delivered" name="مُستلَم" fill="var(--color-primary)" radius={[3, 3, 0, 0]} />
+          <Bar dataKey="responded" name="استجاب" fill="var(--status-green)" radius={[3, 3, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
 
@@ -145,12 +145,12 @@ export function CampaignResultsClient({ campaigns }: Props) {
         <table className="w-full min-w-[560px] text-sm border-collapse">
           <thead>
             <tr className="border-b border-border">
-              <th className="py-2 ps-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide">Campaign</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide">Type</th>
-              <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide">Sent</th>
-              <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide">Delivery %</th>
-              <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide">Response %</th>
-              <th className="py-2 pe-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide">Status</th>
+              <th className="py-2 ps-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide">الحملة</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide">النوع</th>
+              <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide">مُرسَل</th>
+              <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide">% التسليم</th>
+              <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide">% الاستجابة</th>
+              <th className="py-2 pe-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide">الحالة</th>
             </tr>
           </thead>
           <tbody>
@@ -162,7 +162,7 @@ export function CampaignResultsClient({ campaigns }: Props) {
                 </td>
                 <td className="py-2.5 px-2">
                   <span className="text-xs text-muted-foreground">
-                    {TYPE_LABELS[c.type as CampaignType]?.label ?? c.type}
+                    {TYPE_LABELS[c.type as CampaignType]?.labelAr ?? c.type}
                   </span>
                 </td>
                 <td className="py-2.5 px-2 text-end tabular-nums text-foreground">{c.sent.toLocaleString()}</td>

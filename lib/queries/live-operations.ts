@@ -35,6 +35,22 @@ const REGION_TO_ISO: Record<string, string> = {
   "Asir":       "SA-14",
 }
 
+const REGION_NAME_AR: Record<string, string> = {
+  "Riyadh":     "منطقة الرياض",
+  "Makkah":     "منطقة مكة المكرمة",
+  "Medina":     "منطقة المدينة المنورة",
+  "Eastern":    "المنطقة الشرقية",
+  "Qassim":     "منطقة القصيم",
+  "Hail":       "منطقة حائل",
+  "Tabuk":      "منطقة تبوك",
+  "N. Borders": "منطقة الحدود الشمالية",
+  "Jizan":      "منطقة جازان",
+  "Najran":     "منطقة نجران",
+  "Al Baha":    "منطقة الباحة",
+  "Al Jouf":    "منطقة الجوف",
+  "Asir":       "منطقة عسير",
+}
+
 export interface SlaAdminRegion {
   /** GeoJSON shapeISO — matches properties.shapeISO in ksa-regions.json */
   regionIso: string
@@ -100,9 +116,8 @@ export async function getSlaAdminRegionsData(filters: Filters): Promise<SlaAdmin
         ? "amber"
         : "green"
 
-    // Region display name: use the first cluster's region string
     const regionName = regionClusters[0].region
-    const regionNameAr = regionClusters[0].nameAr // cluster nameAr as fallback
+    const regionNameAr = REGION_NAME_AR[regionName] ?? regionClusters[0].nameAr
 
     results.push({
       regionIso: iso,

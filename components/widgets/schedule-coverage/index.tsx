@@ -29,10 +29,10 @@ async function ScheduleCoverageBody({ filters }: Props) {
       titleAr="الجدول والتغطية"
       actions={
         <span className="text-xs text-muted-foreground tabular-nums">
-          {data.swaps.length} pending swap{data.swaps.length !== 1 ? "s" : ""}
+          {data.swaps.length} طلب تبادل معلّق{data.swaps.length !== 1 ? "" : ""}
         </span>
       }
-      footer="Staffed vs forecast demand by hour · Supervisor role required to approve swaps"
+      footer="الموظفون مقابل الطلب المتوقع بالساعة · يتطلب دور المشرف لموافقة التبادلات"
     >
       <ScheduleCoverageClient slots={data.slots} swaps={data.swaps} />
     </Widget>

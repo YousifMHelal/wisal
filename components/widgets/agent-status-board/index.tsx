@@ -24,30 +24,30 @@ async function BoardBody({ filters, locale = "en" }: Props) {
       titleAr="حالة الوكلاء المباشرة"
       actions={
         <span className="text-xs text-muted-foreground tabular">
-          {totalAvail + totalOnCall}/{totalAgents} active
+          {totalAvail + totalOnCall}/{totalAgents} نشط
         </span>
       }
       footer={
         <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
             <span className="size-2 rounded-full inline-block" style={{ background: "var(--status-green)" }} />
-            Available
+            متاح
           </span>
           <span className="flex items-center gap-1">
             <span className="size-2 rounded-full inline-block" style={{ background: "var(--primary)" }} />
-            On Call
+            في مكالمة
           </span>
           <span className="flex items-center gap-1">
             <span className="size-2 rounded-full inline-block" style={{ background: "var(--status-amber)" }} />
-            Wrap/After
+            إنهاء/بعد المكالمة
           </span>
           <span className="flex items-center gap-1">
             <span className="size-2 rounded-full inline-block" style={{ background: "var(--muted-foreground)" }} />
-            Break
+            استراحة
           </span>
           <span className="flex items-center gap-1">
             <span className="size-2 rounded-full inline-block" style={{ background: "var(--status-red)" }} />
-            Offline
+            غير متصل
           </span>
         </div>
       }

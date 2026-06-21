@@ -31,7 +31,7 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
       });
 
       if (result?.error) {
-        setError("Invalid email or password");
+        setError("البريد الإلكتروني أو كلمة المرور غير صحيحة");
         return;
       }
 
@@ -45,7 +45,7 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
       <CardContent className="pt-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email address</Label>
+            <Label htmlFor="email">البريد الإلكتروني</Label>
             <Input
               id="email"
               name="email"
@@ -58,7 +58,7 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">كلمة المرور</Label>
             <Input
               id="password"
               name="password"
@@ -81,10 +81,10 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
             {isPending ? (
               <>
                 <Loader2 className="me-2 h-4 w-4 animate-spin" />
-                Signing in…
+                جارٍ تسجيل الدخول…
               </>
             ) : (
-              "Sign in"
+              "تسجيل الدخول"
             )}
           </Button>
         </form>
@@ -121,7 +121,7 @@ function DevRoleSwitcher() {
   return (
     <div className="mt-6 border-t pt-4">
       <p className="text-xs text-muted-foreground mb-2 text-center">
-        Dev quick-login
+        دخول سريع للتطوير
       </p>
       <div className="flex flex-wrap gap-2 justify-center">
         {devUsers.map((u) => (

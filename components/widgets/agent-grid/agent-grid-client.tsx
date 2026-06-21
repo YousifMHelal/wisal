@@ -9,12 +9,12 @@ import { status as kpiStatus } from "@/lib/kpi"
 import type { AgentRow, AgentTrainingRecord } from "@/lib/queries/workforce"
 
 const STATE_CONFIG: Record<string, { label: string; className: string }> = {
-  AVAILABLE: { label: "Available", className: "bg-[var(--status-green-bg)] text-[var(--status-green-fg)] border-[var(--status-green)]" },
-  ON_CALL: { label: "On Call", className: "bg-[var(--status-amber-bg)] text-[var(--status-amber-fg)] border-[var(--status-amber)]" },
-  WRAP: { label: "Wrap", className: "bg-[var(--status-amber-bg)] text-[var(--status-amber-fg)] border-[var(--status-amber)]" },
-  AFTER_CALL: { label: "After Call", className: "bg-[var(--status-amber-bg)] text-[var(--status-amber-fg)] border-[var(--status-amber)]" },
-  BREAK: { label: "Break", className: "bg-muted text-muted-foreground border-border" },
-  OFFLINE: { label: "Offline", className: "bg-[var(--status-red-bg)] text-[var(--status-red-fg)] border-[var(--status-red)]" },
+  AVAILABLE: { label: "متاح", className: "bg-[var(--status-green-bg)] text-[var(--status-green-fg)] border-[var(--status-green)]" },
+  ON_CALL: { label: "في مكالمة", className: "bg-[var(--status-amber-bg)] text-[var(--status-amber-fg)] border-[var(--status-amber)]" },
+  WRAP: { label: "تسوية", className: "bg-[var(--status-amber-bg)] text-[var(--status-amber-fg)] border-[var(--status-amber)]" },
+  AFTER_CALL: { label: "ما بعد المكالمة", className: "bg-[var(--status-amber-bg)] text-[var(--status-amber-fg)] border-[var(--status-amber)]" },
+  BREAK: { label: "استراحة", className: "bg-muted text-muted-foreground border-border" },
+  OFFLINE: { label: "غير متصل", className: "bg-[var(--status-red-bg)] text-[var(--status-red-fg)] border-[var(--status-red)]" },
 }
 
 function statusClass(s: "green" | "amber" | "red") {
@@ -35,7 +35,7 @@ function ExpandedRow({ agentId, agentName, training, loadTraining: _load }: Expa
     return (
       <tr>
         <td colSpan={8} className="px-4 py-4 bg-muted/20">
-          <p className="text-xs text-muted-foreground">No training records for {agentName}.</p>
+          <p className="text-xs text-muted-foreground">لا توجد سجلات تدريب لـ {agentName}.</p>
         </td>
       </tr>
     )
@@ -43,15 +43,15 @@ function ExpandedRow({ agentId, agentName, training, loadTraining: _load }: Expa
   return (
     <tr>
       <td colSpan={8} className="px-4 py-4 bg-muted/20">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Training History</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">سجل التدريب</p>
         <div className="overflow-x-auto">
           <table className="w-full text-xs min-w-[360px]">
             <thead>
               <tr className="border-b border-border">
-                <th className="py-1.5 pe-3 text-start font-medium text-muted-foreground">Module</th>
-                <th className="py-1.5 px-3 text-start font-medium text-muted-foreground">Completed</th>
-                <th className="py-1.5 px-3 text-end font-medium text-muted-foreground tabular-nums">Before</th>
-                <th className="py-1.5 px-3 text-end font-medium text-muted-foreground tabular-nums">After</th>
+                <th className="py-1.5 pe-3 text-start font-medium text-muted-foreground">الوحدة</th>
+                <th className="py-1.5 px-3 text-start font-medium text-muted-foreground">تاريخ الإتمام</th>
+                <th className="py-1.5 px-3 text-end font-medium text-muted-foreground tabular-nums">قبل</th>
+                <th className="py-1.5 px-3 text-end font-medium text-muted-foreground tabular-nums">بعد</th>
                 <th className="py-1.5 ps-3 text-end font-medium text-muted-foreground tabular-nums">Δ</th>
               </tr>
             </thead>
@@ -142,7 +142,7 @@ export function AgentGridClient({ agents, trainingMap }: Props) {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search agent, team, cluster…"
+            placeholder="ابحث عن موظف أو فريق أو تجمع…"
             className="ps-9 h-8 text-sm"
             aria-label="Search agents"
           />
@@ -153,13 +153,13 @@ export function AgentGridClient({ agents, trainingMap }: Props) {
           className="h-8 rounded-md border border-border bg-card text-sm text-foreground px-2 cursor-pointer focus:outline-none focus:ring-1 focus:ring-ring"
           aria-label="Filter by team"
         >
-          <option value="">All teams</option>
+          <option value="">كل الفرق</option>
           {teams.map((t) => (
             <option key={t} value={t}>{t}</option>
           ))}
         </select>
         <span className="text-xs text-muted-foreground tabular-nums ms-auto shrink-0">
-          {filtered.length} agents
+          {filtered.length} موظف
         </span>
       </div>
 
@@ -173,10 +173,10 @@ export function AgentGridClient({ agents, trainingMap }: Props) {
                 className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide cursor-pointer hover:text-foreground transition-colors select-none whitespace-nowrap"
                 onClick={() => toggleSort("name")}
               >
-                Agent <SortIcon k="name" />
+                الموظف <SortIcon k="name" />
               </th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden md:table-cell">Team</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden lg:table-cell">Cluster</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden md:table-cell">الفريق</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden lg:table-cell">التجمع</th>
               <th
                 className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide cursor-pointer hover:text-foreground transition-colors select-none whitespace-nowrap"
                 onClick={() => toggleSort("aht")}
@@ -207,7 +207,7 @@ export function AgentGridClient({ agents, trainingMap }: Props) {
             {filtered.length === 0 ? (
               <tr>
                 <td colSpan={8} className="py-8 text-center text-sm text-muted-foreground">
-                  No agents match your search.
+                  لا يوجد موظفون يطابقون بحثك.
                 </td>
               </tr>
             ) : (

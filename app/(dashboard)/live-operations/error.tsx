@@ -9,5 +9,5 @@ export default function LiveOperationsError({
   error: Error & { digest?: string }
   reset: () => void
 }) {
-  return <ErrorBoundaryUI error={error} reset={reset} title="Live Operations failed to load" />
+  return <ErrorBoundaryUI error={error} reset={reset} title="فشل تحميل العمليات المباشرة" />
 }

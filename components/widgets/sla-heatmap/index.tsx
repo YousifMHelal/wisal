@@ -15,7 +15,7 @@ async function HeatmapBody({ filters }: Props) {
   if (!data.length) {
     return (
       <Widget title="National SLA Heatmap" titleAr="خريطة مستوى الخدمة الوطنية">
-        <WidgetEmpty message="No region data available." />
+        <WidgetEmpty message="لا توجد بيانات للمناطق." />
       </Widget>
     )
   }
@@ -26,7 +26,7 @@ async function HeatmapBody({ filters }: Props) {
       titleAr="خريطة مستوى الخدمة الوطنية"
       footer={
         <span>
-          {data.length} admin regions · Updated {new Date().toLocaleTimeString()}
+          {data.length} منطقة إدارية · محدّث {new Date().toLocaleTimeString()}
         </span>
       }
     >

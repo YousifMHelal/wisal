@@ -25,7 +25,7 @@ async function CampaignResultsBody({ filters }: Props) {
     <Widget
       title="Campaign Results"
       titleAr="نتائج الحملات"
-      footer="Outbound campaigns · sent / delivered / responded · by type"
+      footer="الحملات الصادرة · مُرسَل / مُوصَّل / استجابة · حسب النوع"
     >
       <CampaignResultsClient campaigns={campaigns} />
     </Widget>

@@ -23,7 +23,7 @@ async function KillSwitchBody() {
     return (
       <Widget title="Kill Switch" titleAr="مفتاح الإيقاف الطارئ">
         <div className="flex items-center justify-center min-h-30">
-          <p className="text-sm text-muted-foreground">Kill switch record not initialised.</p>
+          <p className="text-sm text-muted-foreground">لم تتم تهيئة سجل مفتاح الإيقاف.</p>
         </div>
       </Widget>
     )
@@ -34,7 +34,7 @@ async function KillSwitchBody() {
       title="Kill Switch"
       titleAr="مفتاح الإيقاف الطارئ"
       actions={
-        <span className="text-xs text-muted-foreground">PLATFORM_ADMIN only</span>
+        <span className="text-xs text-muted-foreground">مسؤول النظام فقط</span>
       }
       footer={`Last updated: ${killSwitch.updatedAt.toLocaleString([], {
         month: "short",

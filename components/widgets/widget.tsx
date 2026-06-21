@@ -70,9 +70,9 @@ export function WidgetError({ message, className }: { message?: string; classNam
     <section className={cn("rounded-xl border border-destructive/20 bg-card p-4 md:p-6 flex flex-col items-center justify-center gap-3 min-h-45", className)}>
       <AlertCircle className="size-8 text-destructive/60" aria-hidden="true" />
       <div className="text-center space-y-1">
-        <p className="text-sm font-medium text-foreground">Unable to load data</p>
+        <p className="text-sm font-medium text-foreground">تعذّر تحميل البيانات</p>
         <p className="text-xs text-muted-foreground">
-          {message ?? "An error occurred. Try refreshing the page."}
+          {message ?? "حدث خطأ. حاول تحديث الصفحة."}
         </p>
       </div>
     </section>
@@ -87,9 +87,9 @@ export function WidgetEmpty({ message, messageAr, className }: { message?: strin
         <span lang="en" className="[html[dir=rtl]_&]:hidden">
           {message ?? "No data available for the selected filters."}
         </span>
-        {messageAr && (
-          <span lang="ar" className="hidden [html[dir=rtl]_&]:inline">{messageAr}</span>
-        )}
+        <span lang="ar" className="hidden [html[dir=rtl]_&]:inline">
+          {messageAr ?? "لا توجد بيانات للفلاتر المحددة."}
+        </span>
       </p>
     </div>
   )

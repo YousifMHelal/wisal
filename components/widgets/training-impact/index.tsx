@@ -23,10 +23,10 @@ async function TrainingImpactBody({ filters, moduleFilter }: Props) {
       titleAr="أثر التدريب"
       actions={
         <span className="text-xs text-muted-foreground tabular-nums">
-          {summaries.length} module{summaries.length !== 1 ? "s" : ""}
+          {summaries.length} وحدة{summaries.length !== 1 ? "" : ""}
         </span>
       }
-      footer="QA score before vs after per training module"
+      footer="درجة الجودة قبل وبعد كل وحدة تدريبية"
     >
       <TrainingImpactClient
         summaries={summaries}

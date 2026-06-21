@@ -9,18 +9,18 @@ import { assignTicketAgent } from "@/lib/actions/workforce"
 import type { TicketRow, AgentOption } from "@/lib/queries/workforce"
 
 const PRIORITY_CONFIG: Record<string, { label: string; className: string; order: number }> = {
-  CRITICAL: { label: "Critical", className: "bg-[var(--status-red-bg)] text-[var(--status-red-fg)] border-[var(--status-red)]", order: 0 },
-  HIGH: { label: "High", className: "bg-[var(--status-amber-bg)] text-[var(--status-amber-fg)] border-[var(--status-amber)]", order: 1 },
-  MEDIUM: { label: "Medium", className: "bg-muted text-foreground border-border", order: 2 },
-  LOW: { label: "Low", className: "bg-muted text-muted-foreground border-border", order: 3 },
+  CRITICAL: { label: "حرج", className: "bg-[var(--status-red-bg)] text-[var(--status-red-fg)] border-[var(--status-red)]", order: 0 },
+  HIGH: { label: "عالٍ", className: "bg-[var(--status-amber-bg)] text-[var(--status-amber-fg)] border-[var(--status-amber)]", order: 1 },
+  MEDIUM: { label: "متوسط", className: "bg-muted text-foreground border-border", order: 2 },
+  LOW: { label: "منخفض", className: "bg-muted text-muted-foreground border-border", order: 3 },
 }
 
 const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
-  OPEN: { label: "Open", className: "bg-[var(--status-amber-bg)] text-[var(--status-amber-fg)] border-[var(--status-amber)]" },
-  IN_PROGRESS: { label: "In Progress", className: "bg-primary/10 text-primary border-primary/40" },
-  ESCALATED: { label: "Escalated", className: "bg-[var(--status-red-bg)] text-[var(--status-red-fg)] border-[var(--status-red)]" },
-  RESOLVED: { label: "Resolved", className: "bg-[var(--status-green-bg)] text-[var(--status-green-fg)] border-[var(--status-green)]" },
-  CLOSED: { label: "Closed", className: "bg-muted text-muted-foreground border-border" },
+  OPEN: { label: "مفتوح", className: "bg-[var(--status-amber-bg)] text-[var(--status-amber-fg)] border-[var(--status-amber)]" },
+  IN_PROGRESS: { label: "قيد التنفيذ", className: "bg-primary/10 text-primary border-primary/40" },
+  ESCALATED: { label: "مُصعَّد", className: "bg-[var(--status-red-bg)] text-[var(--status-red-fg)] border-[var(--status-red)]" },
+  RESOLVED: { label: "محلول", className: "bg-[var(--status-green-bg)] text-[var(--status-green-fg)] border-[var(--status-green)]" },
+  CLOSED: { label: "مغلق", className: "bg-muted text-muted-foreground border-border" },
 }
 
 interface AssignCellProps {
@@ -58,7 +58,7 @@ function AssignCell({ ticket, agents }: AssignCellProps) {
         className="h-7 flex-1 min-w-0 rounded-md border border-border bg-card text-xs text-foreground px-1.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
         aria-label={`Assign agent to ticket ${ticket.id}`}
       >
-        <option value="">Unassigned</option>
+        <option value="">غير مُعيَّن</option>
         {clusterAgents.map((a) => (
           <option key={a.id} value={a.id}>{a.name}</option>
         ))}
@@ -106,7 +106,7 @@ export function TicketQueueClient({ tickets, agents }: Props) {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search ticket, beneficiary…"
+            placeholder="ابحث عن تذكرة أو مستفيد…"
             className="ps-9 h-8 text-sm"
             aria-label="Search tickets"
           />
@@ -117,9 +117,9 @@ export function TicketQueueClient({ tickets, agents }: Props) {
           className="h-8 rounded-md border border-border bg-card text-sm text-foreground px-2 cursor-pointer focus:outline-none focus:ring-1 focus:ring-ring"
           aria-label="Filter by type"
         >
-          <option value="">All types</option>
-          <option value="COMPLAINT">Complaint</option>
-          <option value="REQUEST">Request</option>
+          <option value="">كل الأنواع</option>
+          <option value="COMPLAINT">شكوى</option>
+          <option value="REQUEST">طلب</option>
         </select>
         <select
           value={priorityFilter}
@@ -127,20 +127,20 @@ export function TicketQueueClient({ tickets, agents }: Props) {
           className="h-8 rounded-md border border-border bg-card text-sm text-foreground px-2 cursor-pointer focus:outline-none focus:ring-1 focus:ring-ring"
           aria-label="Filter by priority"
         >
-          <option value="">All priorities</option>
-          <option value="CRITICAL">Critical</option>
-          <option value="HIGH">High</option>
-          <option value="MEDIUM">Medium</option>
-          <option value="LOW">Low</option>
+          <option value="">كل الأولويات</option>
+          <option value="CRITICAL">حرج</option>
+          <option value="HIGH">عالٍ</option>
+          <option value="MEDIUM">متوسط</option>
+          <option value="LOW">منخفض</option>
         </select>
         <div className="flex items-center gap-1.5 ms-auto shrink-0 text-xs text-muted-foreground">
           {breachedCount > 0 && (
             <span className="flex items-center gap-1 text-[var(--status-red-fg)]">
               <AlertCircle className="size-3.5" aria-hidden />
-              {breachedCount} SLA breached
+              {breachedCount} خرق SLA
             </span>
           )}
-          <span className="tabular-nums">{filtered.length} tickets</span>
+          <span className="tabular-nums">{filtered.length} تذكرة</span>
         </div>
       </div>
 
@@ -149,21 +149,21 @@ export function TicketQueueClient({ tickets, agents }: Props) {
         <table className="w-full text-sm min-w-[800px]">
           <thead>
             <tr className="border-b border-border bg-muted/40">
-              <th className="py-2 ps-3 pe-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">Ticket</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden md:table-cell">Beneficiary</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">Type</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">Priority</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">Status</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">SLA Due</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">Assign Agent</th>
-              <th className="py-2 ps-2 pe-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden lg:table-cell">Escalation</th>
+              <th className="py-2 ps-3 pe-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">التذكرة</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden md:table-cell">المستفيد</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">النوع</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">الأولوية</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">الحالة</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">موعد SLA</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">تعيين موظف</th>
+              <th className="py-2 ps-2 pe-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden lg:table-cell">التصعيد</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {filtered.length === 0 ? (
               <tr>
                 <td colSpan={8} className="py-8 text-center text-sm text-muted-foreground">
-                  No tickets match your search.
+                  لا توجد تذاكر تطابق بحثك.
                 </td>
               </tr>
             ) : (
@@ -185,8 +185,8 @@ export function TicketQueueClient({ tickets, agents }: Props) {
                         <a
                           href={`/operations?beneficiaryId=${ticket.beneficiaryId}`}
                           className="text-primary hover:text-primary/80 transition-colors"
-                          title="View Beneficiary 360"
-                          aria-label="Open Beneficiary 360 profile"
+                          title="عرض الملف الشامل للمستفيد"
+                          aria-label="فتح الملف الشامل للمستفيد"
                         >
                           <ExternalLink className="size-3" aria-hidden />
                         </a>
@@ -197,7 +197,7 @@ export function TicketQueueClient({ tickets, agents }: Props) {
                     </td>
                     <td className="py-2.5 px-2 whitespace-nowrap">
                       <Badge variant="outline" className="text-xs">
-                        {ticket.type === "COMPLAINT" ? "Complaint" : "Request"}
+                        {ticket.type === "COMPLAINT" ? "شكوى" : "طلب"}
                       </Badge>
                     </td>
                     <td className="py-2.5 px-2 whitespace-nowrap">
@@ -231,7 +231,7 @@ export function TicketQueueClient({ tickets, agents }: Props) {
       </div>
 
       <p className="text-xs text-muted-foreground text-end tabular-nums">
-        {filtered.length} of {tickets.length} tickets · sorted by priority + SLA due
+        {filtered.length} من {tickets.length} تذكرة · مرتب حسب الأولوية + موعد SLA
       </p>
     </div>
   )

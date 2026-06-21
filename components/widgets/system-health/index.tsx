@@ -11,7 +11,7 @@ async function SystemHealthBody() {
   if (!data) {
     return (
       <Widget title="System Health & DR" titleAr="صحة النظام والتعافي من الكوارث">
-        <WidgetEmpty message="No system health data available." />
+        <WidgetEmpty message="لا توجد بيانات لصحة النظام." />
       </Widget>
     )
   }
@@ -20,7 +20,7 @@ async function SystemHealthBody() {
     <Widget
       title="System Health & DR"
       titleAr="صحة النظام والتعافي من الكوارث"
-      footer={`Availability target: 99.9999% · BCP/DR RTO/RPO per channel · KSA data residency`}
+      footer={`هدف التوفر: 99.9999% · BCP/DR RTO/RPO لكل قناة · إقامة البيانات في المملكة`}
     >
       <SystemHealthClient data={data} />
     </Widget>

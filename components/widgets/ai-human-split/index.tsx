@@ -23,11 +23,11 @@ async function AiHumanSplitBody({ filters }: Props) {
             className="text-xs font-semibold tabular-nums"
             style={{ color: "var(--primary)" }}
           >
-            {data.overall.aiTotalPct.toFixed(1)}% AI
+            {data.overall.aiTotalPct.toFixed(1)}% ذكاء اصطناعي
           </span>
         ) : undefined
       }
-      footer="Toggle donut ↔ funnel · Segment by channel or cluster"
+      footer="تبديل الدائرة ↔ القمع · تقسيم حسب القناة أو التجمع"
     >
       <AiHumanSplitClient data={data} />
     </Widget>

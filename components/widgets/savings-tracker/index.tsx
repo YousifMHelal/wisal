@@ -25,7 +25,7 @@ async function SavingsTrackerBody({ filters }: Props) {
     <Widget
       title="Savings & Efficiency"
       titleAr="المدخرات والكفاءة"
-      footer="Hover → volume × AHT saved calc · export for board reporting"
+      footer="مرر للحساب: الحجم × وقت التعامل المُوفَّر · تصدير للتقرير"
     >
       <SavingsTrackerClient data={data} filters={filters} />
     </Widget>

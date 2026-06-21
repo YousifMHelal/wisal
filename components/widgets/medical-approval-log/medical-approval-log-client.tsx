@@ -8,9 +8,9 @@ import { format } from "date-fns"
 import type { MedicalApprovalRow } from "@/lib/queries/governance"
 
 const STATUS_CONFIG = {
-  APPROVED: { label: "Approved", className: "bg-status-green/15 text-status-green-fg border-status-green/30" },
-  PENDING: { label: "Pending", className: "bg-status-amber/15 text-status-amber-fg border-status-amber/30" },
-  REJECTED: { label: "Rejected", className: "bg-status-red/15 text-status-red-fg border-status-red/30" },
+  APPROVED: { label: "معتمد", className: "bg-status-green/15 text-status-green-fg border-status-green/30" },
+  PENDING: { label: "معلق", className: "bg-status-amber/15 text-status-amber-fg border-status-amber/30" },
+  REJECTED: { label: "مرفوض", className: "bg-status-red/15 text-status-red-fg border-status-red/30" },
 } as const
 
 interface Props {
@@ -42,7 +42,7 @@ export function MedicalApprovalLogClient({ rows, exportUrl }: Props) {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search case ID, cluster, status…"
+            placeholder="ابحث برقم الحالة أو التجمع أو الحالة…"
             className="ps-9 h-8 text-sm"
             aria-label="Search approvals"
           />
@@ -62,18 +62,18 @@ export function MedicalApprovalLogClient({ rows, exportUrl }: Props) {
         <table className="w-full text-sm min-w-[600px]">
           <thead>
             <tr className="border-b border-border bg-muted/40">
-              <th className="py-2 ps-3 pe-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">Case ID</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">Cluster</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">Status</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden md:table-cell">Approved By</th>
-              <th className="py-2 ps-2 pe-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">Date</th>
+              <th className="py-2 ps-3 pe-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">رقم الحالة</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">التجمع</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">الحالة</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden md:table-cell">اعتمد بواسطة</th>
+              <th className="py-2 ps-2 pe-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">التاريخ</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {filtered.length === 0 ? (
               <tr>
                 <td colSpan={5} className="py-8 text-center text-sm text-muted-foreground">
-                  No records match your search.
+                  لا توجد سجلات تطابق بحثك.
                 </td>
               </tr>
             ) : (
@@ -101,7 +101,7 @@ export function MedicalApprovalLogClient({ rows, exportUrl }: Props) {
       </div>
 
       <p className="text-xs text-muted-foreground text-end tabular-nums">
-        Showing {filtered.length} of {rows.length} records
+        عرض {filtered.length} من {rows.length} سجل
       </p>
     </div>
   )

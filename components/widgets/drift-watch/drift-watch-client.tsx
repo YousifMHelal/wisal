@@ -47,7 +47,7 @@ export function DriftWatchClient({ data, assignableUsers }: Props) {
 
   const { series, alerts } = data
 
-  if (!series.length) return <WidgetEmpty message="No drift data for this period." />
+  if (!series.length) return <WidgetEmpty message="لا توجد بيانات انحراف لهذه الفترة." />
 
   // Build flat chart data — all series share same date axis
   const allDates = Array.from(
@@ -156,7 +156,7 @@ export function DriftWatchClient({ data, assignableUsers }: Props) {
         <div className="border-t pt-3 space-y-2">
           <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
             <AlertTriangle className="size-3.5 text-[var(--status-amber-fg)]" aria-hidden />
-            Flagged Alerts ({alerts.length})
+            تنبيهات مُعلَّمة ({alerts.length})
           </div>
 
           <div className="space-y-1.5 max-h-52 overflow-y-auto">
@@ -213,17 +213,17 @@ export function DriftWatchClient({ data, assignableUsers }: Props) {
                           setAssigningId(isAssigning ? null : alert.id)
                         }}
                         className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer flex-shrink-0"
-                        aria-label="Assign alert"
+                        aria-label="تكليف تنبيه"
                       >
                         <UserCheck className="size-3.5" aria-hidden />
-                        Assign
+                        تكليف
                       </button>
                     )}
                     {result === "success" && (
-                      <span className="text-xs text-[var(--status-green-fg)]">Assigned ✓</span>
+                      <span className="text-xs text-[var(--status-green-fg)]">تم التكليف ✓</span>
                     )}
                     {result === "error" && (
-                      <span className="text-xs text-[var(--status-red-fg)]">Failed</span>
+                      <span className="text-xs text-[var(--status-red-fg)]">فشل</span>
                     )}
                   </div>
 
@@ -239,7 +239,7 @@ export function DriftWatchClient({ data, assignableUsers }: Props) {
                         className="flex-1 rounded border bg-transparent text-xs px-2 py-1 text-foreground focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
                         aria-label="Select assignee"
                       >
-                        <option value="">Select member…</option>
+                        <option value="">اختر عضواً…</option>
                         {assignableUsers.map((u) => (
                           <option key={u.id} value={u.id}>
                             {u.name} ({u.role})
@@ -251,7 +251,7 @@ export function DriftWatchClient({ data, assignableUsers }: Props) {
                         onClick={() => handleAssign(alert.id)}
                         className="rounded px-2 py-1 text-xs bg-[var(--primary)] text-[var(--primary-foreground)] disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed transition-opacity"
                       >
-                        {isPending ? "…" : "Assign"}
+                        {isPending ? "…" : "تكليف"}
                       </button>
                     </div>
                   )}

@@ -17,7 +17,7 @@ async function GaugeBody({ filters }: Props) {
     <Widget
       title="Today vs Target"
       titleAr="اليوم مقابل الهدف"
-      footer={<span>Click a gauge to highlight · Targets from RFP Appendix 1</span>}
+      footer={<span>انقر على المقياس لإبرازه · الأهداف من ملحق RFP 1</span>}
     >
       <CompositeGauge
         serviceLevel={data.serviceLevel}

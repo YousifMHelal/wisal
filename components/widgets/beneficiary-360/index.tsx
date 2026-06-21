@@ -23,7 +23,7 @@ async function Beneficiary360Body({ beneficiaryId }: Props) {
     <Widget
       title="Beneficiary 360"
       titleAr="ملف المستفيد الشامل"
-      footer="Search by national ID (Iqama) or name · Cross-channel interaction history · Active tickets"
+      footer="ابحث برقم الهوية (الإقامة) أو الاسم · سجل التفاعلات عبر القنوات · التذاكر النشطة"
     >
       <Beneficiary360Client initialBeneficiaryId={beneficiaryId} />
     </Widget>

@@ -9,5 +9,5 @@ export default function OperationsError({
   error: Error & { digest?: string }
   reset: () => void
 }) {
-  return <ErrorBoundaryUI error={error} reset={reset} title="Operations & Integrations failed to load" />
+  return <ErrorBoundaryUI error={error} reset={reset} title="فشل تحميل العمليات والتكاملات" />
 }

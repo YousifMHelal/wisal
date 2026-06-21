@@ -41,10 +41,10 @@ async function ConsentAuditBody({ filters }: Props) {
       titleAr="تدقيق الموافقة والإفصاح"
       actions={
         <span className={`text-xs tabular-nums font-medium ${missingCount > 0 ? "text-status-red-fg" : "text-muted-foreground"}`}>
-          {missingCount > 0 ? `${missingCount} missing` : `${rows.length} records`}
+          {missingCount > 0 ? `${missingCount} مفقود` : `${rows.length} سجل`}
         </span>
       }
-      footer="Links to Caregiver Audit (Module 02) · COMPLIANCE role required"
+      footer="مرتبط بمراجعة مقدم الرعاية (الوحدة 02) · يتطلب دور الامتثال"
     >
       <ConsentAuditClient rows={rows} exportUrl={exportUrl} />
     </Widget>

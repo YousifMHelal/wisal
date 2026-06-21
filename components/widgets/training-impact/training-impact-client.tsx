@@ -104,13 +104,13 @@ export function TrainingImpactClient({
             className="inline-flex items-center gap-1 h-7 px-2 rounded-md border border-border text-xs text-muted-foreground hover:bg-muted transition-colors duration-150 cursor-pointer"
           >
             <ChevronLeft className="size-3" aria-hidden />
-            Back
+            رجوع
           </button>
-          <span className="text-sm font-medium text-foreground">{drilldown.agentName} — Training History</span>
+          <span className="text-sm font-medium text-foreground">{drilldown.agentName} — سجل التدريب</span>
         </div>
 
         {trendData.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-8">No training records.</p>
+          <p className="text-sm text-muted-foreground text-center py-8">لا توجد سجلات تدريب.</p>
         ) : (
           <>
             <ResponsiveContainer width="100%" height={200}>
@@ -153,10 +153,10 @@ export function TrainingImpactClient({
               <table className="w-full text-xs min-w-[360px]">
                 <thead>
                   <tr className="border-b border-border bg-muted/40">
-                    <th className="py-2 ps-3 text-start font-medium text-muted-foreground">Module</th>
-                    <th className="py-2 px-2 text-start font-medium text-muted-foreground">Completed</th>
-                    <th className="py-2 px-2 text-end font-medium text-muted-foreground tabular-nums">Before</th>
-                    <th className="py-2 px-2 text-end font-medium text-muted-foreground tabular-nums">After</th>
+                    <th className="py-2 ps-3 text-start font-medium text-muted-foreground">الوحدة</th>
+                    <th className="py-2 px-2 text-start font-medium text-muted-foreground">تاريخ الإتمام</th>
+                    <th className="py-2 px-2 text-end font-medium text-muted-foreground tabular-nums">قبل</th>
+                    <th className="py-2 px-2 text-end font-medium text-muted-foreground tabular-nums">بعد</th>
                     <th className="py-2 pe-3 text-end font-medium text-muted-foreground tabular-nums">Δ</th>
                   </tr>
                 </thead>
@@ -188,26 +188,26 @@ export function TrainingImpactClient({
     <div className="flex flex-col gap-4">
       {/* Module filter */}
       <div className="flex flex-wrap items-center gap-2">
-        <label className="text-xs text-muted-foreground shrink-0">Module</label>
+        <label className="text-xs text-muted-foreground shrink-0">الوحدة</label>
         <select
           value={selectedModule}
           onChange={(e) => onModuleChange(e.target.value)}
           className="h-8 rounded-md border border-border bg-card text-sm text-foreground px-2 cursor-pointer focus:outline-none focus:ring-1 focus:ring-ring"
-          aria-label="Filter by training module"
+          aria-label="تصفية حسب وحدة التدريب"
         >
-          <option value="">All modules</option>
+          <option value="">كل الوحدات</option>
           {moduleList.map((m) => (
             <option key={m} value={m}>{m}</option>
           ))}
         </select>
         <span className="text-xs text-muted-foreground ms-auto tabular-nums">
-          {summaries.reduce((s, m) => s + m.completions, 0)} completions
+          {summaries.reduce((s, m) => s + m.completions, 0)} إتمام
         </span>
       </div>
 
       {summaries.length === 0 ? (
         <div className="flex items-center justify-center min-h-[160px]">
-          <p className="text-sm text-muted-foreground">No training records for this selection.</p>
+          <p className="text-sm text-muted-foreground">لا توجد سجلات تدريب لهذا الاختيار.</p>
         </div>
       ) : (
         <>
@@ -232,12 +232,14 @@ export function TrainingImpactClient({
               <Legend wrapperStyle={{ fontSize: 10 }} />
               <Bar
                 dataKey="Avg Before"
+                name="متوسط قبل"
                 fill="var(--muted-foreground)"
                 radius={[3, 3, 0, 0]}
                 opacity={0.6}
               />
               <Bar
                 dataKey="Avg After"
+                name="متوسط بعد"
                 fill="var(--primary)"
                 radius={[3, 3, 0, 0]}
               />
@@ -249,11 +251,11 @@ export function TrainingImpactClient({
             <table className="w-full text-sm min-w-[480px]">
               <thead>
                 <tr className="border-b border-border bg-muted/40">
-                  <th className="py-2 ps-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide">Module</th>
-                  <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide tabular-nums">Completions</th>
-                  <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide tabular-nums">Before</th>
-                  <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide tabular-nums">After</th>
-                  <th className="py-2 pe-3 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide tabular-nums">Δ avg</th>
+                  <th className="py-2 ps-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide">الوحدة</th>
+                  <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide tabular-nums">الإتمامات</th>
+                  <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide tabular-nums">قبل</th>
+                  <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide tabular-nums">بعد</th>
+                  <th className="py-2 pe-3 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide tabular-nums">Δ متوسط</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -275,7 +277,7 @@ export function TrainingImpactClient({
           {/* Agent-level drilldown: pick from available details */}
           {Object.keys(agentDetails).length > 0 && (
             <div className="flex flex-col gap-2">
-              <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Agent Drilldown</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">تحليل الموظف</p>
               <div className="flex flex-wrap gap-2">
                 {Object.values(agentDetails).map((d) => (
                   <button

@@ -25,15 +25,15 @@ async function IncidentsBody({ filters }: Props) {
         data.length > 0 ? (
           <span className="text-xs text-muted-foreground tabular">
             {criticalCount > 0 && (
-              <span className="text-status-red-fg me-2">{criticalCount} critical</span>
+              <span className="text-status-red-fg me-2">{criticalCount} حرج</span>
             )}
             {warningCount > 0 && (
-              <span className="text-status-amber-fg">{warningCount} warning</span>
+              <span className="text-status-amber-fg">{warningCount} تحذير</span>
             )}
           </span>
         ) : undefined
       }
-      footer={data.length > 0 ? <span>{data.length} unacknowledged · Click to expand trend</span> : undefined}
+      footer={data.length > 0 ? <span>{data.length} غير مُقرّ · انقر لعرض التوجه</span> : undefined}
     >
       <ActiveIncidentsClient data={data} />
     </Widget>

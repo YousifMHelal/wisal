@@ -17,7 +17,7 @@ async function PulseBody({ filters, locale = "en" }: Props) {
   if (!data.length) {
     return (
       <Widget title="Channel Pulse" titleAr="نبض القنوات">
-        <WidgetEmpty message="No channel data." />
+        <WidgetEmpty message="لا توجد بيانات للقنوات." />
       </Widget>
     )
   }
@@ -26,7 +26,7 @@ async function PulseBody({ filters, locale = "en" }: Props) {
     <Widget
       title="Channel Pulse"
       titleAr="نبض القنوات"
-      footer={<span>Click a channel to filter incidents below</span>}
+      footer={<span>انقر على قناة لتصفية الحوادث أدناه</span>}
     >
       <ChannelPulseClient data={data} locale={locale} />
     </Widget>

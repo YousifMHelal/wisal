@@ -30,10 +30,10 @@ async function CaregiverAuditBody({ filters }: Props) {
       titleAr="تدقيق نمط القائم بالرعاية"
       actions={
         <span className="text-xs text-muted-foreground tabular-nums">
-          {rows.length} cases
+          {rows.length} حالة
         </span>
       }
-      footer="RBAC-gated · Compliance & above · All interactions logged"
+      footer="مقيّد بالصلاحيات · الامتثال وما فوق · جميع التفاعلات مسجّلة"
     >
       <CaregiverAuditClient rows={rows} />
     </Widget>

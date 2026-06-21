@@ -26,11 +26,11 @@ async function DriftWatchBody({ filters }: Props) {
       actions={
         data.alerts.length > 0 ? (
           <span className="text-xs text-status-amber-fg tabular-nums">
-            {data.alerts.length} flagged
+            {data.alerts.length} مُبلَّغ عنه
           </span>
         ) : undefined
       }
-      footer="NLU confidence by cluster/dialect · Click alert to highlight series · Assign to member"
+      footer="ثقة NLU حسب التجمع/اللهجة · انقر على التنبيه لإبراز السلسلة · كلّف إلى عضو"
     >
       <DriftWatchClient data={data} assignableUsers={assignableUsers} />
     </Widget>

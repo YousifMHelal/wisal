@@ -15,9 +15,9 @@ function sentimentColor(s: number): string {
 }
 
 function sentimentLabel(s: number): string {
-  if (s >= 0.3) return "Positive"
-  if (s >= -0.2) return "Neutral"
-  return "Negative"
+  if (s >= 0.3) return "إيجابي"
+  if (s >= -0.2) return "محايد"
+  return "سلبي"
 }
 
 function sentimentBg(s: number): string {
@@ -98,7 +98,7 @@ function ThemeCard({ theme }: ThemeCardProps) {
         <button
           onClick={() => setExpanded((e) => !e)}
           className="shrink-0 p-1 rounded-md hover:bg-black/10 dark:hover:bg-white/10 transition-colors cursor-pointer"
-          aria-label={expanded ? "Collapse" : "Expand"}
+          aria-label={expanded ? "طي" : "توسيع"}
           aria-expanded={expanded}
         >
           {expanded ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
@@ -120,7 +120,7 @@ function ThemeCard({ theme }: ThemeCardProps) {
           {/* trend sparkline */}
           {theme.weekTrend.length > 1 && (
             <div>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">4-week sentiment trend</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">اتجاه الشعور لـ ٤ أسابيع</p>
               <Sparkline trend={theme.weekTrend} />
             </div>
           )}
@@ -128,7 +128,7 @@ function ThemeCard({ theme }: ThemeCardProps) {
           {/* anonymized examples */}
           {theme.examples.length > 0 && (
             <div className="space-y-1.5">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Anonymized examples</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">أمثلة مجهولة الهوية</p>
               {theme.examples.slice(0, 3).map((ex, i) => (
                 <div key={i} className="flex items-start gap-2 text-xs text-foreground/80">
                   <MessageSquareQuote className="size-3.5 shrink-0 mt-0.5 text-muted-foreground" />
@@ -149,7 +149,7 @@ export function BeneficiaryVoiceClient({ themes }: Props) {
   if (!themes.length) {
     return (
       <div className="flex items-center justify-center min-h-30">
-        <p className="text-sm text-muted-foreground">No beneficiary voice themes available.</p>
+        <p className="text-sm text-muted-foreground">لا توجد موضوعات صوت المستفيدين.</p>
       </div>
     )
   }

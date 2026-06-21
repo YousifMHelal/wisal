@@ -37,9 +37,9 @@ async function MedicalApprovalLogBody({ filters }: Props) {
       title="Medical Content Approval Log"
       titleAr="سجل اعتماد المحتوى الطبي"
       actions={
-        <span className="text-xs text-muted-foreground tabular-nums">{rows.length} records</span>
+        <span className="text-xs text-muted-foreground tabular-nums">{rows.length} سجل</span>
       }
-      footer="Governance & Compliance · COMPLIANCE role required · All records are audit-logged"
+      footer="الحوكمة والامتثال · يتطلب دور الامتثال · جميع السجلات مدرجة في سجل التدقيق"
     >
       <MedicalApprovalLogClient rows={rows} exportUrl={exportUrl} />
     </Widget>

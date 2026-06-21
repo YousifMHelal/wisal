@@ -116,7 +116,7 @@ export function SubGauge({
       <span className="text-lg font-semibold tabular text-foreground leading-none">{displayValue}</span>
       <span className="text-xs text-muted-foreground text-center leading-tight">{label}</span>
       <span className="text-xs text-muted-foreground tabular">
-        Target: {unit === "s" && target >= 60 ? `${(target / 60).toFixed(1)}m` : `${target}${unit}`}
+        الهدف: {unit === "s" && target >= 60 ? `${(target / 60).toFixed(1)}د` : `${target}${unit}`}
       </span>
     </button>
   )
@@ -136,10 +136,10 @@ function worstStatus(statuses: KpiStatus[]): KpiStatus {
 }
 
 const SUB_GAUGE_CONFIG = [
-  { key: "serviceLevel" as const, label: "Service Level", labelAr: "مستوى الخدمة", target: 80, unit: "%" },
-  { key: "abandonedCalls" as const, label: "Abandoned", labelAr: "متروكة", target: 5, unit: "%" },
-  { key: "aht" as const, label: "AHT", labelAr: "وقت المعالجة", target: 300, unit: "s" },
-  { key: "fcr" as const, label: "FCR", labelAr: "الحل الأول", target: 90, unit: "%" },
+  { key: "serviceLevel" as const, label: "مستوى الخدمة", labelAr: "مستوى الخدمة", target: 80, unit: "%" },
+  { key: "abandonedCalls" as const, label: "المكالمات المتروكة", labelAr: "متروكة", target: 5, unit: "%" },
+  { key: "aht" as const, label: "متوسط وقت المعالجة", labelAr: "وقت المعالجة", target: 300, unit: "s" },
+  { key: "fcr" as const, label: "الحل من أول تواصل", labelAr: "الحل الأول", target: 90, unit: "%" },
 ]
 
 export function CompositeGauge({ serviceLevel, abandonedCalls, aht, fcr }: CompositeGaugeProps) {
@@ -161,7 +161,7 @@ export function CompositeGauge({ serviceLevel, abandonedCalls, aht, fcr }: Compo
             <StatusBadge status={overall} />
           </div>
         </div>
-        <p className="text-xs text-muted-foreground uppercase tracking-wide">Overall Today</p>
+        <p className="text-xs text-muted-foreground uppercase tracking-wide">الأداء الكلي اليوم</p>
       </div>
 
       {/* Sub-gauges grid — 2 cols mobile, 4 desktop */}

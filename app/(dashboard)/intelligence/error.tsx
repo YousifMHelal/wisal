@@ -9,5 +9,5 @@ export default function IntelligenceError({
   error: Error & { digest?: string }
   reset: () => void
 }) {
-  return <ErrorBoundaryUI error={error} reset={reset} title="Wisal Intelligence failed to load" />
+  return <ErrorBoundaryUI error={error} reset={reset} title="فشل تحميل ذكاء وصال" />
 }

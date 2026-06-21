@@ -35,7 +35,7 @@ export function ConsentAuditClient({ rows, exportUrl }: Props) {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search case ID or caregiver case…"
+            placeholder="ابحث برقم الحالة أو حالة مقدم الرعاية…"
             className="ps-9 h-8 text-sm"
             aria-label="Search consent records"
           />
@@ -55,18 +55,18 @@ export function ConsentAuditClient({ rows, exportUrl }: Props) {
         <table className="w-full text-sm min-w-[560px]">
           <thead>
             <tr className="border-b border-border bg-muted/40">
-              <th className="py-2 ps-3 pe-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">Case ID</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">Caregiver Case</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">Consent on File</th>
-              <th className="py-2 ps-2 pe-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">Date</th>
-              <th className="py-2 ps-2 pe-3 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">Audit</th>
+              <th className="py-2 ps-3 pe-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">رقم الحالة</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">حالة مقدم الرعاية</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">الموافقة</th>
+              <th className="py-2 ps-2 pe-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">التاريخ</th>
+              <th className="py-2 ps-2 pe-3 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">التدقيق</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {filtered.length === 0 ? (
               <tr>
                 <td colSpan={5} className="py-8 text-center text-sm text-muted-foreground">
-                  No records match your search.
+                  لا توجد سجلات تطابق بحثك.
                 </td>
               </tr>
             ) : (
@@ -77,11 +77,11 @@ export function ConsentAuditClient({ rows, exportUrl }: Props) {
                   <td className="py-2.5 px-2 whitespace-nowrap">
                     {row.consentOnFile ? (
                       <Badge variant="outline" className="text-xs font-medium bg-status-green/15 text-status-green-fg border-status-green/30">
-                        On file
+                        موجودة
                       </Badge>
                     ) : (
                       <Badge variant="outline" className="text-xs font-medium bg-status-red/15 text-status-red-fg border-status-red/30">
-                        Missing
+                        مفقودة
                       </Badge>
                     )}
                   </td>
@@ -95,7 +95,7 @@ export function ConsentAuditClient({ rows, exportUrl }: Props) {
                       aria-label={`View caregiver audit for ${row.caregiverCaseRef}`}
                     >
                       <ExternalLink className="size-3" aria-hidden />
-                      <span className="hidden sm:inline">Caregiver Audit</span>
+                      <span className="hidden sm:inline">تدقيق مقدم الرعاية</span>
                     </Link>
                   </td>
                 </tr>
@@ -106,7 +106,7 @@ export function ConsentAuditClient({ rows, exportUrl }: Props) {
       </div>
 
       <p className="text-xs text-muted-foreground text-end tabular-nums">
-        Showing {filtered.length} of {rows.length} records
+        عرض {filtered.length} من {rows.length} سجل
       </p>
     </div>
   )

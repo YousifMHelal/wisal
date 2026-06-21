@@ -24,7 +24,7 @@ async function AgentGridBody({ filters }: Props) {
       title="Agent Performance Grid"
       titleAr="شبكة أداء الوكلاء"
       actions={
-        <span className="text-xs text-muted-foreground tabular-nums">{agents.length} agents</span>
+        <span className="text-xs text-muted-foreground tabular-nums">{agents.length} موظف</span>
       }
     >
       <AgentGridClient agents={agents} trainingMap={trainingMap} />

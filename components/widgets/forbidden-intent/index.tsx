@@ -39,10 +39,10 @@ async function ForbiddenIntentBody({ filters }: Props) {
       titleAr="محفزات النية المحظورة"
       actions={
         <span className={`text-xs tabular-nums font-medium ${data.events.length > 0 ? "text-status-amber-fg" : "text-muted-foreground"}`}>
-          {data.events.length} event{data.events.length !== 1 ? "s" : ""}
+          {data.events.length} حدث{data.events.length !== 1 ? "" : ""}
         </span>
       }
-      footer="Click a chart data point to filter the log to that date · COMPLIANCE role required"
+      footer="انقر على نقطة بيانات لتصفية السجل حسب التاريخ · يتطلب دور الامتثال"
     >
       <ForbiddenIntentClient data={data} exportUrl={exportUrl} />
     </Widget>

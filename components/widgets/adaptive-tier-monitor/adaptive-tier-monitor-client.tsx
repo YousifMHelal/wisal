@@ -35,9 +35,9 @@ const TIER_COLORS = {
 }
 
 const TIER_LABELS: Record<string, string> = {
-  T1: "Tier 1 (AI)",
-  T2: "Tier 2 (Copilot)",
-  T3: "Tier 3 (Caregiver)",
+  T1: "المستوى ١ (ذكاء اصطناعي)",
+  T2: "المستوى ٢ (مساعد)",
+  T3: "المستوى ٣ (مقدم رعاية)",
 }
 
 export function AdaptiveTierMonitorClient({ data }: Props) {
@@ -60,7 +60,7 @@ export function AdaptiveTierMonitorClient({ data }: Props) {
     [trend]
   )
 
-  if (!trend.length) return <WidgetEmpty message="No tier data for this period." />
+  if (!trend.length) return <WidgetEmpty message="لا توجد بيانات مستويات لهذه الفترة." />
 
   const filteredData = activeTier
     ? chartData.map((d) => ({
@@ -101,7 +101,7 @@ export function AdaptiveTierMonitorClient({ data }: Props) {
             onClick={() => setActiveTier(null)}
             className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer px-2"
           >
-            Clear filter
+            مسح الفلتر
           </button>
         )}
       </div>
@@ -183,7 +183,7 @@ export function AdaptiveTierMonitorClient({ data }: Props) {
       {/* Tier-1 autocorrect mini-trend */}
       <div className="border-t pt-3 space-y-1">
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <span>Tier-1 Autocorrect Rate</span>
+          <span>معدل التصحيح الذاتي للمستوى ١</span>
           <TooltipProvider>
             <UITooltip>
               <TooltipTrigger>
@@ -191,8 +191,7 @@ export function AdaptiveTierMonitorClient({ data }: Props) {
               </TooltipTrigger>
               <TooltipContent>
                 <p className="max-w-50">
-                  % of Tier-1 interactions where AI self-corrected before final response.
-                  Target ≥ 80%.
+                  نسبة تفاعلات المستوى ١ التي صحّح فيها الذكاء الاصطناعي نفسه قبل الرد النهائي. الهدف ≥ ٨٠٪.
                 </p>
               </TooltipContent>
             </UITooltip>
@@ -225,7 +224,7 @@ export function AdaptiveTierMonitorClient({ data }: Props) {
                   borderRadius: 8,
                   fontSize: 11,
                 }}
-                formatter={(v) => [`${(v as number).toFixed(1)}%`, "Autocorrect"]}
+                formatter={(v) => [`${(v as number).toFixed(1)}%`, "التصحيح الذاتي"]}
               />
               <Line
                 type="monotone"
@@ -243,9 +242,9 @@ export function AdaptiveTierMonitorClient({ data }: Props) {
       {latest && (
         <div className="grid grid-cols-3 gap-2 border-t pt-3">
           {[
-            { label: "T1 (AI)", value: latest.tier1Pct, color: TIER_COLORS.T1 },
-            { label: "T2 (Copilot)", value: latest.tier2Pct, color: TIER_COLORS.T2 },
-            { label: "T3 (Caregiver)", value: latest.tier3Pct, color: TIER_COLORS.T3 },
+            { label: "م١ (ذكاء اصطناعي)", value: latest.tier1Pct, color: TIER_COLORS.T1 },
+            { label: "م٢ (مساعد)", value: latest.tier2Pct, color: TIER_COLORS.T2 },
+            { label: "م٣ (مقدم رعاية)", value: latest.tier3Pct, color: TIER_COLORS.T3 },
           ].map((item) => (
             <div key={item.label} className="text-center space-y-0.5">
               <div

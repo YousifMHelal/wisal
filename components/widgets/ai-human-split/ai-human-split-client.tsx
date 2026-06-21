@@ -31,9 +31,9 @@ const SPLIT_COLORS = [
 ]
 
 const DONUT_SLICE_COLORS = {
-  "AI Full": "var(--primary)",
-  "AI Partial": "var(--status-amber)",
-  Human: "var(--status-red)",
+  "ذكاء اصطناعي كامل": "var(--primary)",
+  "ذكاء اصطناعي جزئي": "var(--status-amber)",
+  "بشري": "var(--status-red)",
 }
 
 export function AiHumanSplitClient({ data }: Props) {
@@ -44,34 +44,34 @@ export function AiHumanSplitClient({ data }: Props) {
 
   const hasData = byChannel.length > 0 || byCluster.length > 0
 
-  if (!hasData) return <WidgetEmpty message="No resolution split data for this period." />
+  if (!hasData) return <WidgetEmpty message="لا توجد بيانات توزيع الحلول لهذه الفترة." />
 
   const donutData = [
-    { name: "AI Full", value: overall.aiFullPct },
-    { name: "AI Partial", value: overall.aiPartialPct },
-    { name: "Human", value: overall.humanPct },
+    { name: "ذكاء اصطناعي كامل", value: overall.aiFullPct },
+    { name: "ذكاء اصطناعي جزئي", value: overall.aiPartialPct },
+    { name: "بشري", value: overall.humanPct },
   ].filter((d) => d.value > 0)
 
   const segmentRows = segment === "channel" ? byChannel : byCluster
 
   const funnelData = [
     {
-      name: "Total Interactions",
+      name: "إجمالي التفاعلات",
       value: segmentRows.reduce((s, r) => s + r.volume, 0),
       fill: "var(--primary)",
     },
     {
-      name: "AI Handled (Full)",
+      name: "حُل بالذكاء الاصطناعي",
       value: segmentRows.reduce((s, r) => s + Math.round((r.aiFullPct / 100) * r.volume), 0),
       fill: "var(--status-green)",
     },
     {
-      name: "AI Partial",
+      name: "حُل جزئياً",
       value: segmentRows.reduce((s, r) => s + Math.round((r.aiPartialPct / 100) * r.volume), 0),
       fill: "var(--status-amber)",
     },
     {
-      name: "Human Handled",
+      name: "حُل بشرياً",
       value: segmentRows.reduce((s, r) => s + Math.round((r.humanPct / 100) * r.volume), 0),
       fill: "var(--status-red)",
     },
@@ -95,7 +95,7 @@ export function AiHumanSplitClient({ data }: Props) {
               ].join(" ")}
               aria-pressed={viewMode === mode}
             >
-              {mode}
+              {mode === "donut" ? "دائري" : "قمعي"}
             </button>
           ))}
         </div>
@@ -114,7 +114,7 @@ export function AiHumanSplitClient({ data }: Props) {
               ].join(" ")}
               aria-pressed={segment === s}
             >
-              {s}
+              {s === "channel" ? "قناة" : "تجمع"}
             </button>
           ))}
         </div>
@@ -185,7 +185,7 @@ export function AiHumanSplitClient({ data }: Props) {
             {/* AI total callout */}
             <div className="border-t pt-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">AI Total</span>
+                <span className="text-xs text-muted-foreground">إجمالي الذكاء الاصطناعي</span>
                 <span
                   className="text-sm font-semibold tabular-nums"
                   style={{ color: "var(--primary)" }}
@@ -207,7 +207,7 @@ export function AiHumanSplitClient({ data }: Props) {
                     {row.label}
                   </span>
                   <span className="text-xs tabular-nums text-foreground flex-shrink-0">
-                    {row.aiTotalPct.toFixed(0)}% AI
+                    {row.aiTotalPct.toFixed(0)}% ذكاء
                   </span>
                 </div>
               ))}

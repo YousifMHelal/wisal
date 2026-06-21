@@ -27,10 +27,10 @@ async function ComplianceScorecardBody({ filters: _filters }: Props) {
 
   const statusSummary =
     nonCompliantCount > 0
-      ? `${nonCompliantCount} breach${nonCompliantCount > 1 ? "es" : ""}`
+      ? `${nonCompliantCount} خرق${nonCompliantCount > 1 ? "" : ""}`
       : partialCount > 0
-      ? `${partialCount} partial`
-      : "All compliant"
+      ? `${partialCount} جزئي`
+      : "الكل ممتثل"
 
   return (
     <Widget
@@ -45,7 +45,7 @@ async function ComplianceScorecardBody({ filters: _filters }: Props) {
           {statusSummary}
         </span>
       }
-      footer="NCA · PDPL · DGA · NDMO · Export per-framework or full compliance pack"
+      footer="NCA · PDPL · DGA · NDMO · تصدير حسب الإطار أو حزمة الامتثال الكاملة"
     >
       <ComplianceScorecardClient
         cards={cards}

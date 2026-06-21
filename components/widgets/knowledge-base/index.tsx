@@ -26,13 +26,13 @@ async function KnowledgeBaseBody({ filters: _filters }: Props) {
       titleAr="قاعدة المعرفة"
       actions={
         <span className="text-xs text-muted-foreground tabular-nums">
-          {publishedCount} published · {draftCount} draft
+          {publishedCount} منشور · {draftCount} مسودة
         </span>
       }
       footer={
         canPublish
-          ? "Bilingual AR/EN · Version-tracked · Publish requires COMPLIANCE role · All changes audit-logged"
-          : "Bilingual AR/EN · Version-tracked · Read-only view"
+          ? "ثنائي اللغة · تتبع الإصدارات · النشر يتطلب دور الامتثال · جميع التغييرات مسجّلة"
+          : "ثنائي اللغة · تتبع الإصدارات · عرض للقراءة فقط"
       }
     >
       <KnowledgeBaseClient rows={rows} canPublish={canPublish} />

@@ -36,7 +36,7 @@ export function AgentStatusBoardClient({ data, locale = "en" }: Props) {
 
   if (!data.length) {
     return (
-      <p className="text-sm text-muted-foreground text-center py-8">No agent status data.</p>
+      <p className="text-sm text-muted-foreground text-center py-8">لا توجد بيانات حالة الموظفين.</p>
     )
   }
 
@@ -62,7 +62,7 @@ export function AgentStatusBoardClient({ data, locale = "en" }: Props) {
               <p className="text-xs font-semibold text-foreground truncate">
                 {isAr ? cluster.clusterNameAr : cluster.clusterName}
               </p>
-              <p className="text-[10px] text-muted-foreground tabular">{cluster.total} agents</p>
+              <p className="text-[10px] text-muted-foreground tabular">{cluster.total} موظف</p>
             </div>
             <StatusBadge status={cluster.overallStatus} dot />
           </div>

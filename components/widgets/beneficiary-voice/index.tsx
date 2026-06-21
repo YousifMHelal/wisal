@@ -22,7 +22,7 @@ async function BeneficiaryVoiceBody() {
     <Widget
       title="Beneficiary Voice"
       titleAr="صوت المستفيد"
-      footer="Plain-language themes from beneficiary interactions · expand for anonymized examples + trend"
+      footer="موضوعات من تفاعلات المستفيد · وسّع لأمثلة مجهولة الهوية + التوجه"
     >
       <BeneficiaryVoiceClient themes={themes} />
     </Widget>

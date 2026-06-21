@@ -30,11 +30,11 @@ async function PenaltyImpactBody({ filters }: Props) {
       actions={
         breachedCount > 0 ? (
           <span className="text-xs font-medium text-status-red-fg tabular-nums">
-            {breachedCount} breach{breachedCount > 1 ? "es" : ""} · SAR {totalPenalty.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+            {breachedCount} خرق{breachedCount > 1 ? "" : ""} · SAR {totalPenalty.toLocaleString(undefined, { maximumFractionDigits: 0 })}
           </span>
         ) : undefined
       }
-      footer="Failure % vs permissible tolerance · breach = avg failure % × operating cost (RFP §6)"
+      footer="% الفشل مقابل التسامح المسموح · الخرق = متوسط % الفشل × تكلفة التشغيل (RFP §6)"
     >
       <PenaltyImpactClient rows={rows} filters={filters} />
     </Widget>

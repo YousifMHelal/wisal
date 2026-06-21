@@ -9,5 +9,5 @@ export default function GovernanceError({
   error: Error & { digest?: string }
   reset: () => void
 }) {
-  return <ErrorBoundaryUI error={error} reset={reset} title="Governance & Compliance failed to load" />
+  return <ErrorBoundaryUI error={error} reset={reset} title="فشل تحميل الحوكمة والامتثال" />
 }

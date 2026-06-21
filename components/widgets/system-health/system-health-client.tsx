@@ -15,7 +15,7 @@ function AvailabilityStatus({ pct }: { pct: number }) {
     return (
       <span className="flex items-center gap-1.5 text-[var(--status-green-fg)]">
         <CheckCircle className="size-4 shrink-0" aria-hidden="true" />
-        On Target
+        في الهدف
       </span>
     )
   }
@@ -23,14 +23,14 @@ function AvailabilityStatus({ pct }: { pct: number }) {
     return (
       <span className="flex items-center gap-1.5 text-[var(--status-amber-fg)]">
         <AlertTriangle className="size-4 shrink-0" aria-hidden="true" />
-        At Tolerance
+        عند الحد المسموح
       </span>
     )
   }
   return (
     <span className="flex items-center gap-1.5 text-[var(--status-red-fg)]">
       <AlertTriangle className="size-4 shrink-0" aria-hidden="true" />
-      Breaching
+      خرق
     </span>
   )
 }
@@ -51,13 +51,13 @@ export function SystemHealthClient({ data }: Props) {
           "rounded-lg border p-4 flex flex-col gap-1 col-span-1 sm:col-span-2",
           onTarget ? "border-s-4 border-s-[var(--status-green)]" : "border-s-4 border-s-[var(--status-red)]",
         ].join(" ")}>
-          <span className="text-xs text-muted-foreground uppercase tracking-wide">Availability</span>
+          <span className="text-xs text-muted-foreground uppercase tracking-wide">الإتاحة</span>
           <div className="flex items-end gap-3 flex-wrap">
             <span className="text-3xl font-bold tabular-nums text-foreground">
               {data.availabilityPct.toFixed(4)}%
             </span>
             <span className="text-xs text-muted-foreground mb-1">
-              Target: {AVAILABILITY_TARGET}%
+              الهدف: {AVAILABILITY_TARGET}%
             </span>
           </div>
           <AvailabilityStatus pct={data.availabilityPct} />
@@ -69,8 +69,8 @@ export function SystemHealthClient({ data }: Props) {
           <div className="rounded-lg border bg-muted/30 p-3 flex items-center gap-2">
             <MapPin className="size-4 text-primary shrink-0" aria-hidden="true" />
             <div className="min-w-0">
-              <p className="text-xs text-muted-foreground">Data Residency</p>
-              <p className="text-sm font-medium text-foreground">{data.region} Region</p>
+              <p className="text-xs text-muted-foreground">إقامة البيانات</p>
+              <p className="text-sm font-medium text-foreground">منطقة {data.region}</p>
             </div>
             <Badge className="ms-auto text-[10px] bg-primary/20 text-primary border-primary/30 shrink-0">
               Sovereign
@@ -81,11 +81,11 @@ export function SystemHealthClient({ data }: Props) {
           <div className="rounded-lg border bg-muted/30 p-3 flex items-center gap-2">
             <CalendarCheck className="size-4 text-muted-foreground shrink-0" aria-hidden="true" />
             <div className="min-w-0">
-              <p className="text-xs text-muted-foreground">Last DR Test</p>
+              <p className="text-xs text-muted-foreground">آخر اختبار DR</p>
               <p className="text-sm font-medium text-foreground">
                 {data.lastDrTestAt
                   ? format(data.lastDrTestAt, "d MMM yyyy")
-                  : "Never tested"}
+                  : "لم يُختبر مطلقًا"}
               </p>
               {data.lastDrTestAt && (
                 <p className="text-xs text-muted-foreground">
@@ -103,7 +103,7 @@ export function SystemHealthClient({ data }: Props) {
           <table className="w-full text-sm border-collapse" role="table" aria-label="DR RTO/RPO by channel">
             <thead>
               <tr className="border-b border-border">
-                <th className="text-start py-2 px-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">Channel</th>
+                <th className="text-start py-2 px-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">القناة</th>
                 <th className="text-start py-2 px-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">RTO</th>
                 <th className="text-start py-2 px-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">RPO</th>
               </tr>
@@ -122,7 +122,7 @@ export function SystemHealthClient({ data }: Props) {
       )}
 
       {data.drChannels.length === 0 && (
-        <p className="text-xs text-muted-foreground text-center py-2">No DR channel data configured.</p>
+        <p className="text-xs text-muted-foreground text-center py-2">لا توجد بيانات قنوات DR مضبوطة.</p>
       )}
     </div>
   )

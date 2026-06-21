@@ -36,15 +36,15 @@ async function TicketQueueBody({ filters }: Props) {
         <div className="flex items-center gap-2">
           {breachedCount > 0 && (
             <span className="text-xs text-[var(--status-red-fg)] tabular-nums font-medium">
-              {breachedCount} SLA breached
+              {breachedCount} خرق اتفاقية الخدمة
             </span>
           )}
           <span className="text-xs text-muted-foreground tabular-nums">
-            {tickets.length} open
+            {tickets.length} مفتوح
           </span>
         </div>
       }
-      footer="Complaints & requests · row → Beneficiary 360 · assign agent writes AuditLog"
+      footer="الشكاوى والطلبات · الصف → ملف المستفيد ٣٦٠ · تكليف موظف يُسجّل في سجل التدقيق"
     >
       <TicketQueueClient tickets={tickets} agents={agents} />
     </Widget>

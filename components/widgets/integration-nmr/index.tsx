@@ -22,7 +22,7 @@ async function IntegrationNmrBody() {
     <Widget
       title="Integration & NMR Status"
       titleAr="حالة التكاملات وـ NMR"
-      footer="Integration matrix health · NMR = Live Open API feed · No point-to-point connections"
+      footer="صحة مصفوفة التكاملات · NMR = تغذية API مباشرة · لا وصلات مباشرة"
     >
       <IntegrationNmrClient rows={rows} />
     </Widget>

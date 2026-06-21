@@ -21,12 +21,12 @@ async function TierMonitorBody({ filters }: Props) {
       actions={
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <BrainCircuit className="size-3.5" aria-hidden />
-          <span>{data.trend.length} snapshots</span>
+          <span>{data.trend.length} لقطة</span>
         </div>
       }
       footer={
         data.latest
-          ? `T1: ${data.latest.tier1Pct.toFixed(0)}% · T2: ${data.latest.tier2Pct.toFixed(0)}% · T3: ${data.latest.tier3Pct.toFixed(0)}% · Click tier band to filter`
+          ? `T1: ${data.latest.tier1Pct.toFixed(0)}% · T2: ${data.latest.tier2Pct.toFixed(0)}% · T3: ${data.latest.tier3Pct.toFixed(0)}% · انقر على نطاق المستوى للتصفية`
           : undefined
       }
     >

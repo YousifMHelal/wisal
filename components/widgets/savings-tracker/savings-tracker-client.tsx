@@ -37,12 +37,12 @@ function SavingsTooltip({ active, payload, label }: CustomTooltipProps) {
     <div className="rounded-lg border border-border bg-card p-3 shadow-xl text-xs space-y-1.5 min-w-[200px]">
       <p className="font-medium text-foreground">{label}</p>
       <div className="space-y-1 text-muted-foreground">
-        <p>Agent hours saved: <span className="tabular-nums text-foreground font-medium">{agentHrs.toFixed(1)} h</span></p>
-        <p>AI resolved volume: <span className="tabular-nums text-foreground font-medium">{volume.toLocaleString()}</span></p>
-        <p>Est. hours saved (vol × AHT): <span className="tabular-nums text-foreground font-medium">{ahtSaved.toFixed(1)} h</span></p>
+        <p>ساعات الموظفين الموفرة: <span className="tabular-nums text-foreground font-medium">{agentHrs.toFixed(1)} ساعة</span></p>
+        <p>حجم ما حله الذكاء الاصطناعي: <span className="tabular-nums text-foreground font-medium">{volume.toLocaleString()}</span></p>
+        <p>الساعات المقدرة الموفرة (حجم × AHT): <span className="tabular-nums text-foreground font-medium">{ahtSaved.toFixed(1)} ساعة</span></p>
       </div>
       <p className="text-[10px] text-muted-foreground border-t border-border pt-1">
-        Calc: AI resolved volume × avg handle time saved ÷ 3600
+        الحساب: حجم ما حله الذكاء الاصطناعي × متوسط وقت المعالجة الموفر ÷ 3600
       </p>
     </div>
   )
@@ -81,7 +81,7 @@ export function SavingsTrackerClient({ data, filters }: Props) {
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[200px]">
-        <p className="text-sm text-muted-foreground">No savings data for this period.</p>
+        <p className="text-sm text-muted-foreground">لا توجد بيانات توفير لهذه الفترة.</p>
       </div>
     )
   }
@@ -98,7 +98,7 @@ export function SavingsTrackerClient({ data, filters }: Props) {
           className="gap-2 cursor-pointer"
         >
           {isPending ? <Loader2 className="size-3.5 animate-spin" /> : <Download className="size-3.5" />}
-          Export for Board
+          تصدير للمجلس
         </Button>
       </div>
 
@@ -134,9 +134,9 @@ export function SavingsTrackerClient({ data, filters }: Props) {
             wrapperStyle={{ fontSize: 11, color: "var(--color-muted-foreground)" }}
             formatter={(value) =>
               value === "agentHoursSaved"
-                ? "Agent Hours Saved"
+                ? "ساعات الموظفين الموفرة"
                 : value === "estimatedHoursSaved"
-                ? "Est. Hours Saved (vol × AHT)"
+                ? "الساعات المقدرة (حجم × AHT)"
                 : value
             }
           />

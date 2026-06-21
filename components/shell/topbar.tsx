@@ -14,7 +14,7 @@ export async function TopBar({ locale, statuses }: TopBarProps) {
   const [session, clusters] = await Promise.all([
     requireAuth(),
     prisma.cluster.findMany({
-      select: { id: true, name: true },
+      select: { id: true, name: true, nameAr: true },
       orderBy: { name: "asc" },
     }),
   ])

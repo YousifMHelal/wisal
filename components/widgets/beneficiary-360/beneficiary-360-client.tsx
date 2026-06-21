@@ -42,17 +42,17 @@ function TicketStatusBadge({ status }: { status: string }) {
 function ConsentBadge({ status }: { status: string }) {
   if (status === "GIVEN") return (
     <span className="flex items-center gap-1 text-[var(--status-green-fg)] text-xs font-medium">
-      <CheckCircle className="size-3.5" aria-hidden="true" /> Consent Given
+      <CheckCircle className="size-3.5" aria-hidden="true" /> موافقة ممنوحة
     </span>
   )
   if (status === "WITHDRAWN") return (
     <span className="flex items-center gap-1 text-[var(--status-red-fg)] text-xs font-medium">
-      <XCircle className="size-3.5" aria-hidden="true" /> Consent Withdrawn
+      <XCircle className="size-3.5" aria-hidden="true" /> موافقة مسحوبة
     </span>
   )
   return (
     <span className="flex items-center gap-1 text-[var(--status-amber-fg)] text-xs font-medium">
-      <AlertTriangle className="size-3.5" aria-hidden="true" /> Pending Consent
+      <AlertTriangle className="size-3.5" aria-hidden="true" /> موافقة معلقة
     </span>
   )
 }
@@ -86,7 +86,7 @@ function ProfileCard({ profile }: { profile: Beneficiary360["profile"] }) {
         )}
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Shield className="size-3.5 shrink-0" aria-hidden="true" />
-          {profile.gender} · DOB {format(profile.dateOfBirth, "d MMM yyyy")}
+          {profile.gender} · تاريخ الميلاد {format(profile.dateOfBirth, "d MMM yyyy")}
         </div>
         <Badge variant="outline" className="text-[10px] px-1.5 py-0">{profile.tier}</Badge>
         <ConsentBadge status={profile.consentStatus} />
@@ -99,7 +99,7 @@ function ProfileCard({ profile }: { profile: Beneficiary360["profile"] }) {
 
 function InteractionsTab({ interactions }: { interactions: Beneficiary360["interactions"] }) {
   if (interactions.length === 0) {
-    return <p className="text-sm text-muted-foreground text-center py-8">No interactions recorded.</p>
+    return <p className="text-sm text-muted-foreground text-center py-8">لا توجد تفاعلات مسجلة.</p>
   }
   return (
     <div className="flex flex-col gap-2 max-h-72 overflow-y-auto pe-1">
@@ -138,18 +138,18 @@ function InteractionsTab({ interactions }: { interactions: Beneficiary360["inter
 
 function TicketsTab({ tickets }: { tickets: Beneficiary360["tickets"] }) {
   if (tickets.length === 0) {
-    return <p className="text-sm text-muted-foreground text-center py-8">No tickets found.</p>
+    return <p className="text-sm text-muted-foreground text-center py-8">لا توجد تذاكر.</p>
   }
   return (
     <div className="overflow-x-auto -mx-1">
       <table className="w-full text-xs border-collapse min-w-[480px]" aria-label="Tickets">
         <thead>
           <tr className="border-b border-border">
-            <th className="text-start py-2 px-2 text-muted-foreground font-medium">Type</th>
-            <th className="text-start py-2 px-2 text-muted-foreground font-medium">Priority</th>
-            <th className="text-start py-2 px-2 text-muted-foreground font-medium">Status</th>
-            <th className="text-start py-2 px-2 text-muted-foreground font-medium">SLA Due</th>
-            <th className="text-start py-2 px-2 text-muted-foreground font-medium">Agent</th>
+            <th className="text-start py-2 px-2 text-muted-foreground font-medium">النوع</th>
+            <th className="text-start py-2 px-2 text-muted-foreground font-medium">الأولوية</th>
+            <th className="text-start py-2 px-2 text-muted-foreground font-medium">الحالة</th>
+            <th className="text-start py-2 px-2 text-muted-foreground font-medium">موعد SLA</th>
+            <th className="text-start py-2 px-2 text-muted-foreground font-medium">الموظف</th>
           </tr>
         </thead>
         <tbody>
@@ -239,9 +239,9 @@ export function Beneficiary360Client({ initialBeneficiaryId }: Props) {
             onChange={(e) => handleSearch(e.target.value)}
             onFocus={() => searchResults.length > 0 && setShowDropdown(true)}
             onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
-            placeholder="Search by national ID or name…"
+            placeholder="ابحث بالهوية الوطنية أو الاسم…"
             className="ps-9"
-            aria-label="Search beneficiary by national ID or name"
+            aria-label="ابحث عن مستفيد بالهوية الوطنية أو الاسم"
             aria-expanded={showDropdown}
             aria-haspopup="listbox"
             autoComplete="off"
@@ -279,13 +279,13 @@ export function Beneficiary360Client({ initialBeneficiaryId }: Props) {
 
         {showDropdown && searchResults.length === 0 && query.length >= 2 && !isPending && (
           <div className="absolute z-20 top-full mt-1 start-0 end-0 bg-popover border border-border rounded-lg shadow-lg px-3 py-2.5">
-            <p className="text-sm text-muted-foreground">No beneficiaries found. Try a different name or ID.</p>
+            <p className="text-sm text-muted-foreground">لم يتم العثور على مستفيدين. جرّب اسمًا أو هوية مختلفة.</p>
           </div>
         )}
       </div>
 
       {isPending && (
-        <p className="text-xs text-muted-foreground animate-pulse">Searching…</p>
+        <p className="text-xs text-muted-foreground animate-pulse">جارٍ البحث…</p>
       )}
 
       {error && (
@@ -314,15 +314,16 @@ export function Beneficiary360Client({ initialBeneficiaryId }: Props) {
                   aria-selected={activeTab === tab}
                   onClick={() => setActiveTab(tab)}
                   className={[
-                    "px-3 py-2 text-sm font-medium capitalize transition-colors border-b-2 -mb-px",
+                    "px-3 py-2 text-sm font-medium transition-colors border-b-2 -mb-px",
                     activeTab === tab
                       ? "border-primary text-foreground"
                       : "border-transparent text-muted-foreground hover:text-foreground",
                   ].join(" ")}
                 >
-                  {tab}
+                  {tab === "interactions" ? "التفاعلات" : "التذاكر"}
                   <span className="ms-1.5 text-xs text-muted-foreground">
                     {tab === "interactions" ? `(${profile.interactions.length})` : `(${profile.tickets.length})`}
+
                   </span>
                 </button>
               ))}
@@ -339,8 +340,8 @@ export function Beneficiary360Client({ initialBeneficiaryId }: Props) {
       {!profile && !isPending && !isLoadingProfile && !error && (
         <div className="flex flex-col items-center justify-center min-h-[140px] text-center gap-2">
           <Search className="size-8 text-muted-foreground/40" aria-hidden="true" />
-          <p className="text-sm text-muted-foreground">Search a beneficiary to view their 360 profile</p>
-          <p className="text-xs text-muted-foreground">National ID, name (EN or AR)</p>
+          <p className="text-sm text-muted-foreground">ابحث عن مستفيد لعرض ملفه الشامل</p>
+          <p className="text-xs text-muted-foreground">الهوية الوطنية أو الاسم (عربي أو إنجليزي)</p>
         </div>
       )}
     </div>

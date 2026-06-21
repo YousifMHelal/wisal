@@ -30,7 +30,7 @@ export class WidgetErrorBoundary extends Component<Props, State> {
     if (this.state.error) {
       return (
         <WidgetError
-          message={this.state.error.message || "Widget failed to load. Try refreshing."}
+          message={this.state.error.message || "فشل تحميل القسم. حاول تحديث الصفحة."}
         />
       )
     }

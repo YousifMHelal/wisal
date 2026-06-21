@@ -9,43 +9,43 @@ import type { ComplianceCard } from "@/lib/queries/governance"
 const FRAMEWORK_META: Record<string, { label: string; description: string; logLink: string }> = {
   NCA: {
     label: "NCA",
-    description: "National Cybersecurity Authority",
+    description: "الهيئة الوطنية للأمن السيبراني",
     logLink: "/governance?filter=nca",
   },
   PDPL: {
     label: "PDPL",
-    description: "Personal Data Protection Law",
+    description: "نظام حماية البيانات الشخصية",
     logLink: "/governance?filter=pdpl",
   },
   DGA: {
     label: "DGA",
-    description: "Data Governance Authority",
+    description: "هيئة الحكومة الرقمية",
     logLink: "/governance?filter=dga",
   },
   NDMO: {
     label: "NDMO",
-    description: "National Data Management Office",
+    description: "المكتب الوطني لإدارة البيانات",
     logLink: "/governance?filter=ndmo",
   },
 }
 
 const STATUS_CONFIG = {
   COMPLIANT: {
-    label: "Compliant",
+    label: "ملتزم",
     icon: CheckCircle2,
     className: "bg-status-green/15 text-status-green-fg border-status-green/30",
     ringClass: "ring-status-green/20",
     scoreClass: "text-status-green-fg",
   },
   PARTIAL: {
-    label: "Partial",
+    label: "جزئي",
     icon: AlertTriangle,
     className: "bg-status-amber/15 text-status-amber-fg border-status-amber/30",
     ringClass: "ring-status-amber/20",
     scoreClass: "text-status-amber-fg",
   },
   NON_COMPLIANT: {
-    label: "Non-Compliant",
+    label: "غير ملتزم",
     icon: XCircle,
     className: "bg-status-red/15 text-status-red-fg border-status-red/30",
     ringClass: "ring-status-red/20",
@@ -69,7 +69,7 @@ export function ComplianceScorecardClient({ cards, packExportUrl }: Props) {
           className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md border border-border bg-transparent text-sm font-medium text-foreground hover:bg-muted transition-colors duration-150 cursor-pointer"
         >
           <Download className="size-3.5" aria-hidden />
-          Compliance Pack
+          حزمة الامتثال
         </a>
       </div>
 
@@ -128,7 +128,7 @@ export function ComplianceScorecardClient({ cards, packExportUrl }: Props) {
               {/* Footer */}
               <div className="flex items-center justify-between gap-2">
                 <p className="text-xs text-muted-foreground">
-                  Refreshed {format(card.refreshedAt, "dd MMM yyyy")}
+                  تحديث {format(card.refreshedAt, "dd MMM yyyy")}
                 </p>
                 <div className="flex items-center gap-2">
                   <a
@@ -138,7 +138,7 @@ export function ComplianceScorecardClient({ cards, packExportUrl }: Props) {
                     className="inline-flex items-center gap-1 h-6 px-2 rounded text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-150 cursor-pointer"
                   >
                     <Download className="size-3" aria-hidden />
-                    Export
+                    تصدير
                   </a>
                   {meta?.logLink && (
                     <Link
@@ -147,7 +147,7 @@ export function ComplianceScorecardClient({ cards, packExportUrl }: Props) {
                       aria-label={`View ${card.framework} supporting logs`}
                     >
                       <ExternalLink className="size-3" aria-hidden />
-                      Logs
+                      السجلات
                     </Link>
                   )}
                 </div>
@@ -158,7 +158,7 @@ export function ComplianceScorecardClient({ cards, packExportUrl }: Props) {
       </div>
 
       {cards.length === 0 && (
-        <p className="text-sm text-muted-foreground text-center py-8">No compliance data available.</p>
+        <p className="text-sm text-muted-foreground text-center py-8">لا توجد بيانات امتثال متاحة.</p>
       )}
     </div>
   )
