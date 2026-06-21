@@ -4,7 +4,7 @@ Single source of truth for "what's done". The agent MUST update this after finis
 
 Status: `TODO` · `IN PROGRESS` · `DONE` · `BLOCKED`
 
-Last updated: 2026-06-21 — *Phase 6 DONE. 5 Workforce & Quality widgets built: AgentGrid (sortable table AHT/FCR/QA/CSAT + status badges + team/search filter + row expand → training history), ScheduleCoverage (24h bar gantt staffed-vs-forecast + inline shift-swap approve/reject + AuditLog), QaQueue (priority-ordered list low sentiment/confidence + inline 1-5 scoring form + optimistic removal), TrainingImpact (grouped bar chart before/after per module + agent drilldown line chart), TicketQueue (RBAC-gated sortable table complaints+requests, SLA breach highlight, assign-agent dropdown + AuditLog, row → Beneficiary 360 link). lib/queries/workforce.ts + lib/actions/workforce.ts + workforce/page.tsx. 0 TS errors.*
+Last updated: 2026-06-21 — *Phase 7 DONE. 6 Executive Rollup widgets built: KpiScorecard (7-KPI card grid, click → owning module), ClusterRanking (leaderboard sortable by any KPI, cluster click → ?cluster=), SavingsTracker (AreaChart trend + hover tooltip volume×AHT calc + CSV board export), BeneficiaryVoice (theme cards expand → anonymized examples + sparkline trend), CampaignResults (type filter pills + grouped BarChart + campaign table delivery/response %), PenaltyImpact (sortable table failure% vs tolerance, breach flag + AlertTriangle icon, SAR penalty, breach-only filter + CSV export). lib/queries/executive.ts + lib/actions/executive.ts + executive/page.tsx. 0 TS errors.*
 
 ---
 
@@ -19,7 +19,7 @@ Last updated: 2026-06-21 — *Phase 6 DONE. 5 Workforce & Quality widgets built:
 | 4 | Module 02 Wisal Intelligence | DONE | 5 widgets, RBAC + kill switch |
 | 5 | Module 03 Governance & Compliance | DONE | export + cross-links + KB |
 | 6 | Module 04 Workforce & Quality | DONE | AgentGrid + ScheduleCoverage + QaQueue + TrainingImpact + TicketQueue |
-| 7 | Module 05 Executive Rollup | TODO | + campaigns + penalties |
+| 7 | Module 05 Executive Rollup | DONE | KpiScorecard + ClusterRanking + SavingsTracker + BeneficiaryVoice + CampaignResults + PenaltyImpact |
 | 8 | Module 06 Operations & Integrations | TODO | NMR/integration, sys health, 360 (RFP gaps) |
 | 9 | Hardening & Production-Ready | TODO | |
 | 10 | Polish | TODO | ui-ux-pro-max final pass |
@@ -97,12 +97,12 @@ Last updated: 2026-06-21 — *Phase 6 DONE. 5 Workforce & Quality widgets built:
 ### Phase 7 — Executive Rollup
 | ID | Task | Status |
 |---|---|---|
-| P7-1 | National KPI Scorecard | TODO |
-| P7-2 | Cluster Ranking | TODO |
-| P7-3 | Savings & Efficiency | TODO |
-| P7-4 | Beneficiary Voice | TODO |
-| P7-5 | Campaign Results *(RFP gap)* | TODO |
-| P7-6 | SLA Penalty / Financial Impact *(RFP §6 gap)* | TODO |
+| P7-1 | National KPI Scorecard | DONE |
+| P7-2 | Cluster Ranking | DONE |
+| P7-3 | Savings & Efficiency | DONE |
+| P7-4 | Beneficiary Voice | DONE |
+| P7-5 | Campaign Results *(RFP gap)* | DONE |
+| P7-6 | SLA Penalty / Financial Impact *(RFP §6 gap)* | DONE |
 
 ### Phase 8 — Module 06 Operations & Integrations *(RFP gaps)*
 | ID | Task | Status |
@@ -141,6 +141,7 @@ Last updated: 2026-06-21 — *Phase 6 DONE. 5 Workforce & Quality widgets built:
 ---
 
 ## Changelog (newest first)
+- **2026-06-21 (Phase 7 DONE)** — P7-1: `KpiScorecardWidget` 7-KPI card grid (thisWeek/target/lastWeek), status badge + delta icon, click → owning module route. P7-2: `ClusterRankingWidget` leaderboard, client-side sort by compositeScore or any KPI column, medal icons for top-3, cluster click → `?cluster=` URL update. P7-3: `SavingsTrackerWidget` dual-series AreaChart (agentHoursSaved + estimatedHoursSaved), rich tooltip showing volume×AHT calc formula, board CSV export via `exportSavingsReport` server action. P7-4: `BeneficiaryVoiceWidget` responsive card grid, sentiment bar + color-coded border, expand → sparkline trend + anonymized quoted examples. P7-5: `CampaignResultsWidget` type-filter pills, grouped BarChart (sent/delivered/responded by type), scrollable campaign table with delivery% + response% + StatusBadge. P7-6: `PenaltyImpactWidget` sortable table (failure% vs tolerance, AlertTriangle/CheckCircle breach icons, SAR penalty), breach-only filter toggle, CSV export via `exportPenaltyReport` server action; breach rows highlighted red. `lib/queries/executive.ts` (6 fetchers) + `lib/actions/executive.ts` (exportSavingsReport + exportPenaltyReport) + `executive/page.tsx` wired. 0 TS errors.
 - **2026-06-21 (Phase 6 DONE)** — P6-1: `AgentGridWidget` sortable table (AHT/FCR/QA/CSAT status-colored), team + search filter, row expand → pre-loaded training history. P6-2: `ScheduleCoverageWidget` 24h bar gantt (over/on-target/under staffing), 24h/peak toggle, inline `ShiftSwapCard` approve/reject → `resolveShiftSwap` server action + AuditLog; SUPERVISOR-gated. P6-3: `QaQueueWidget` priority-ordered (high priority + worst sentiment first), row expand → 1-5 quality score form + notes → `submitQaScore` server action + AuditLog + optimistic removal from queue. P6-4: `TrainingImpactWidget` grouped bar chart (Avg Before/After per module, Recharts BarChart), module filter, agent drilldown → line chart score trend + record table. P6-5: `TicketQueueWidget` SUPERVISOR-gated, sortable/searchable table (complaint/request type + priority + status + SLA due + assign-agent dropdown), SLA-breached rows highlighted red, `assignTicketAgent` server action → AuditLog + status auto-advance to IN_PROGRESS, ExternalLink → `/operations?beneficiaryId=`. `lib/queries/workforce.ts` (5 fetchers) + `lib/actions/workforce.ts` (resolveShiftSwap + submitQaScore + assignTicketAgent) + `workforce/page.tsx` wired. 0 TS errors.
 - **2026-06-21 (Phase 5 DONE)** — P5-1: `MedicalApprovalLogWidget` searchable table (caseId/cluster/status/approvedBy/date), CSV export via `/api/export/medical-approvals`. P5-2: `ConsentAuditWidget` searchable table, missing-consent counter in header, deep-link → `/intelligence?highlight=<caregiverCaseId>`. P5-3: `ForbiddenIntentWidget` Recharts `AreaChart` trend (red fill, teal line), click data point → filters log to date, searchable event log, CSV export. P5-4: `ComplianceScorecardWidget` 2×2 grid (NCA/PDPL/DGA/NDMO), score bar, status ring, per-card export + full compliance-pack export. P5-5: `KnowledgeBaseWidget` expandable list, AR/EN body toggle, RBAC-gated publish/unpublish/draft actions (`setArticleStatus` server action + AuditLog). `lib/queries/governance.ts` (5 fetchers) + `lib/actions/governance.ts` (setArticleStatus + buildExportCsv) + `app/api/export/[kind]/route.ts` (COMPLIANCE-gated CSV endpoint). `/governance` page wired. 0 TS errors.
 - **2026-06-21 (Phase 4 DONE)** — P4-1: `AdaptiveTierMonitorWidget` stacked AreaChart (T1/T2/T3) + tier-band filter buttons + Tier-1 autocorrect LineChart mini-trend + latest snapshot 3-col summary. P4-2: `CaregiverAuditWidget` RBAC-gated (`checkRole("COMPLIANCE")`); locked state if insufficient; searchable table + inline audit-trail row expand. P4-3: `AiHumanSplitWidget` donut⇄funnel toggle + channel/cluster segment toggle; overall AI% callout. P4-4: `DriftWatchWidget` multi-line NLU confidence chart (up to 8 series) + flagged alert list; alert click highlights series; `assignDriftAlert` server action + inline assignee picker. P4-5: `KillSwitchWidget` PLATFORM_ADMIN-gated; status card (ARMED/ACTIVE); typed confirmation (`ACTIVATE KILL SWITCH`) required for activation; `toggleKillSwitch` server action → AuditLog. `lib/queries/intelligence.ts` (5 fetchers) + `lib/actions/intelligence.ts` (toggleKillSwitch + assignDriftAlert + getAssignableUsers). `intelligence/page.tsx` wired with all widgets + filters. 0 TS errors.

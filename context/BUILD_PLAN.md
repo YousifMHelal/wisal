@@ -97,12 +97,12 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ## Phase 7 — Module 05: Executive Rollup
 
-- [ ] **P7-1** `widgets/kpi-scorecard` — 7-KPI card grid (this week vs target vs last week); card click → owning module/metric.
-- [ ] **P7-2** `widgets/cluster-ranking` — leaderboard, sortable by any KPI; cluster click → sets `?cluster=`.
-- [ ] **P7-3** `widgets/savings-tracker` — trend; hover shows calc (volume × AHT saved); export for board.
-- [ ] **P7-4** `widgets/beneficiary-voice` — plain-language theme cards; expand → anonymized examples + theme trend.
-- [ ] **P7-5** `widgets/campaign-results` *(RFP gap)* — outbound campaign results: sent/delivered/responded, outcome by type (reminder/survey/awareness/reschedule).
-- [ ] **P7-6** `widgets/penalty-impact` *(RFP §6 gap)* — SLA penalty / financial impact: failure % vs permissible tolerance per KPI/cluster, breach flag, estimated penalty (avg failure % × operating cost).
+- [x] **P7-1** `widgets/kpi-scorecard` — 7-KPI card grid (this week vs target vs last week); card click → owning module/metric.
+- [x] **P7-2** `widgets/cluster-ranking` — leaderboard, sortable by any KPI; cluster click → sets `?cluster=`.
+- [x] **P7-3** `widgets/savings-tracker` — trend; hover shows calc (volume × AHT saved); export for board.
+- [x] **P7-4** `widgets/beneficiary-voice` — plain-language theme cards; expand → anonymized examples + theme trend.
+- [x] **P7-5** `widgets/campaign-results` *(RFP gap)* — outbound campaign results: sent/delivered/responded, outcome by type (reminder/survey/awareness/reschedule).
+- [x] **P7-6** `widgets/penalty-impact` *(RFP §6 gap)* — SLA penalty / financial impact: failure % vs permissible tolerance per KPI/cluster, breach flag, estimated penalty (avg failure % × operating cost).
 
 **Exit:** Module 05 done. Five spec modules complete.
 
