@@ -85,11 +85,11 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ## Phase 6 — Module 04: Workforce & Quality
 
-- [ ] **P6-1** `widgets/agent-grid` — sortable DataTable (AHT/FCR/QA/CSAT, r/a/g), filter by team/cluster, row → agent detail + history.
-- [ ] **P6-2** `widgets/schedule-coverage` — calendar/gantt staffed-vs-forecast by hour/cluster; inline approve/reject shift-swaps (mutation + AuditLog).
-- [ ] **P6-3** `widgets/qa-queue` — prioritized list (low sentiment/low confidence); item → transcript + scoring form; completed removed from queue.
-- [ ] **P6-4** `widgets/training-impact` — before/after comparison; filter by module/date; agent click → training history + score trend.
-- [ ] **P6-5** `widgets/ticket-queue` *(RFP gap)* — case/ticket queue (complaints + requests): status, priority, SLA due, escalation path, assign agent (mutation + AuditLog); row → Beneficiary 360.
+- [x] **P6-1** `widgets/agent-grid` — sortable DataTable (AHT/FCR/QA/CSAT, r/a/g), filter by team/cluster, row → agent detail + history.
+- [x] **P6-2** `widgets/schedule-coverage` — calendar/gantt staffed-vs-forecast by hour/cluster; inline approve/reject shift-swaps (mutation + AuditLog).
+- [x] **P6-3** `widgets/qa-queue` — prioritized list (low sentiment/low confidence); item → transcript + scoring form; completed removed from queue.
+- [x] **P6-4** `widgets/training-impact` — before/after comparison; filter by module/date; agent click → training history + score trend.
+- [x] **P6-5** `widgets/ticket-queue` *(RFP gap)* — case/ticket queue (complaints + requests): status, priority, SLA due, escalation path, assign agent (mutation + AuditLog); row → Beneficiary 360.
 
 **Exit:** Module 04 done.
 

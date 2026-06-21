@@ -4,7 +4,7 @@ Single source of truth for "what's done". The agent MUST update this after finis
 
 Status: `TODO` · `IN PROGRESS` · `DONE` · `BLOCKED`
 
-Last updated: 2026-06-21 — *Phase 5 DONE. 5 Governance & Compliance widgets built: MedicalApprovalLog (searchable table + CSV export), ConsentAudit (searchable table + deep-link → Caregiver Audit), ForbiddenIntent (Recharts AreaChart trend + log, spike click filters log), ComplianceScorecard (NCA/PDPL/DGA/NDMO card grid, per-card export + compliance pack), KnowledgeBase (versioned bilingual AR/EN, RBAC-gated publish/unpublish, row expand preview). lib/queries/governance.ts + lib/actions/governance.ts + app/api/export/[kind]/route.ts. 0 TS errors.*
+Last updated: 2026-06-21 — *Phase 6 DONE. 5 Workforce & Quality widgets built: AgentGrid (sortable table AHT/FCR/QA/CSAT + status badges + team/search filter + row expand → training history), ScheduleCoverage (24h bar gantt staffed-vs-forecast + inline shift-swap approve/reject + AuditLog), QaQueue (priority-ordered list low sentiment/confidence + inline 1-5 scoring form + optimistic removal), TrainingImpact (grouped bar chart before/after per module + agent drilldown line chart), TicketQueue (RBAC-gated sortable table complaints+requests, SLA breach highlight, assign-agent dropdown + AuditLog, row → Beneficiary 360 link). lib/queries/workforce.ts + lib/actions/workforce.ts + workforce/page.tsx. 0 TS errors.*
 
 ---
 
@@ -18,7 +18,7 @@ Last updated: 2026-06-21 — *Phase 5 DONE. 5 Governance & Compliance widgets bu
 | 3 | Module 01 Live Operations | DONE | 5 widgets, filters wired, SSE refresh |
 | 4 | Module 02 Wisal Intelligence | DONE | 5 widgets, RBAC + kill switch |
 | 5 | Module 03 Governance & Compliance | DONE | export + cross-links + KB |
-| 6 | Module 04 Workforce & Quality | TODO | + ticket/case queue |
+| 6 | Module 04 Workforce & Quality | DONE | AgentGrid + ScheduleCoverage + QaQueue + TrainingImpact + TicketQueue |
 | 7 | Module 05 Executive Rollup | TODO | + campaigns + penalties |
 | 8 | Module 06 Operations & Integrations | TODO | NMR/integration, sys health, 360 (RFP gaps) |
 | 9 | Hardening & Production-Ready | TODO | |
@@ -88,11 +88,11 @@ Last updated: 2026-06-21 — *Phase 5 DONE. 5 Governance & Compliance widgets bu
 ### Phase 6 — Workforce & Quality
 | ID | Task | Status |
 |---|---|---|
-| P6-1 | Agent Performance Grid | TODO |
-| P6-2 | Schedule & Coverage | TODO |
-| P6-3 | QA Sampling Queue | TODO |
-| P6-4 | Training Impact Tracker | TODO |
-| P6-5 | Ticket / Case queue *(RFP gap)* | TODO |
+| P6-1 | Agent Performance Grid | DONE |
+| P6-2 | Schedule & Coverage | DONE |
+| P6-3 | QA Sampling Queue | DONE |
+| P6-4 | Training Impact Tracker | DONE |
+| P6-5 | Ticket / Case queue *(RFP gap)* | DONE |
 
 ### Phase 7 — Executive Rollup
 | ID | Task | Status |
@@ -141,6 +141,7 @@ Last updated: 2026-06-21 — *Phase 5 DONE. 5 Governance & Compliance widgets bu
 ---
 
 ## Changelog (newest first)
+- **2026-06-21 (Phase 6 DONE)** — P6-1: `AgentGridWidget` sortable table (AHT/FCR/QA/CSAT status-colored), team + search filter, row expand → pre-loaded training history. P6-2: `ScheduleCoverageWidget` 24h bar gantt (over/on-target/under staffing), 24h/peak toggle, inline `ShiftSwapCard` approve/reject → `resolveShiftSwap` server action + AuditLog; SUPERVISOR-gated. P6-3: `QaQueueWidget` priority-ordered (high priority + worst sentiment first), row expand → 1-5 quality score form + notes → `submitQaScore` server action + AuditLog + optimistic removal from queue. P6-4: `TrainingImpactWidget` grouped bar chart (Avg Before/After per module, Recharts BarChart), module filter, agent drilldown → line chart score trend + record table. P6-5: `TicketQueueWidget` SUPERVISOR-gated, sortable/searchable table (complaint/request type + priority + status + SLA due + assign-agent dropdown), SLA-breached rows highlighted red, `assignTicketAgent` server action → AuditLog + status auto-advance to IN_PROGRESS, ExternalLink → `/operations?beneficiaryId=`. `lib/queries/workforce.ts` (5 fetchers) + `lib/actions/workforce.ts` (resolveShiftSwap + submitQaScore + assignTicketAgent) + `workforce/page.tsx` wired. 0 TS errors.
 - **2026-06-21 (Phase 5 DONE)** — P5-1: `MedicalApprovalLogWidget` searchable table (caseId/cluster/status/approvedBy/date), CSV export via `/api/export/medical-approvals`. P5-2: `ConsentAuditWidget` searchable table, missing-consent counter in header, deep-link → `/intelligence?highlight=<caregiverCaseId>`. P5-3: `ForbiddenIntentWidget` Recharts `AreaChart` trend (red fill, teal line), click data point → filters log to date, searchable event log, CSV export. P5-4: `ComplianceScorecardWidget` 2×2 grid (NCA/PDPL/DGA/NDMO), score bar, status ring, per-card export + full compliance-pack export. P5-5: `KnowledgeBaseWidget` expandable list, AR/EN body toggle, RBAC-gated publish/unpublish/draft actions (`setArticleStatus` server action + AuditLog). `lib/queries/governance.ts` (5 fetchers) + `lib/actions/governance.ts` (setArticleStatus + buildExportCsv) + `app/api/export/[kind]/route.ts` (COMPLIANCE-gated CSV endpoint). `/governance` page wired. 0 TS errors.
 - **2026-06-21 (Phase 4 DONE)** — P4-1: `AdaptiveTierMonitorWidget` stacked AreaChart (T1/T2/T3) + tier-band filter buttons + Tier-1 autocorrect LineChart mini-trend + latest snapshot 3-col summary. P4-2: `CaregiverAuditWidget` RBAC-gated (`checkRole("COMPLIANCE")`); locked state if insufficient; searchable table + inline audit-trail row expand. P4-3: `AiHumanSplitWidget` donut⇄funnel toggle + channel/cluster segment toggle; overall AI% callout. P4-4: `DriftWatchWidget` multi-line NLU confidence chart (up to 8 series) + flagged alert list; alert click highlights series; `assignDriftAlert` server action + inline assignee picker. P4-5: `KillSwitchWidget` PLATFORM_ADMIN-gated; status card (ARMED/ACTIVE); typed confirmation (`ACTIVATE KILL SWITCH`) required for activation; `toggleKillSwitch` server action → AuditLog. `lib/queries/intelligence.ts` (5 fetchers) + `lib/actions/intelligence.ts` (toggleKillSwitch + assignDriftAlert + getAssignableUsers). `intelligence/page.tsx` wired with all widgets + filters. 0 TS errors.
 - **2026-06-21 (SLA Heatmap rebuilt)** — P3-1: `SlaHeatmapWidget` rebuilt with `react-simple-maps@3` + real KSA GeoJSON (geoBoundaries, 13 ADM1 regions). New `getSlaAdminRegionsData()` query aggregates 20 clusters → 13 admin regions (weighted-avg SL%, worst status). `color-mix()` for dimmed fills, CSS var tokens throughout, hover tooltip + mobile tap panel, geoMercator [45,24] scale 800. 0 TS errors.
