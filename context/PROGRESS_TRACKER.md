@@ -4,7 +4,7 @@ Single source of truth for "what's done". The agent MUST update this after finis
 
 Status: `TODO` · `IN PROGRESS` · `DONE` · `BLOCKED`
 
-Last updated: 2026-06-21 — *Phase 4 DONE. 5 Wisal Intelligence widgets built: AdaptiveTierMonitor (stacked area + autocorrect mini-trend), CaregiverAudit (RBAC-gated table, row expand), AiHumanSplit (donut⇄funnel toggle, channel/cluster segmentation), DriftWatch (multi-line NLU chart + flagged alert list + assign action), KillSwitch (PLATFORM_ADMIN-gated, typed confirmation, AuditLog). lib/queries/intelligence.ts + lib/actions/intelligence.ts. 0 TS errors.*
+Last updated: 2026-06-21 — *Phase 5 DONE. 5 Governance & Compliance widgets built: MedicalApprovalLog (searchable table + CSV export), ConsentAudit (searchable table + deep-link → Caregiver Audit), ForbiddenIntent (Recharts AreaChart trend + log, spike click filters log), ComplianceScorecard (NCA/PDPL/DGA/NDMO card grid, per-card export + compliance pack), KnowledgeBase (versioned bilingual AR/EN, RBAC-gated publish/unpublish, row expand preview). lib/queries/governance.ts + lib/actions/governance.ts + app/api/export/[kind]/route.ts. 0 TS errors.*
 
 ---
 
@@ -17,7 +17,7 @@ Last updated: 2026-06-21 — *Phase 4 DONE. 5 Wisal Intelligence widgets built: 
 | 2 | App Shell | DONE | layout + sidebar + topbar + filters + search |
 | 3 | Module 01 Live Operations | DONE | 5 widgets, filters wired, SSE refresh |
 | 4 | Module 02 Wisal Intelligence | DONE | 5 widgets, RBAC + kill switch |
-| 5 | Module 03 Governance & Compliance | TODO | export + cross-links + KB |
+| 5 | Module 03 Governance & Compliance | DONE | export + cross-links + KB |
 | 6 | Module 04 Workforce & Quality | TODO | + ticket/case queue |
 | 7 | Module 05 Executive Rollup | TODO | + campaigns + penalties |
 | 8 | Module 06 Operations & Integrations | TODO | NMR/integration, sys health, 360 (RFP gaps) |
@@ -79,11 +79,11 @@ Last updated: 2026-06-21 — *Phase 4 DONE. 5 Wisal Intelligence widgets built: 
 ### Phase 5 — Governance & Compliance
 | ID | Task | Status |
 |---|---|---|
-| P5-1 | Medical Content Approval Log | TODO |
-| P5-2 | Consent & Disclosure Audit | TODO |
-| P5-3 | Forbidden-Intent Triggers | TODO |
-| P5-4 | Compliance Scorecard + export | TODO |
-| P5-5 | Knowledge Base manager *(RFP gap)* | TODO |
+| P5-1 | Medical Content Approval Log | DONE |
+| P5-2 | Consent & Disclosure Audit | DONE |
+| P5-3 | Forbidden-Intent Triggers | DONE |
+| P5-4 | Compliance Scorecard + export | DONE |
+| P5-5 | Knowledge Base manager *(RFP gap)* | DONE |
 
 ### Phase 6 — Workforce & Quality
 | ID | Task | Status |
@@ -141,6 +141,7 @@ Last updated: 2026-06-21 — *Phase 4 DONE. 5 Wisal Intelligence widgets built: 
 ---
 
 ## Changelog (newest first)
+- **2026-06-21 (Phase 5 DONE)** — P5-1: `MedicalApprovalLogWidget` searchable table (caseId/cluster/status/approvedBy/date), CSV export via `/api/export/medical-approvals`. P5-2: `ConsentAuditWidget` searchable table, missing-consent counter in header, deep-link → `/intelligence?highlight=<caregiverCaseId>`. P5-3: `ForbiddenIntentWidget` Recharts `AreaChart` trend (red fill, teal line), click data point → filters log to date, searchable event log, CSV export. P5-4: `ComplianceScorecardWidget` 2×2 grid (NCA/PDPL/DGA/NDMO), score bar, status ring, per-card export + full compliance-pack export. P5-5: `KnowledgeBaseWidget` expandable list, AR/EN body toggle, RBAC-gated publish/unpublish/draft actions (`setArticleStatus` server action + AuditLog). `lib/queries/governance.ts` (5 fetchers) + `lib/actions/governance.ts` (setArticleStatus + buildExportCsv) + `app/api/export/[kind]/route.ts` (COMPLIANCE-gated CSV endpoint). `/governance` page wired. 0 TS errors.
 - **2026-06-21 (Phase 4 DONE)** — P4-1: `AdaptiveTierMonitorWidget` stacked AreaChart (T1/T2/T3) + tier-band filter buttons + Tier-1 autocorrect LineChart mini-trend + latest snapshot 3-col summary. P4-2: `CaregiverAuditWidget` RBAC-gated (`checkRole("COMPLIANCE")`); locked state if insufficient; searchable table + inline audit-trail row expand. P4-3: `AiHumanSplitWidget` donut⇄funnel toggle + channel/cluster segment toggle; overall AI% callout. P4-4: `DriftWatchWidget` multi-line NLU confidence chart (up to 8 series) + flagged alert list; alert click highlights series; `assignDriftAlert` server action + inline assignee picker. P4-5: `KillSwitchWidget` PLATFORM_ADMIN-gated; status card (ARMED/ACTIVE); typed confirmation (`ACTIVATE KILL SWITCH`) required for activation; `toggleKillSwitch` server action → AuditLog. `lib/queries/intelligence.ts` (5 fetchers) + `lib/actions/intelligence.ts` (toggleKillSwitch + assignDriftAlert + getAssignableUsers). `intelligence/page.tsx` wired with all widgets + filters. 0 TS errors.
 - **2026-06-21 (SLA Heatmap rebuilt)** — P3-1: `SlaHeatmapWidget` rebuilt with `react-simple-maps@3` + real KSA GeoJSON (geoBoundaries, 13 ADM1 regions). New `getSlaAdminRegionsData()` query aggregates 20 clusters → 13 admin regions (weighted-avg SL%, worst status). `color-mix()` for dimmed fills, CSS var tokens throughout, hover tooltip + mobile tap panel, geoMercator [45,24] scale 800. 0 TS errors.
 - **2026-06-21 (Phase 3 widgets DONE)** — P3-1: `SlaHeatmapWidget` SVG choropleth (20 KSA regions, status fill, hover tooltip, click→?cluster=, tap reveal mobile). P3-2: `ChannelPulseWidget` horizontal snap-scroll strip, 6 channels. P3-3: `ActiveIncidentsWidget` severity-ranked list, inline Recharts trend, `acknowledgeIncident` server action → AuditLog. P3-4: `TodayVsTargetWidget` arc gauge composite + 4 sub-gauges (SL/Abandoned/AHT/FCR). P3-5: `AgentStatusBoardWidget` cluster grid tiles (Avail/OnCall/Wrap/Break/Offline + utilisation bar). P3-6: `LiveRefresh` SSE client + `/api/stream` route + `revalidate=30` ISR. Shared `Widget/WidgetSkeleton/WidgetError/WidgetEmpty/WidgetLocked` shell. `lib/queries/live-operations.ts` all 4 queries. `lib/actions/incidents.ts` acknowledge mutation. 0 TS errors.

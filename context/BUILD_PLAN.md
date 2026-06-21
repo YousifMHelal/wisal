@@ -73,11 +73,11 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ## Phase 5 — Module 03: Governance & Compliance
 
-- [ ] **P5-1** `widgets/medical-approval-log` — searchable table (caseId/date/status), export filtered CSV.
-- [ ] **P5-2** `widgets/consent-audit` — searchable table; rows deep-link into Caregiver Audit (Module 02).
-- [ ] **P5-3** `widgets/forbidden-intent` — trend on top, log below; click spike → filters log to date range.
-- [ ] **P5-4** `widgets/compliance-scorecard` — card grid (NCA/PDPL/DGA/NDMO); per-card + full "compliance pack" export; cards link to supporting logs.
-- [ ] **P5-5** `widgets/knowledge-base` *(RFP gap)* — versioned bilingual (AR/EN) article manager: list/version/status (Draft/Published/Unpublished), scheduled publish, role-based publish rights.
+- [x] **P5-1** `widgets/medical-approval-log` — searchable table (caseId/date/status), export filtered CSV.
+- [x] **P5-2** `widgets/consent-audit` — searchable table; rows deep-link into Caregiver Audit (Module 02).
+- [x] **P5-3** `widgets/forbidden-intent` — trend on top, log below; click spike → filters log to date range.
+- [x] **P5-4** `widgets/compliance-scorecard` — card grid (NCA/PDPL/DGA/NDMO); per-card + full "compliance pack" export; cards link to supporting logs.
+- [x] **P5-5** `widgets/knowledge-base` *(RFP gap)* — versioned bilingual (AR/EN) article manager: list/version/status (Draft/Published/Unpublished), scheduled publish, role-based publish rights.
 
 **Exit:** Module 03 done, export + cross-module links working.
 
