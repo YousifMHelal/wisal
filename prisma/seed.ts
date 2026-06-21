@@ -273,9 +273,12 @@ async function main() {
   const PROXY = ["YES", "NO", "AMBIGUOUS"] as const
   const CAREGIVER_ACTIONS = ["COMPLETED_WITH_CONSENT", "FAILCLOSED_HANDOFF"] as const
   for (let i = 0; i < 60; i++) {
-    await prisma.caregiverCase.create({
-      data: {
-        caseId: `CG-${String(i + 1).padStart(5, "0")}`,
+    const cgCaseId = `CG-${String(i + 1).padStart(5, "0")}`
+    await prisma.caregiverCase.upsert({
+      where: { caseId: cgCaseId },
+      update: {},
+      create: {
+        caseId: cgCaseId,
         clusterId: pick(clusterIds),
         proxyConfirmed: pick(PROXY),
         action: pick(CAREGIVER_ACTIONS),
@@ -291,8 +294,10 @@ async function main() {
   // Add consent disclosures for caregiver cases
   const cgCases = await prisma.caregiverCase.findMany({ select: { id: true } })
   for (const cgc of cgCases) {
-    await prisma.consentDisclosure.create({
-      data: {
+    await prisma.consentDisclosure.upsert({
+      where: { caregiverCaseId: cgc.id },
+      update: {},
+      create: {
         caseId: `CD-${cgc.id.slice(-6)}`,
         caregiverCaseId: cgc.id,
         consentOnFile: Math.random() > 0.2,
