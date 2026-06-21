@@ -61,11 +61,11 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ## Phase 4 — Module 02: Wisal Intelligence
 
-- [ ] **P4-1** `widgets/adaptive-tier-monitor` — stacked trend (T1/T2/T3) + Tier-1 autocorrect mini-trend; tier-band click filters; info tooltip.
-- [ ] **P4-2** `widgets/caregiver-audit` — **RBAC-gated** table; row expand → full audit trail. Locked state if role insufficient.
-- [ ] **P4-3** `widgets/ai-human-split` — donut⇄funnel toggle, segmented by channel/cluster, segment click filters module.
-- [ ] **P4-4** `widgets/drift-watch` — multi-line per cluster/dialect + alert list; alert click → that trend line; assign-to-member action.
-- [ ] **P4-5** `widgets/kill-switch` — status card + **PLATFORM_ADMIN-gated** control with confirmation step; writes AuditLog.
+- [x] **P4-1** `widgets/adaptive-tier-monitor` — stacked trend (T1/T2/T3) + Tier-1 autocorrect mini-trend; tier-band click filters; info tooltip.
+- [x] **P4-2** `widgets/caregiver-audit` — **RBAC-gated** table; row expand → full audit trail. Locked state if role insufficient.
+- [x] **P4-3** `widgets/ai-human-split` — donut⇄funnel toggle, segmented by channel/cluster, segment click filters module.
+- [x] **P4-4** `widgets/drift-watch` — multi-line per cluster/dialect + alert list; alert click → that trend line; assign-to-member action.
+- [x] **P4-5** `widgets/kill-switch` — status card + **PLATFORM_ADMIN-gated** control with confirmation step; writes AuditLog.
 
 **Exit:** Module 02 done, RBAC + confirmation flows working.
 

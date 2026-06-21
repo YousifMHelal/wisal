@@ -9,6 +9,9 @@ Append-only record of decisions, changes, and rationale across sessions. Read at
 - **Client context:** HHC (Saudi Health Holding Company), Tender PR-00786. 20 HHC clusters.
 - **Source docs:** `requirement/RFP.md`, `requirement/Wisal Command Center Design Spec.md`, `requirement/Wisal_Technical_File Detailed.md`.
 
+## Change Log
+- **2026-06-21 (Phase 4 DONE)** — 5 Wisal Intelligence widgets. Key decisions: (1) Recharts `formatter` prop accepts `(value, name) => [...]` — must cast `value as number` to satisfy TS strict (ValueType includes undefined). (2) shadcn canary `TooltipProvider` has no `delayDuration` prop (base-ui, not Radix). (3) `getAssignableUsers` is a server action (`"use server"`) called from RSC — works fine, but `User.name` is `string | null` in schema, requires null-coalesce before passing to client component. (4) Tailwind v4 canonical class warnings: use `bg-primary` not `bg-[var(--primary)]`, `border-border` not `border-[var(--border)]`, `text-status-amber-fg` works because `--color-status-amber-fg` is mapped in globals.css.
+
 ## Locked Decisions
 | Date | Decision | Rationale |
 |---|---|---|

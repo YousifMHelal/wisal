@@ -4,7 +4,7 @@ Single source of truth for "what's done". The agent MUST update this after finis
 
 Status: `TODO` · `IN PROGRESS` · `DONE` · `BLOCKED`
 
-Last updated: 2026-06-21 — *Phase 3 DONE. SLA Heatmap rebuilt: react-simple-maps + real KSA GeoJSON (13 admin regions, geoBoundaries public domain). ComposableMap geoMercator [45,24] scale 800. Status fill via CSS var tokens. Hover tooltip + mobile tap panel. 0 TS errors.*
+Last updated: 2026-06-21 — *Phase 4 DONE. 5 Wisal Intelligence widgets built: AdaptiveTierMonitor (stacked area + autocorrect mini-trend), CaregiverAudit (RBAC-gated table, row expand), AiHumanSplit (donut⇄funnel toggle, channel/cluster segmentation), DriftWatch (multi-line NLU chart + flagged alert list + assign action), KillSwitch (PLATFORM_ADMIN-gated, typed confirmation, AuditLog). lib/queries/intelligence.ts + lib/actions/intelligence.ts. 0 TS errors.*
 
 ---
 
@@ -15,8 +15,8 @@ Last updated: 2026-06-21 — *Phase 3 DONE. SLA Heatmap rebuilt: react-simple-ma
 | 0 | Scaffold & Foundations | DONE | |
 | 1 | Data Model & Seed | DONE | Docker postgres:16-alpine, 35 tables, verified |
 | 2 | App Shell | DONE | layout + sidebar + topbar + filters + search |
-| 3 | Module 01 Live Operations | IN PROGRESS | 5 widgets done, filters wired, SSE refresh |
-| 4 | Module 02 Wisal Intelligence | TODO | RBAC + kill switch |
+| 3 | Module 01 Live Operations | DONE | 5 widgets, filters wired, SSE refresh |
+| 4 | Module 02 Wisal Intelligence | DONE | 5 widgets, RBAC + kill switch |
 | 5 | Module 03 Governance & Compliance | TODO | export + cross-links + KB |
 | 6 | Module 04 Workforce & Quality | TODO | + ticket/case queue |
 | 7 | Module 05 Executive Rollup | TODO | + campaigns + penalties |
@@ -70,11 +70,11 @@ Last updated: 2026-06-21 — *Phase 3 DONE. SLA Heatmap rebuilt: react-simple-ma
 ### Phase 4 — Wisal Intelligence
 | ID | Task | Status |
 |---|---|---|
-| P4-1 | Adaptive Tier Monitor | TODO |
-| P4-2 | Caregiver Mode Audit (RBAC) | TODO |
-| P4-3 | AI vs Human Split | TODO |
-| P4-4 | Drift Watch | TODO |
-| P4-5 | Kill Switch (admin + confirm) | TODO |
+| P4-1 | Adaptive Tier Monitor | DONE |
+| P4-2 | Caregiver Mode Audit (RBAC) | DONE |
+| P4-3 | AI vs Human Split | DONE |
+| P4-4 | Drift Watch | DONE |
+| P4-5 | Kill Switch (admin + confirm) | DONE |
 
 ### Phase 5 — Governance & Compliance
 | ID | Task | Status |
@@ -141,6 +141,7 @@ Last updated: 2026-06-21 — *Phase 3 DONE. SLA Heatmap rebuilt: react-simple-ma
 ---
 
 ## Changelog (newest first)
+- **2026-06-21 (Phase 4 DONE)** — P4-1: `AdaptiveTierMonitorWidget` stacked AreaChart (T1/T2/T3) + tier-band filter buttons + Tier-1 autocorrect LineChart mini-trend + latest snapshot 3-col summary. P4-2: `CaregiverAuditWidget` RBAC-gated (`checkRole("COMPLIANCE")`); locked state if insufficient; searchable table + inline audit-trail row expand. P4-3: `AiHumanSplitWidget` donut⇄funnel toggle + channel/cluster segment toggle; overall AI% callout. P4-4: `DriftWatchWidget` multi-line NLU confidence chart (up to 8 series) + flagged alert list; alert click highlights series; `assignDriftAlert` server action + inline assignee picker. P4-5: `KillSwitchWidget` PLATFORM_ADMIN-gated; status card (ARMED/ACTIVE); typed confirmation (`ACTIVATE KILL SWITCH`) required for activation; `toggleKillSwitch` server action → AuditLog. `lib/queries/intelligence.ts` (5 fetchers) + `lib/actions/intelligence.ts` (toggleKillSwitch + assignDriftAlert + getAssignableUsers). `intelligence/page.tsx` wired with all widgets + filters. 0 TS errors.
 - **2026-06-21 (SLA Heatmap rebuilt)** — P3-1: `SlaHeatmapWidget` rebuilt with `react-simple-maps@3` + real KSA GeoJSON (geoBoundaries, 13 ADM1 regions). New `getSlaAdminRegionsData()` query aggregates 20 clusters → 13 admin regions (weighted-avg SL%, worst status). `color-mix()` for dimmed fills, CSS var tokens throughout, hover tooltip + mobile tap panel, geoMercator [45,24] scale 800. 0 TS errors.
 - **2026-06-21 (Phase 3 widgets DONE)** — P3-1: `SlaHeatmapWidget` SVG choropleth (20 KSA regions, status fill, hover tooltip, click→?cluster=, tap reveal mobile). P3-2: `ChannelPulseWidget` horizontal snap-scroll strip, 6 channels. P3-3: `ActiveIncidentsWidget` severity-ranked list, inline Recharts trend, `acknowledgeIncident` server action → AuditLog. P3-4: `TodayVsTargetWidget` arc gauge composite + 4 sub-gauges (SL/Abandoned/AHT/FCR). P3-5: `AgentStatusBoardWidget` cluster grid tiles (Avail/OnCall/Wrap/Break/Offline + utilisation bar). P3-6: `LiveRefresh` SSE client + `/api/stream` route + `revalidate=30` ISR. Shared `Widget/WidgetSkeleton/WidgetError/WidgetEmpty/WidgetLocked` shell. `lib/queries/live-operations.ts` all 4 queries. `lib/actions/incidents.ts` acknowledge mutation. 0 TS errors.
 - **2026-06-21 (Phase 2 DONE)** — P2-1: `(dashboard)/layout.tsx` (sidebar + topbar + main grid, h-screen flex). P2-2: `SidebarRail` (256px rail lg+, collapsible to 64px, status dots) + `MobileNav` (Sheet drawer). P2-3: `TopBarClient` (cluster dropdown, date-range, global search with results, theme/lang/account) + `TopBar` RSC wrapper. P2-4: `lib/filters.ts` (parseFilters, resolveDateBounds, filtersToParams). P2-5: `lib/actions/search.ts` (globalSearch, clusters+agents+tickets). P2-6: root `/` already redirects. Also: `StatusBadge` shared component, `lib/module-status.ts` (worst-status per module, server-computed). 0 TS errors.
