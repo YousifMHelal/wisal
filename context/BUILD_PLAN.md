@@ -110,9 +110,9 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ## Phase 8 — Module 06: Operations & Integrations *(RFP-gap module)*
 
-- [ ] **P8-1** `widgets/integration-nmr` — integration matrix health (Nafath/Mawid/Sehhaty/HR) + **NMR Live (Open API)** status: up/degraded/down, last sync, latency, sync/event pattern; no point-to-point.
-- [ ] **P8-2** `widgets/system-health` — Availability vs 99.9999% target, DR RTO/RPO per channel, last DR test, KSA region/residency flag.
-- [ ] **P8-3** `widgets/beneficiary-360` — search beneficiary (iqama/name) → full 360 profile: demographics, cross-channel interaction history, active cases, consent status, audit trail. Also drill-in target from agent rows / tickets / global search.
+- [x] **P8-1** `widgets/integration-nmr` — integration matrix health (Nafath/Mawid/Sehhaty/HR) + **NMR Live (Open API)** status: up/degraded/down, last sync, latency, sync/event pattern; no point-to-point.
+- [x] **P8-2** `widgets/system-health` — Availability vs 99.9999% target, DR RTO/RPO per channel, last DR test, KSA region/residency flag.
+- [x] **P8-3** `widgets/beneficiary-360` — search beneficiary (iqama/name) → full 360 profile: demographics, cross-channel interaction history, active cases, consent status, audit trail. Also drill-in target from agent rows / tickets / global search.
 
 **Exit:** Module 06 done. Full RFP coverage matrix satisfied (ARCHITECTURE §6b).
 
