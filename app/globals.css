@@ -193,19 +193,34 @@
   }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
   }
   /* Arabic locale: swap to Arabic-optimised font stack */
   html[dir="rtl"] {
     font-family: var(--font-arabic);
+    /* Arabic-specific: slightly tighter tracking, slightly looser line-height */
+    letter-spacing: 0;
+    line-height: 1.7;
   }
   body {
     @apply bg-background text-foreground;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   /* Tabular numerics globally for metric displays */
   .tabular {
     font-variant-numeric: tabular-nums;
   }
-  /* Logical-props reminder: never use left/right in components — use ps/pe/ms/me/start/end */
+  /* Suppress all transitions/animations for prefers-reduced-motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
 @layer utilities {
@@ -213,4 +228,51 @@
   .status-green  { color: var(--status-green-fg); background: var(--status-green-bg); }
   .status-amber  { color: var(--status-amber-fg); background: var(--status-amber-bg); }
   .status-red    { color: var(--status-red-fg);   background: var(--status-red-bg);   }
+
+  /* Widget transition helpers — use for hover/expand/filter micro-interactions */
+  .transition-widget {
+    transition: border-color 150ms ease-out, background-color 150ms ease-out, box-shadow 150ms ease-out;
+  }
+  /* Elevation on hover — for interactive cards */
+  .hover-elevate {
+    transition: border-color 150ms ease-out, background-color 150ms ease-out, box-shadow 150ms ease-out;
+  }
+  .hover-elevate:hover {
+    @apply border-primary/40 shadow-sm;
+  }
+
+  /* Recharts global tooltip polish — applies to all Tooltip components across all widgets */
+  .recharts-tooltip-wrapper .recharts-default-tooltip {
+    background: var(--card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+  }
+  .recharts-default-tooltip .recharts-tooltip-label {
+    color: var(--foreground) !important;
+    font-weight: 500 !important;
+    margin-bottom: 4px !important;
+  }
+  .recharts-default-tooltip .recharts-tooltip-item {
+    color: var(--muted-foreground) !important;
+    padding: 0 !important;
+    line-height: 1.6 !important;
+  }
+  /* Recharts axis ticks — consistent muted color across all charts */
+  .recharts-cartesian-axis-tick-value {
+    fill: var(--muted-foreground) !important;
+    font-size: 11px !important;
+  }
+  /* Recharts grid lines */
+  .recharts-cartesian-grid line {
+    stroke: var(--border) !important;
+    opacity: 0.6 !important;
+  }
+  /* Recharts cursor */
+  .recharts-tooltip-cursor {
+    stroke: var(--border) !important;
+    opacity: 0.8 !important;
+  }
 }
