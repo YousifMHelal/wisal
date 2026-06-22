@@ -221,6 +221,7 @@ export interface IncidentRow {
   type: string
   description: string
   clusterName: string | null
+  clusterNameAr: string | null
   channelType: string | null
   triggeredAt: Date
   acknowledgedAt: Date | null
@@ -238,7 +239,7 @@ export async function getActiveIncidents(filters: Filters): Promise<IncidentRow[
     },
     orderBy: [{ severity: "asc" }, { triggeredAt: "desc" }],
     include: {
-      cluster: { select: { name: true } },
+      cluster: { select: { name: true, nameAr: true } },
       channel: { select: { type: true } },
     },
     take: 50,
@@ -250,6 +251,7 @@ export async function getActiveIncidents(filters: Filters): Promise<IncidentRow[
     type: inc.type,
     description: inc.description,
     clusterName: inc.cluster?.name ?? null,
+    clusterNameAr: inc.cluster?.nameAr ?? null,
     channelType: inc.channel?.type ?? null,
     triggeredAt: inc.triggeredAt,
     acknowledgedAt: inc.acknowledgedAt,

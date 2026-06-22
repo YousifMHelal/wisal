@@ -66,6 +66,7 @@ export interface CaregiverCaseRow {
   id: string
   caseId: string
   clusterName: string
+  clusterNameEn: string
   proxyConfirmed: string
   action: string
   timestamp: Date
@@ -89,6 +90,7 @@ export async function getCaregiverAuditData(filters: Filters): Promise<Caregiver
     id: r.id,
     caseId: r.caseId,
     clusterName: r.cluster.nameAr ?? r.cluster.name,
+    clusterNameEn: r.cluster.name,
     proxyConfirmed: r.proxyConfirmed,
     action: r.action,
     timestamp: r.timestamp,
@@ -207,6 +209,7 @@ export interface DriftSeriesPoint {
 export interface DriftSeries {
   id: string
   label: string
+  labelEn: string
   dialect: string
   clusterName: string
   clusterId: string
@@ -219,8 +222,10 @@ export interface DriftSeries {
 export interface DriftAlert {
   id: string
   clusterName: string
+  clusterNameEn: string
   clusterId: string
   dialect: string
+  dialectEn: string
   date: Date
   nluConfidence: number
   message: string | null
@@ -254,7 +259,7 @@ export async function getDriftWatchData(filters: Filters): Promise<DriftWatchDat
 
   const seriesMap = new Map<
     string,
-    { clusterId: string; clusterName: string; dialect: string; dialectAr: string; points: DriftSeriesPoint[]; flagged: boolean }
+    { clusterId: string; clusterName: string; clusterNameEn: string; dialect: string; dialectAr: string; points: DriftSeriesPoint[]; flagged: boolean }
   >()
 
   for (const s of snaps) {
@@ -263,6 +268,7 @@ export async function getDriftWatchData(filters: Filters): Promise<DriftWatchDat
       seriesMap.set(key, {
         clusterId: s.clusterId,
         clusterName: s.cluster.nameAr ?? s.cluster.name,
+        clusterNameEn: s.cluster.name,
         dialect: s.dialect,
         dialectAr: DIALECT_AR[s.dialect] ?? s.dialect,
         points: [],
@@ -283,6 +289,7 @@ export async function getDriftWatchData(filters: Filters): Promise<DriftWatchDat
     return {
       id: key,
       label: `${v.clusterName} / ${v.dialectAr}`,
+      labelEn: `${v.clusterNameEn} / ${v.dialect}`,
       dialect: v.dialectAr,
       clusterName: v.clusterName,
       clusterId: v.clusterId,
@@ -298,8 +305,10 @@ export async function getDriftWatchData(filters: Filters): Promise<DriftWatchDat
     .map((s) => ({
       id: s.id,
       clusterName: s.cluster.nameAr ?? s.cluster.name,
+      clusterNameEn: s.cluster.name,
       clusterId: s.clusterId,
       dialect: DIALECT_AR[s.dialect] ?? s.dialect,
+      dialectEn: s.dialect,
       date: s.date,
       nluConfidence: s.nluConfidence,
       message: s.message,

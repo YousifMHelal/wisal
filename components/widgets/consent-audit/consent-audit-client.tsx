@@ -11,9 +11,11 @@ import type { ConsentAuditRow } from "@/lib/queries/governance"
 interface Props {
   rows: ConsentAuditRow[]
   exportUrl: string
+  locale?: string
 }
 
-export function ConsentAuditClient({ rows, exportUrl }: Props) {
+export function ConsentAuditClient({ rows, exportUrl, locale = "ar" }: Props) {
+  const isAr = locale === "ar"
   const [search, setSearch] = useState("")
 
   const filtered = useMemo(() => {
@@ -35,7 +37,7 @@ export function ConsentAuditClient({ rows, exportUrl }: Props) {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="ابحث برقم الحالة أو حالة مقدم الرعاية…"
+            placeholder={isAr ? "ابحث برقم الحالة أو حالة مقدم الرعاية…" : "Search by case ID or caregiver case…"}
             className="ps-9 h-8 text-sm"
             aria-label="Search consent records"
           />
@@ -46,7 +48,7 @@ export function ConsentAuditClient({ rows, exportUrl }: Props) {
           className="inline-flex items-center gap-1.5 h-8 px-3 shrink-0 rounded-md border border-border bg-transparent text-sm font-medium text-foreground hover:bg-muted transition-colors duration-150 cursor-pointer"
         >
           <Download className="size-3.5" aria-hidden />
-          <span className="hidden sm:inline">تصدير</span>
+          <span className="hidden sm:inline">{isAr ? "تصدير" : "Export"}</span>
         </a>
       </div>
 
@@ -55,18 +57,18 @@ export function ConsentAuditClient({ rows, exportUrl }: Props) {
         <table className="w-full text-sm min-w-[560px]">
           <thead>
             <tr className="border-b border-border bg-muted/40">
-              <th className="py-2 ps-3 pe-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">رقم الحالة</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">حالة مقدم الرعاية</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">الموافقة</th>
-              <th className="py-2 ps-2 pe-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">التاريخ</th>
-              <th className="py-2 ps-2 pe-3 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">التدقيق</th>
+              <th className="py-2 ps-3 pe-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">{isAr ? "رقم الحالة" : "Case ID"}</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">{isAr ? "حالة مقدم الرعاية" : "Caregiver case"}</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">{isAr ? "الموافقة" : "Consent"}</th>
+              <th className="py-2 ps-2 pe-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">{isAr ? "التاريخ" : "Date"}</th>
+              <th className="py-2 ps-2 pe-3 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">{isAr ? "التدقيق" : "Audit"}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {filtered.length === 0 ? (
               <tr>
                 <td colSpan={5} className="py-8 text-center text-sm text-muted-foreground">
-                  لا توجد سجلات تطابق بحثك.
+                  {isAr ? "لا توجد سجلات تطابق بحثك." : "No records match your search."}
                 </td>
               </tr>
             ) : (
@@ -77,11 +79,11 @@ export function ConsentAuditClient({ rows, exportUrl }: Props) {
                   <td className="py-2.5 px-2 whitespace-nowrap">
                     {row.consentOnFile ? (
                       <Badge variant="outline" className="text-xs font-medium bg-status-green/15 text-status-green-fg border-status-green/30">
-                        موجودة
+                        {isAr ? "موجودة" : "On file"}
                       </Badge>
                     ) : (
                       <Badge variant="outline" className="text-xs font-medium bg-status-red/15 text-status-red-fg border-status-red/30">
-                        مفقودة
+                        {isAr ? "مفقودة" : "Missing"}
                       </Badge>
                     )}
                   </td>
@@ -95,7 +97,7 @@ export function ConsentAuditClient({ rows, exportUrl }: Props) {
                       aria-label={`View caregiver audit for ${row.caregiverCaseRef}`}
                     >
                       <ExternalLink className="size-3" aria-hidden />
-                      <span className="hidden sm:inline">تدقيق مقدم الرعاية</span>
+                      <span className="hidden sm:inline">{isAr ? "تدقيق مقدم الرعاية" : "Caregiver audit"}</span>
                     </Link>
                   </td>
                 </tr>
@@ -106,7 +108,7 @@ export function ConsentAuditClient({ rows, exportUrl }: Props) {
       </div>
 
       <p className="text-xs text-muted-foreground text-end tabular-nums">
-        عرض {filtered.length} من {rows.length} سجل
+        {isAr ? `عرض ${filtered.length} من ${rows.length} سجل` : `Showing ${filtered.length} of ${rows.length} records`}
       </p>
     </div>
   )

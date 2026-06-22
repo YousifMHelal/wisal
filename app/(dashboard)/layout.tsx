@@ -17,7 +17,14 @@ export default async function DashboardLayout({
   const locale = resolveLocale(cookieStore.get("locale")?.value)
 
   // Server-compute module status dots (one DB round-trip, shared)
-  const statuses = await getModuleStatuses()
+  const statuses = await getModuleStatuses().catch(() => ({
+    "live-operations": "green" as const,
+    intelligence: "green" as const,
+    governance: "green" as const,
+    workforce: "green" as const,
+    executive: "green" as const,
+    operations: "green" as const,
+  }))
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">

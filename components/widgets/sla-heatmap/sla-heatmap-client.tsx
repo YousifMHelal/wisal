@@ -86,6 +86,7 @@ interface TooltipState {
 interface Props {
   data: SlaAdminRegion[]
   selectedCluster: string | null
+  locale?: string
 }
 
 const STATUS_FILL: Record<KpiStatus, string> = {
@@ -100,7 +101,8 @@ const STATUS_FILL_DIM: Record<KpiStatus, string> = {
   red:   "color-mix(in srgb, var(--status-red)   30%, var(--card))",
 }
 
-export function SlaHeatmapClient({ data, selectedCluster }: Props) {
+export function SlaHeatmapClient({ data, selectedCluster, locale = "ar" }: Props) {
+  const isAr = locale === "ar"
   const router = useRouter()
   const searchParams = useSearchParams()
   const mapRef = useRef<HTMLDivElement>(null)
@@ -202,7 +204,7 @@ export function SlaHeatmapClient({ data, selectedCluster }: Props) {
   if (geoError) {
     return (
       <div className="flex items-center justify-center min-h-80 text-sm text-muted-foreground">
-        تعذّر تحميل خريطة المناطق
+        {isAr ? "تعذّر تحميل خريطة المناطق" : "Failed to load regions map"}
       </div>
     )
   }
@@ -216,7 +218,7 @@ export function SlaHeatmapClient({ data, selectedCluster }: Props) {
             <span key={s} className="flex items-center gap-1.5">
               <StatusBadge status={s} dot />
               <span className="text-muted-foreground tabular-nums">
-                {statusCounts[s]} منطقة
+                {statusCounts[s]} {isAr ? "منطقة" : "regions"}
               </span>
             </span>
           ) : null
@@ -230,14 +232,14 @@ export function SlaHeatmapClient({ data, selectedCluster }: Props) {
             className="absolute inset-0 flex items-center justify-center text-xs text-muted-foreground"
             aria-live="polite"
           >
-            جارٍ تحميل الخريطة…
+            {isAr ? "جارٍ تحميل الخريطة…" : "Loading map…"}
           </div>
         )}
         <svg
           viewBox={`0 0 ${MAP_W} ${MAP_H}`}
           preserveAspectRatio="xMidYMid meet"
           role="img"
-          aria-label="خريطة مستوى الخدمة الوطنية للمناطق الإدارية في المملكة العربية السعودية"
+          aria-label={isAr ? "خريطة مستوى الخدمة الوطنية للمناطق الإدارية في المملكة العربية السعودية" : "National SLA heatmap for administrative regions of Saudi Arabia"}
           style={{ display: "block", width: "100%", height: "auto", maxHeight: "600px" }}
         >
           {/* Background */}
@@ -266,7 +268,9 @@ export function SlaHeatmapClient({ data, selectedCluster }: Props) {
                 role={region ? "button" : undefined}
                 aria-label={
                   region
-                    ? `${region.regionName}: ${region.serviceLevelPct.toFixed(1)}% مستوى الخدمة`
+                    ? isAr
+                      ? `${region.regionNameAr}: ${region.serviceLevelPct.toFixed(1)}% مستوى الخدمة`
+                      : `${region.regionName}: ${region.serviceLevelPct.toFixed(1)}% service level`
                     : name
                 }
                 style={{
@@ -299,7 +303,7 @@ export function SlaHeatmapClient({ data, selectedCluster }: Props) {
             style={{ insetInlineStart: tooltip.x, top: tooltip.y }}
             role="tooltip"
           >
-            <TooltipContent region={tooltip.region} />
+            <TooltipContent region={tooltip.region} isAr={isAr} />
           </div>
         )}
       </div>
@@ -308,27 +312,29 @@ export function SlaHeatmapClient({ data, selectedCluster }: Props) {
       <div className="min-h-20 md:hidden">
         {activeRegion && isTouch ? (
           <div className="rounded-lg border bg-card p-3 text-sm">
-            <TooltipContent region={activeRegion} />
+            <TooltipContent region={activeRegion} isAr={isAr} />
             <button
               className="mt-2 text-xs text-muted-foreground underline underline-offset-2 cursor-pointer"
               onClick={() => setActiveRegion(null)}
             >
-              إغلاق
+              {isAr ? "إغلاق" : "Close"}
             </button>
           </div>
         ) : (
           <p className="text-xs text-muted-foreground ps-1 pt-2">
-            اضغط على منطقة لعرض التفاصيل
+            {isAr ? "اضغط على منطقة لعرض التفاصيل" : "Tap a region to view details"}
           </p>
         )}
       </div>
 
       {/* Legend */}
       <div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
-        <LegendItem status="green" label="في الهدف (≥٨٠%)" />
-        <LegendItem status="amber" label="الهامش (٧٨–٨٠%)" />
-        <LegendItem status="red"   label="خرق (<٧٨%)" />
-        <span className="ms-auto hidden md:inline">انقر على منطقة للتصفية</span>
+        <LegendItem status="green" label={isAr ? "في الهدف (≥٨٠%)" : "On target (≥80%)"} />
+        <LegendItem status="amber" label={isAr ? "الهامش (٧٨–٨٠%)" : "Marginal (78–80%)"} />
+        <LegendItem status="red"   label={isAr ? "خرق (<٧٨%)" : "Breach (<78%)"} />
+        <span className="ms-auto hidden md:inline">
+          {isAr ? "انقر على منطقة للتصفية" : "Click a region to filter"}
+        </span>
       </div>
     </div>
   )
@@ -347,22 +353,31 @@ function LegendItem({ status, label }: { status: KpiStatus; label: string }) {
   )
 }
 
-function TooltipContent({ region }: { region: SlaAdminRegion }) {
+function TooltipContent({ region, isAr }: { region: SlaAdminRegion; isAr: boolean }) {
+  const dir = isAr ? "rtl" : "ltr"
   return (
     <>
-      <p className="font-semibold mb-0.5 truncate" dir="rtl">{region.regionNameAr}</p>
-      <p className="text-xs text-muted-foreground mb-1.5 truncate">{region.regionName}</p>
+      <p className="font-semibold mb-0.5 truncate" dir={dir}>
+        {isAr ? region.regionNameAr : region.regionName}
+      </p>
+      <p className="text-xs text-muted-foreground mb-1.5 truncate">
+        {isAr ? region.regionName : region.regionNameAr}
+      </p>
       <div className="space-y-0.5 text-xs tabular-nums">
         <div className="flex justify-between gap-4">
-          <span className="text-muted-foreground">متوسط مستوى الخدمة</span>
+          <span className="text-muted-foreground">
+            {isAr ? "متوسط مستوى الخدمة" : "Avg service level"}
+          </span>
           <span className="font-medium">{region.serviceLevelPct.toFixed(1)}%</span>
         </div>
         <div className="flex justify-between gap-4">
-          <span className="text-muted-foreground">الحجم</span>
-          <span className="font-medium">{region.callVolume.toLocaleString("ar-SA")}</span>
+          <span className="text-muted-foreground">{isAr ? "الحجم" : "Volume"}</span>
+          <span className="font-medium">
+            {region.callVolume.toLocaleString(isAr ? "ar-SA" : "en-US")}
+          </span>
         </div>
         <div className="flex justify-between gap-4">
-          <span className="text-muted-foreground">التجمعات</span>
+          <span className="text-muted-foreground">{isAr ? "التجمعات" : "Clusters"}</span>
           <span className="font-medium">{region.clusters.length}</span>
         </div>
       </div>

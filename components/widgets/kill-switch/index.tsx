@@ -1,12 +1,18 @@
 import { Suspense } from "react"
+import { cookies } from "next/headers"
 import { Widget, WidgetSkeleton, WidgetLocked } from "@/components/widgets/widget"
 import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getKillSwitchData } from "@/lib/queries/intelligence"
 import { checkRole } from "@/lib/auth"
 import { KillSwitchClient } from "./kill-switch-client"
+import { resolveLocale } from "@/lib/i18n"
 import { Skeleton } from "@/components/ui/skeleton"
 
 async function KillSwitchBody() {
+  const jar = await cookies()
+  const locale = resolveLocale(jar.get("locale")?.value)
+  const isAr = locale === "ar"
+
   const allowed = await checkRole("PLATFORM_ADMIN")
 
   if (!allowed) {
@@ -23,27 +29,30 @@ async function KillSwitchBody() {
     return (
       <Widget title="Kill Switch" titleAr="مفتاح الإيقاف الطارئ">
         <div className="flex items-center justify-center min-h-30">
-          <p className="text-sm text-muted-foreground">لم تتم تهيئة سجل مفتاح الإيقاف.</p>
+          <p className="text-sm text-muted-foreground">
+            {isAr ? "لم تتم تهيئة سجل مفتاح الإيقاف." : "Kill switch record not initialised."}
+          </p>
         </div>
       </Widget>
     )
   }
+
+  const updatedStr = killSwitch.updatedAt.toLocaleString(isAr ? "ar-SA" : "en-US", {
+    month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+  })
 
   return (
     <Widget
       title="Kill Switch"
       titleAr="مفتاح الإيقاف الطارئ"
       actions={
-        <span className="text-xs text-muted-foreground">مسؤول النظام فقط</span>
+        <span className="text-xs text-muted-foreground">
+          {isAr ? "مسؤول النظام فقط" : "Platform Admin only"}
+        </span>
       }
-      footer={`Last updated: ${killSwitch.updatedAt.toLocaleString([], {
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      })}`}
+      footer={isAr ? `آخر تحديث: ${updatedStr}` : `Last updated: ${updatedStr}`}
     >
-      <KillSwitchClient killSwitch={killSwitch} />
+      <KillSwitchClient killSwitch={killSwitch} locale={locale} />
     </Widget>
   )
 }

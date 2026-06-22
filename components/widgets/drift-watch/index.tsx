@@ -1,9 +1,11 @@
 import { Suspense } from "react"
+import { cookies } from "next/headers"
 import { Widget, WidgetSkeleton } from "@/components/widgets/widget"
 import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getDriftWatchData } from "@/lib/queries/intelligence"
 import { getAssignableUsers } from "@/lib/actions/intelligence"
 import { DriftWatchClient } from "./drift-watch-client"
+import { resolveLocale } from "@/lib/i18n"
 import type { Filters } from "@/lib/filters"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -12,6 +14,10 @@ interface Props {
 }
 
 async function DriftWatchBody({ filters }: Props) {
+  const jar = await cookies()
+  const locale = resolveLocale(jar.get("locale")?.value)
+  const isAr = locale === "ar"
+
   const [data, rawUsers] = await Promise.all([
     getDriftWatchData(filters),
     getAssignableUsers(),
@@ -26,13 +32,15 @@ async function DriftWatchBody({ filters }: Props) {
       actions={
         data.alerts.length > 0 ? (
           <span className="text-xs text-status-amber-fg tabular-nums">
-            {data.alerts.length} مُبلَّغ عنه
+            {data.alerts.length} {isAr ? "مُبلَّغ عنه" : "reported"}
           </span>
         ) : undefined
       }
-      footer="ثقة NLU حسب التجمع/اللهجة · انقر على التنبيه لإبراز السلسلة · كلّف إلى عضو"
+      footer={isAr
+        ? "ثقة NLU حسب التجمع/اللهجة · انقر على التنبيه لإبراز السلسلة · كلّف إلى عضو"
+        : "NLU confidence by cluster/dialect · click alert to highlight chain · assign to member"}
     >
-      <DriftWatchClient data={data} assignableUsers={assignableUsers} />
+      <DriftWatchClient data={data} assignableUsers={assignableUsers} locale={locale} />
     </Widget>
   )
 }

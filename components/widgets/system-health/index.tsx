@@ -1,17 +1,26 @@
 import { Suspense } from "react"
+import { cookies } from "next/headers"
 import { Widget, WidgetSkeleton, WidgetEmpty } from "@/components/widgets/widget"
 import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getSystemHealthData } from "@/lib/queries/operations"
 import { SystemHealthClient } from "./system-health-client"
+import { resolveLocale } from "@/lib/i18n"
 
 async function SystemHealthBody() {
+  const jar = await cookies()
+  const locale = resolveLocale(jar.get("locale")?.value)
+  const isAr = locale === "ar"
+
   const data = await getSystemHealthData()
 
   if (!data) {
     return (
       <Widget title="System Health & DR" titleAr="صحة النظام والتعافي من الكوارث">
-        <WidgetEmpty message="لا توجد بيانات لصحة النظام." />
+        <WidgetEmpty
+          message="No system health data available."
+          messageAr="لا توجد بيانات لصحة النظام."
+        />
       </Widget>
     )
   }
@@ -20,9 +29,11 @@ async function SystemHealthBody() {
     <Widget
       title="System Health & DR"
       titleAr="صحة النظام والتعافي من الكوارث"
-      footer={`هدف التوفر: 99.9999% · BCP/DR RTO/RPO لكل قناة · إقامة البيانات في المملكة`}
+      footer={isAr
+        ? "هدف التوفر: 99.9999% · BCP/DR RTO/RPO لكل قناة · إقامة البيانات في المملكة"
+        : "Availability target: 99.9999% · BCP/DR RTO/RPO per channel · KSA data residency"}
     >
-      <SystemHealthClient data={data} />
+      <SystemHealthClient data={data} locale={locale} />
     </Widget>
   )
 }

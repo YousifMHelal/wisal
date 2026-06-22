@@ -8,13 +8,13 @@ import { format } from "date-fns"
 import { status as kpiStatus } from "@/lib/kpi"
 import type { AgentRow, AgentTrainingRecord } from "@/lib/queries/workforce"
 
-const STATE_CONFIG: Record<string, { label: string; className: string }> = {
-  AVAILABLE: { label: "متاح", className: "bg-[var(--status-green-bg)] text-[var(--status-green-fg)] border-[var(--status-green)]" },
-  ON_CALL: { label: "في مكالمة", className: "bg-[var(--status-amber-bg)] text-[var(--status-amber-fg)] border-[var(--status-amber)]" },
-  WRAP: { label: "تسوية", className: "bg-[var(--status-amber-bg)] text-[var(--status-amber-fg)] border-[var(--status-amber)]" },
-  AFTER_CALL: { label: "ما بعد المكالمة", className: "bg-[var(--status-amber-bg)] text-[var(--status-amber-fg)] border-[var(--status-amber)]" },
-  BREAK: { label: "استراحة", className: "bg-muted text-muted-foreground border-border" },
-  OFFLINE: { label: "غير متصل", className: "bg-[var(--status-red-bg)] text-[var(--status-red-fg)] border-[var(--status-red)]" },
+const STATE_CONFIG: Record<string, { labelAr: string; labelEn: string; className: string }> = {
+  AVAILABLE: { labelAr: "متاح", labelEn: "Available", className: "bg-[var(--status-green-bg)] text-[var(--status-green-fg)] border-[var(--status-green)]" },
+  ON_CALL: { labelAr: "في مكالمة", labelEn: "On Call", className: "bg-[var(--status-amber-bg)] text-[var(--status-amber-fg)] border-[var(--status-amber)]" },
+  WRAP: { labelAr: "تسوية", labelEn: "Wrap", className: "bg-[var(--status-amber-bg)] text-[var(--status-amber-fg)] border-[var(--status-amber)]" },
+  AFTER_CALL: { labelAr: "ما بعد المكالمة", labelEn: "After Call", className: "bg-[var(--status-amber-bg)] text-[var(--status-amber-fg)] border-[var(--status-amber)]" },
+  BREAK: { labelAr: "استراحة", labelEn: "Break", className: "bg-muted text-muted-foreground border-border" },
+  OFFLINE: { labelAr: "غير متصل", labelEn: "Offline", className: "bg-[var(--status-red-bg)] text-[var(--status-red-fg)] border-[var(--status-red)]" },
 }
 
 function statusClass(s: "green" | "amber" | "red") {
@@ -28,14 +28,17 @@ interface ExpandedRowProps {
   agentName: string
   training: AgentTrainingRecord[]
   loadTraining: (id: string) => Promise<AgentTrainingRecord[]>
+  isAr: boolean
 }
 
-function ExpandedRow({ agentId, agentName, training, loadTraining: _load }: ExpandedRowProps) {
+function ExpandedRow({ agentId, agentName, training, loadTraining: _load, isAr }: ExpandedRowProps) {
   if (training.length === 0) {
     return (
       <tr>
         <td colSpan={8} className="px-4 py-4 bg-muted/20">
-          <p className="text-xs text-muted-foreground">لا توجد سجلات تدريب لـ {agentName}.</p>
+          <p className="text-xs text-muted-foreground">
+            {isAr ? `لا توجد سجلات تدريب لـ ${agentName}.` : `No training records for ${agentName}.`}
+          </p>
         </td>
       </tr>
     )
@@ -43,15 +46,17 @@ function ExpandedRow({ agentId, agentName, training, loadTraining: _load }: Expa
   return (
     <tr>
       <td colSpan={8} className="px-4 py-4 bg-muted/20">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">سجل التدريب</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
+          {isAr ? "سجل التدريب" : "Training History"}
+        </p>
         <div className="overflow-x-auto">
           <table className="w-full text-xs min-w-[360px]">
             <thead>
               <tr className="border-b border-border">
-                <th className="py-1.5 pe-3 text-start font-medium text-muted-foreground">الوحدة</th>
-                <th className="py-1.5 px-3 text-start font-medium text-muted-foreground">تاريخ الإتمام</th>
-                <th className="py-1.5 px-3 text-end font-medium text-muted-foreground tabular-nums">قبل</th>
-                <th className="py-1.5 px-3 text-end font-medium text-muted-foreground tabular-nums">بعد</th>
+                <th className="py-1.5 pe-3 text-start font-medium text-muted-foreground">{isAr ? "الوحدة" : "Module"}</th>
+                <th className="py-1.5 px-3 text-start font-medium text-muted-foreground">{isAr ? "تاريخ الإتمام" : "Completed"}</th>
+                <th className="py-1.5 px-3 text-end font-medium text-muted-foreground tabular-nums">{isAr ? "قبل" : "Before"}</th>
+                <th className="py-1.5 px-3 text-end font-medium text-muted-foreground tabular-nums">{isAr ? "بعد" : "After"}</th>
                 <th className="py-1.5 ps-3 text-end font-medium text-muted-foreground tabular-nums">Δ</th>
               </tr>
             </thead>
@@ -81,12 +86,14 @@ function ExpandedRow({ agentId, agentName, training, loadTraining: _load }: Expa
 interface Props {
   agents: AgentRow[]
   trainingMap: Record<string, AgentTrainingRecord[]>
+  locale?: string
 }
 
 type SortKey = "name" | "aht" | "fcr" | "qaScore" | "csat"
 type SortDir = "asc" | "desc"
 
-export function AgentGridClient({ agents, trainingMap }: Props) {
+export function AgentGridClient({ agents, trainingMap, locale = "ar" }: Props) {
+  const isAr = locale === "ar"
   const [search, setSearch] = useState("")
   const [teamFilter, setTeamFilter] = useState("")
   const [sortKey, setSortKey] = useState<SortKey>("name")
@@ -142,7 +149,7 @@ export function AgentGridClient({ agents, trainingMap }: Props) {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="ابحث عن موظف أو فريق أو تجمع…"
+            placeholder={isAr ? "ابحث عن موظف أو فريق أو تجمع…" : "Search agent, team, or cluster…"}
             className="ps-9 h-8 text-sm"
             aria-label="Search agents"
           />
@@ -153,13 +160,13 @@ export function AgentGridClient({ agents, trainingMap }: Props) {
           className="h-8 rounded-md border border-border bg-card text-sm text-foreground px-2 cursor-pointer focus:outline-none focus:ring-1 focus:ring-ring"
           aria-label="Filter by team"
         >
-          <option value="">كل الفرق</option>
+          <option value="">{isAr ? "كل الفرق" : "All teams"}</option>
           {teams.map((t) => (
             <option key={t} value={t}>{t}</option>
           ))}
         </select>
         <span className="text-xs text-muted-foreground tabular-nums ms-auto shrink-0">
-          {filtered.length} موظف
+          {isAr ? `${filtered.length} موظف` : `${filtered.length} agent${filtered.length !== 1 ? "s" : ""}`}
         </span>
       </div>
 
@@ -173,10 +180,10 @@ export function AgentGridClient({ agents, trainingMap }: Props) {
                 className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide cursor-pointer hover:text-foreground transition-colors select-none whitespace-nowrap"
                 onClick={() => toggleSort("name")}
               >
-                الموظف <SortIcon k="name" />
+                {isAr ? "الموظف" : "Agent"} <SortIcon k="name" />
               </th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden md:table-cell">الفريق</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden lg:table-cell">التجمع</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden md:table-cell">{isAr ? "الفريق" : "Team"}</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden lg:table-cell">{isAr ? "التجمع" : "Cluster"}</th>
               <th
                 className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide cursor-pointer hover:text-foreground transition-colors select-none whitespace-nowrap"
                 onClick={() => toggleSort("aht")}
@@ -207,7 +214,7 @@ export function AgentGridClient({ agents, trainingMap }: Props) {
             {filtered.length === 0 ? (
               <tr>
                 <td colSpan={8} className="py-8 text-center text-sm text-muted-foreground">
-                  لا يوجد موظفون يطابقون بحثك.
+                  {isAr ? "لا يوجد موظفون يطابقون بحثك." : "No agents match your search."}
                 </td>
               </tr>
             ) : (
@@ -236,13 +243,13 @@ export function AgentGridClient({ agents, trainingMap }: Props) {
                         <span className="text-sm font-medium text-foreground truncate">{agent.name}</span>
                         {stateCfg && (
                           <Badge variant="outline" className={`text-xs shrink-0 ${stateCfg.className}`}>
-                            {stateCfg.label}
+                            {isAr ? stateCfg.labelAr : stateCfg.labelEn}
                           </Badge>
                         )}
                       </div>
                     </td>
                     <td className="py-2.5 px-2 text-xs text-muted-foreground hidden md:table-cell">{agent.team}</td>
-                    <td className="py-2.5 px-2 text-xs text-muted-foreground hidden lg:table-cell">{agent.clusterName}</td>
+                    <td className="py-2.5 px-2 text-xs text-muted-foreground hidden lg:table-cell">{isAr ? agent.clusterNameAr : agent.clusterName}</td>
                     <td className={`py-2.5 px-2 text-end text-sm tabular-nums font-medium ${statusClass(ahtStatus)}`}>
                       {Math.round(agent.aht)}
                     </td>
@@ -263,6 +270,7 @@ export function AgentGridClient({ agents, trainingMap }: Props) {
                       agentName={agent.name}
                       training={training}
                       loadTraining={async () => []}
+                      isAr={isAr}
                     />
                   ),
                 ].filter(Boolean)

@@ -25,6 +25,7 @@ interface AssignableUser {
 interface Props {
   data: DriftWatchData
   assignableUsers: AssignableUser[]
+  locale?: string
 }
 
 const LINE_COLORS = [
@@ -38,7 +39,8 @@ const LINE_COLORS = [
   "#fb923c",
 ]
 
-export function DriftWatchClient({ data, assignableUsers }: Props) {
+export function DriftWatchClient({ data, assignableUsers, locale = "ar" }: Props) {
+  const isAr = locale === "ar"
   const [highlightedSeries, setHighlightedSeries] = useState<string | null>(null)
   const [assigningId, setAssigningId] = useState<string | null>(null)
   const [assigneeId, setAssigneeId] = useState("")
@@ -47,7 +49,7 @@ export function DriftWatchClient({ data, assignableUsers }: Props) {
 
   const { series, alerts } = data
 
-  if (!series.length) return <WidgetEmpty message="لا توجد بيانات انحراف لهذه الفترة." />
+  if (!series.length) return <WidgetEmpty message="No drift data for this period." messageAr="لا توجد بيانات انحراف لهذه الفترة." />
 
   // Build flat chart data — all series share same date axis
   const allDates = Array.from(
@@ -63,11 +65,10 @@ export function DriftWatchClient({ data, assignableUsers }: Props) {
     return row
   })
 
-  function handleAlertClick(clusterId: string, dialect: string) {
-    const seriesKey = series.find(
-      (s) => s.clusterId === clusterId && s.dialect === dialect
-    )?.id
-    setHighlightedSeries((prev) => (prev === (seriesKey ?? null) ? null : (seriesKey ?? null)))
+  function handleAlertClick(clusterId: string, dialectEn: string) {
+    // series id = "clusterId::dialectEn" (raw DB dialect value)
+    const seriesKey = `${clusterId}::${dialectEn}`
+    setHighlightedSeries((prev) => (prev === seriesKey ? null : seriesKey))
   }
 
   function handleAssign(alertId: string) {
@@ -118,14 +119,15 @@ export function DriftWatchClient({ data, assignableUsers }: Props) {
               }}
               formatter={(v, key) => {
                 const s = series.find((s) => s.id === (key as string))
-                return [`${((v as number) * 100).toFixed(1)}%`, s?.label ?? (key as string)]
+                const lbl = isAr ? s?.label : s?.labelEn
+                return [`${((v as number) * 100).toFixed(1)}%`, lbl ?? (key as string)]
               }}
             />
             <Legend
               wrapperStyle={{ fontSize: 10 }}
               formatter={(value) => {
                 const s = series.find((s) => s.id === value)
-                return s?.label ?? value
+                return (isAr ? s?.label : s?.labelEn) ?? value
               }}
               onClick={(e) =>
                 setHighlightedSeries((prev) =>
@@ -156,7 +158,7 @@ export function DriftWatchClient({ data, assignableUsers }: Props) {
         <div className="border-t pt-3 space-y-2">
           <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
             <AlertTriangle className="size-3.5 text-[var(--status-amber-fg)]" aria-hidden />
-            تنبيهات مُعلَّمة ({alerts.length})
+            {isAr ? `تنبيهات مُعلَّمة (${alerts.length})` : `Flagged alerts (${alerts.length})`}
           </div>
 
           <div className="space-y-1.5 max-h-52 overflow-y-auto">
@@ -169,30 +171,27 @@ export function DriftWatchClient({ data, assignableUsers }: Props) {
                   key={alert.id}
                   className={[
                     "rounded-lg border p-2.5 cursor-pointer transition-all duration-150",
-                    highlightedSeries ===
-                    series.find(
-                      (s) => s.clusterId === alert.clusterId && s.dialect === alert.dialect
-                    )?.id
+                    highlightedSeries === `${alert.clusterId}::${alert.dialectEn}`
                       ? "border-[var(--primary)] bg-[var(--primary)]/5"
                       : "border-[var(--border)] hover:border-[var(--status-amber)] hover:bg-[var(--status-amber-bg)]",
                   ].join(" ")}
-                  onClick={() => handleAlertClick(alert.clusterId, alert.dialect)}
+                  onClick={() => handleAlertClick(alert.clusterId, alert.dialectEn)}
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ")
-                      handleAlertClick(alert.clusterId, alert.dialect)
+                      handleAlertClick(alert.clusterId, alert.dialectEn)
                   }}
-                  aria-label={`Drift alert: ${alert.clusterName} ${alert.dialect}`}
+                  aria-label={`Drift alert: ${alert.clusterNameEn} ${alert.dialectEn}`}
                 >
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div className="space-y-0.5 min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="text-xs font-medium text-foreground">
-                          {alert.clusterName}
+                          {isAr ? alert.clusterName : alert.clusterNameEn}
                         </span>
                         <span className="text-xs text-muted-foreground">·</span>
-                        <span className="text-xs text-muted-foreground">{alert.dialect}</span>
+                        <span className="text-xs text-muted-foreground">{isAr ? alert.dialect : alert.dialectEn}</span>
                         <span className="text-xs text-muted-foreground">·</span>
                         <span className="text-xs tabular-nums text-[var(--status-amber-fg)]">
                           NLU: {(alert.nluConfidence * 100).toFixed(1)}%
@@ -213,17 +212,17 @@ export function DriftWatchClient({ data, assignableUsers }: Props) {
                           setAssigningId(isAssigning ? null : alert.id)
                         }}
                         className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer flex-shrink-0"
-                        aria-label="تكليف تنبيه"
+                        aria-label={isAr ? "تكليف تنبيه" : "Assign alert"}
                       >
                         <UserCheck className="size-3.5" aria-hidden />
-                        تكليف
+                        {isAr ? "تكليف" : "Assign"}
                       </button>
                     )}
                     {result === "success" && (
-                      <span className="text-xs text-[var(--status-green-fg)]">تم التكليف ✓</span>
+                      <span className="text-xs text-[var(--status-green-fg)]">{isAr ? "تم التكليف ✓" : "Assigned ✓"}</span>
                     )}
                     {result === "error" && (
-                      <span className="text-xs text-[var(--status-red-fg)]">فشل</span>
+                      <span className="text-xs text-[var(--status-red-fg)]">{isAr ? "فشل" : "Failed"}</span>
                     )}
                   </div>
 
@@ -239,7 +238,7 @@ export function DriftWatchClient({ data, assignableUsers }: Props) {
                         className="flex-1 rounded border bg-transparent text-xs px-2 py-1 text-foreground focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
                         aria-label="Select assignee"
                       >
-                        <option value="">اختر عضواً…</option>
+                        <option value="">{isAr ? "اختر عضواً…" : "Select a member…"}</option>
                         {assignableUsers.map((u) => (
                           <option key={u.id} value={u.id}>
                             {u.name} ({u.role})
@@ -251,7 +250,7 @@ export function DriftWatchClient({ data, assignableUsers }: Props) {
                         onClick={() => handleAssign(alert.id)}
                         className="rounded px-2 py-1 text-xs bg-[var(--primary)] text-[var(--primary-foreground)] disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed transition-opacity"
                       >
-                        {isPending ? "…" : "تكليف"}
+                        {isPending ? "…" : (isAr ? "تكليف" : "Assign")}
                       </button>
                     </div>
                   )}

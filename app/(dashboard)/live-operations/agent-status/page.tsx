@@ -26,7 +26,7 @@ export default async function AgentStatusPage({ searchParams }: PageProps) {
           { labelEn: "Agent Status Board", labelAr: "لوحة حالة الوكلاء" },
         ]}
       />
-      <AgentStatusBoardWidget filters={filters} locale="ar" />
+      <AgentStatusBoardWidget filters={filters} />
     </>
   )
 }

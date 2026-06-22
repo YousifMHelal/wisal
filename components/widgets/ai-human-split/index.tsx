@@ -1,8 +1,10 @@
 import { Suspense } from "react"
+import { cookies } from "next/headers"
 import { Widget, WidgetSkeleton } from "@/components/widgets/widget"
 import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getAiHumanSplitData } from "@/lib/queries/intelligence"
 import { AiHumanSplitClient } from "./ai-human-split-client"
+import { resolveLocale } from "@/lib/i18n"
 import type { Filters } from "@/lib/filters"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -11,6 +13,10 @@ interface Props {
 }
 
 async function AiHumanSplitBody({ filters }: Props) {
+  const jar = await cookies()
+  const locale = resolveLocale(jar.get("locale")?.value)
+  const isAr = locale === "ar"
+
   const data = await getAiHumanSplitData(filters)
 
   return (
@@ -23,13 +29,13 @@ async function AiHumanSplitBody({ filters }: Props) {
             className="text-xs font-semibold tabular-nums"
             style={{ color: "var(--primary)" }}
           >
-            {data.overall.aiTotalPct.toFixed(1)}% ذكاء اصطناعي
+            {data.overall.aiTotalPct.toFixed(1)}% {isAr ? "ذكاء اصطناعي" : "AI"}
           </span>
         ) : undefined
       }
-      footer="تبديل الدائرة ↔ القمع · تقسيم حسب القناة أو التجمع"
+      footer={isAr ? "تبديل الدائرة ↔ القمع · تقسيم حسب القناة أو التجمع" : "Toggle donut ↔ funnel · split by channel or cluster"}
     >
-      <AiHumanSplitClient data={data} />
+      <AiHumanSplitClient data={data} locale={locale} />
     </Widget>
   )
 }

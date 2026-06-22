@@ -8,27 +8,28 @@ import { format } from "date-fns"
 import { assignTicketAgent } from "@/lib/actions/workforce"
 import type { TicketRow, AgentOption } from "@/lib/queries/workforce"
 
-const PRIORITY_CONFIG: Record<string, { label: string; className: string; order: number }> = {
-  CRITICAL: { label: "حرج", className: "bg-[var(--status-red-bg)] text-[var(--status-red-fg)] border-[var(--status-red)]", order: 0 },
-  HIGH: { label: "عالٍ", className: "bg-[var(--status-amber-bg)] text-[var(--status-amber-fg)] border-[var(--status-amber)]", order: 1 },
-  MEDIUM: { label: "متوسط", className: "bg-muted text-foreground border-border", order: 2 },
-  LOW: { label: "منخفض", className: "bg-muted text-muted-foreground border-border", order: 3 },
+const PRIORITY_CONFIG: Record<string, { labelAr: string; labelEn: string; className: string; order: number }> = {
+  CRITICAL: { labelAr: "حرج", labelEn: "Critical", className: "bg-[var(--status-red-bg)] text-[var(--status-red-fg)] border-[var(--status-red)]", order: 0 },
+  HIGH: { labelAr: "عالٍ", labelEn: "High", className: "bg-[var(--status-amber-bg)] text-[var(--status-amber-fg)] border-[var(--status-amber)]", order: 1 },
+  MEDIUM: { labelAr: "متوسط", labelEn: "Medium", className: "bg-muted text-foreground border-border", order: 2 },
+  LOW: { labelAr: "منخفض", labelEn: "Low", className: "bg-muted text-muted-foreground border-border", order: 3 },
 }
 
-const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
-  OPEN: { label: "مفتوح", className: "bg-[var(--status-amber-bg)] text-[var(--status-amber-fg)] border-[var(--status-amber)]" },
-  IN_PROGRESS: { label: "قيد التنفيذ", className: "bg-primary/10 text-primary border-primary/40" },
-  ESCALATED: { label: "مُصعَّد", className: "bg-[var(--status-red-bg)] text-[var(--status-red-fg)] border-[var(--status-red)]" },
-  RESOLVED: { label: "محلول", className: "bg-[var(--status-green-bg)] text-[var(--status-green-fg)] border-[var(--status-green)]" },
-  CLOSED: { label: "مغلق", className: "bg-muted text-muted-foreground border-border" },
+const STATUS_CONFIG: Record<string, { labelAr: string; labelEn: string; className: string }> = {
+  OPEN: { labelAr: "مفتوح", labelEn: "Open", className: "bg-[var(--status-amber-bg)] text-[var(--status-amber-fg)] border-[var(--status-amber)]" },
+  IN_PROGRESS: { labelAr: "قيد التنفيذ", labelEn: "In Progress", className: "bg-primary/10 text-primary border-primary/40" },
+  ESCALATED: { labelAr: "مُصعَّد", labelEn: "Escalated", className: "bg-[var(--status-red-bg)] text-[var(--status-red-fg)] border-[var(--status-red)]" },
+  RESOLVED: { labelAr: "محلول", labelEn: "Resolved", className: "bg-[var(--status-green-bg)] text-[var(--status-green-fg)] border-[var(--status-green)]" },
+  CLOSED: { labelAr: "مغلق", labelEn: "Closed", className: "bg-muted text-muted-foreground border-border" },
 }
 
 interface AssignCellProps {
   ticket: TicketRow
   agents: AgentOption[]
+  isAr: boolean
 }
 
-function AssignCell({ ticket, agents }: AssignCellProps) {
+function AssignCell({ ticket, agents, isAr }: AssignCellProps) {
   const [isPending, startTransition] = useTransition()
   const [localAgent, setLocalAgent] = useState(ticket.assignedAgentId ?? "")
   const [saved, setSaved] = useState(false)
@@ -58,7 +59,7 @@ function AssignCell({ ticket, agents }: AssignCellProps) {
         className="h-7 flex-1 min-w-0 rounded-md border border-border bg-card text-xs text-foreground px-1.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
         aria-label={`Assign agent to ticket ${ticket.id}`}
       >
-        <option value="">غير مُعيَّن</option>
+        <option value="">{isAr ? "غير مُعيَّن" : "Unassigned"}</option>
         {clusterAgents.map((a) => (
           <option key={a.id} value={a.id}>{a.name}</option>
         ))}
@@ -71,9 +72,11 @@ function AssignCell({ ticket, agents }: AssignCellProps) {
 interface Props {
   tickets: TicketRow[]
   agents: AgentOption[]
+  locale?: string
 }
 
-export function TicketQueueClient({ tickets, agents }: Props) {
+export function TicketQueueClient({ tickets, agents, locale = "ar" }: Props) {
+  const isAr = locale === "ar"
   const [search, setSearch] = useState("")
   const [typeFilter, setTypeFilter] = useState<"" | "COMPLAINT" | "REQUEST">("")
   const [priorityFilter, setPriorityFilter] = useState("")
@@ -106,7 +109,7 @@ export function TicketQueueClient({ tickets, agents }: Props) {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="ابحث عن تذكرة أو مستفيد…"
+            placeholder={isAr ? "ابحث عن تذكرة أو مستفيد…" : "Search ticket or beneficiary…"}
             className="ps-9 h-8 text-sm"
             aria-label="Search tickets"
           />
@@ -117,9 +120,9 @@ export function TicketQueueClient({ tickets, agents }: Props) {
           className="h-8 rounded-md border border-border bg-card text-sm text-foreground px-2 cursor-pointer focus:outline-none focus:ring-1 focus:ring-ring"
           aria-label="Filter by type"
         >
-          <option value="">كل الأنواع</option>
-          <option value="COMPLAINT">شكوى</option>
-          <option value="REQUEST">طلب</option>
+          <option value="">{isAr ? "كل الأنواع" : "All types"}</option>
+          <option value="COMPLAINT">{isAr ? "شكوى" : "Complaint"}</option>
+          <option value="REQUEST">{isAr ? "طلب" : "Request"}</option>
         </select>
         <select
           value={priorityFilter}
@@ -127,20 +130,20 @@ export function TicketQueueClient({ tickets, agents }: Props) {
           className="h-8 rounded-md border border-border bg-card text-sm text-foreground px-2 cursor-pointer focus:outline-none focus:ring-1 focus:ring-ring"
           aria-label="Filter by priority"
         >
-          <option value="">كل الأولويات</option>
-          <option value="CRITICAL">حرج</option>
-          <option value="HIGH">عالٍ</option>
-          <option value="MEDIUM">متوسط</option>
-          <option value="LOW">منخفض</option>
+          <option value="">{isAr ? "كل الأولويات" : "All priorities"}</option>
+          <option value="CRITICAL">{isAr ? "حرج" : "Critical"}</option>
+          <option value="HIGH">{isAr ? "عالٍ" : "High"}</option>
+          <option value="MEDIUM">{isAr ? "متوسط" : "Medium"}</option>
+          <option value="LOW">{isAr ? "منخفض" : "Low"}</option>
         </select>
         <div className="flex items-center gap-1.5 ms-auto shrink-0 text-xs text-muted-foreground">
           {breachedCount > 0 && (
             <span className="flex items-center gap-1 text-[var(--status-red-fg)]">
               <AlertCircle className="size-3.5" aria-hidden />
-              {breachedCount} خرق SLA
+              {isAr ? `${breachedCount} خرق SLA` : `${breachedCount} SLA breach${breachedCount !== 1 ? "es" : ""}`}
             </span>
           )}
-          <span className="tabular-nums">{filtered.length} تذكرة</span>
+          <span className="tabular-nums">{isAr ? `${filtered.length} تذكرة` : `${filtered.length} ticket${filtered.length !== 1 ? "s" : ""}`}</span>
         </div>
       </div>
 
@@ -149,21 +152,21 @@ export function TicketQueueClient({ tickets, agents }: Props) {
         <table className="w-full text-sm min-w-[800px]">
           <thead className="sticky top-0 z-10">
             <tr className="border-b border-border bg-muted">
-              <th className="py-2 ps-3 pe-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">التذكرة</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden md:table-cell">المستفيد</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">النوع</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">الأولوية</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">الحالة</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">موعد SLA</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">تعيين موظف</th>
-              <th className="py-2 ps-2 pe-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden lg:table-cell">التصعيد</th>
+              <th className="py-2 ps-3 pe-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">{isAr ? "التذكرة" : "Ticket"}</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden md:table-cell">{isAr ? "المستفيد" : "Beneficiary"}</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">{isAr ? "النوع" : "Type"}</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">{isAr ? "الأولوية" : "Priority"}</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">{isAr ? "الحالة" : "Status"}</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">{isAr ? "موعد SLA" : "SLA Due"}</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">{isAr ? "تعيين موظف" : "Assign Agent"}</th>
+              <th className="py-2 ps-2 pe-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden lg:table-cell">{isAr ? "التصعيد" : "Escalation"}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {filtered.length === 0 ? (
               <tr>
                 <td colSpan={8} className="py-8 text-center text-sm text-muted-foreground">
-                  لا توجد تذاكر تطابق بحثك.
+                  {isAr ? "لا توجد تذاكر تطابق بحثك." : "No tickets match your search."}
                 </td>
               </tr>
             ) : (
@@ -185,8 +188,8 @@ export function TicketQueueClient({ tickets, agents }: Props) {
                         <a
                           href={`/operations?beneficiaryId=${ticket.beneficiaryId}`}
                           className="text-primary hover:text-primary/80 transition-colors"
-                          title="عرض الملف الشامل للمستفيد"
-                          aria-label="فتح الملف الشامل للمستفيد"
+                          title={isAr ? "عرض الملف الشامل للمستفيد" : "View beneficiary 360 profile"}
+                          aria-label={isAr ? "فتح الملف الشامل للمستفيد" : "Open beneficiary 360 profile"}
                         >
                           <ExternalLink className="size-3" aria-hidden />
                         </a>
@@ -197,17 +200,17 @@ export function TicketQueueClient({ tickets, agents }: Props) {
                     </td>
                     <td className="py-2.5 px-2 whitespace-nowrap">
                       <Badge variant="outline" className="text-xs">
-                        {ticket.type === "COMPLAINT" ? "شكوى" : "طلب"}
+                        {ticket.type === "COMPLAINT" ? (isAr ? "شكوى" : "Complaint") : (isAr ? "طلب" : "Request")}
                       </Badge>
                     </td>
                     <td className="py-2.5 px-2 whitespace-nowrap">
                       <Badge variant="outline" className={`text-xs ${priCfg.className}`}>
-                        {priCfg.label}
+                        {isAr ? priCfg.labelAr : priCfg.labelEn}
                       </Badge>
                     </td>
                     <td className="py-2.5 px-2 whitespace-nowrap">
                       <Badge variant="outline" className={`text-xs ${stsCfg.className}`}>
-                        {stsCfg.label}
+                        {isAr ? stsCfg.labelAr : stsCfg.labelEn}
                       </Badge>
                     </td>
                     <td className={`py-2.5 px-2 text-xs tabular-nums whitespace-nowrap ${slaClass}`}>
@@ -217,7 +220,7 @@ export function TicketQueueClient({ tickets, agents }: Props) {
                       )}
                     </td>
                     <td className="py-2.5 px-2">
-                      <AssignCell ticket={ticket} agents={agents} />
+                      <AssignCell ticket={ticket} agents={agents} isAr={isAr} />
                     </td>
                     <td className="py-2.5 ps-2 pe-3 text-xs text-muted-foreground hidden lg:table-cell max-w-[140px] truncate">
                       {ticket.escalationPath ?? "—"}
@@ -231,7 +234,9 @@ export function TicketQueueClient({ tickets, agents }: Props) {
       </div>
 
       <p className="text-xs text-muted-foreground text-end tabular-nums">
-        {filtered.length} من {tickets.length} تذكرة · مرتب حسب الأولوية + موعد SLA
+        {isAr
+          ? `${filtered.length} من ${tickets.length} تذكرة · مرتب حسب الأولوية + موعد SLA`
+          : `${filtered.length} of ${tickets.length} tickets · sorted by priority + SLA due`}
       </p>
     </div>
   )

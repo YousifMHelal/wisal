@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>دليل المستخدم — مركز قيادة وصال</title>
+  <style>
+    /* ── Fonts ── */
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap');
+
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Root tokens ── */
+    :root {
+      --bg:         #ffffff;
+      --card:       #f8fafc;
+      --border:     #e2e8f0;
+      --text:       #1e293b;
+      --muted:      #64748b;
+      --primary:    #0d9488;   /* teal */
+      --primary-dk: #0f766e;
+      --green:      #16a34a;
+      --amber:      #d97706;
+      --red:        #dc2626;
+      --green-bg:   #f0fdf4;
+      --amber-bg:   #fffbeb;
+      --red-bg:     #fef2f2;
+    }
+
+    /* ── Base ── */
+    html { font-size: 16px; }
+    body {
+      font-family: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      direction: rtl;
+      text-align: right;
+    }
+
+    /* ── Page layout ── */
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 48px 40px;
+    }
+
+    /* ── Cover ── */
+    .cover {
+      text-align: center;
+      padding: 60px 0 48px;
+      border-bottom: 3px solid var(--primary);
+      margin-bottom: 48px;
+    }
+    .cover-logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cover-logo img { width: 80px; height: 80px; object-fit: contain; }
+    .cover h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--primary-dk);
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+    .cover h2 {
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+    .cover .meta {
+      font-size: 0.85rem;
+      color: var(--muted);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: inline-block;
+      padding: 8px 20px;
+    }
+
+    /* ── Notice box ── */
+    .notice {
+      background: #eff6ff;
+      border-right: 4px solid #3b82f6;
+      border-radius: 6px;
+      padding: 12px 16px;
+      font-size: 0.92rem;
+      color: #1e40af;
+      margin-bottom: 40px;
+    }
+
+    /* ── TOC ── */
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 56px;
+      page-break-after: always;
+    }
+    .toc h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--primary-dk);
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .toc ol {
+      padding-right: 20px;
+      counter-reset: none;
+    }
+    .toc li {
+      padding: 4px 0;
+      font-size: 0.95rem;
+    }
+    .toc a {
+      color: var(--text);
+      text-decoration: none;
+    }
+    .toc a:hover { color: var(--primary); }
+
+    /* ── Sections ── */
+    section {
+      margin-bottom: 56px;
+    }
+    section + section {
+      border-top: 1px solid var(--border);
+      padding-top: 48px;
+    }
+
+    /* ── Headings ── */
+    h1 { font-size: 1.9rem; font-weight: 700; }
+    h2 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--primary-dk);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    h2 .num {
+      background: var(--primary);
+      color: white;
+      font-size: 0.9rem;
+      font-weight: 700;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 28px 0 12px;
+      padding-right: 12px;
+      border-right: 3px solid var(--primary);
+    }
+    h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin: 20px 0 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Paragraphs ── */
+    p { margin-bottom: 12px; font-size: 0.97rem; }
+
+    /* ── Tables ── */
+    .table-wrap { overflow-x: auto; margin: 16px 0 24px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    thead tr { background: var(--primary); color: white; }
+    thead th {
+      padding: 10px 14px;
+      text-align: right;
+      font-weight: 600;
+    }
+    tbody tr:nth-child(even) { background: var(--card); }
+    tbody tr:hover { background: #f0fdfa; }
+    td { padding: 9px 14px; border-bottom: 1px solid var(--border); }
+    td.center { text-align: center; }
+
+    /* ── Lists ── */
+    ul, ol { padding-right: 22px; margin-bottom: 14px; }
+    li { margin-bottom: 6px; font-size: 0.95rem; }
+
+    /* ── Status chips ── */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .chip.green  { background: var(--green-bg);  color: var(--green); }
+    .chip.amber  { background: var(--amber-bg);  color: var(--amber); }
+    .chip.red    { background: var(--red-bg);    color: var(--red); }
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .dot.green { background: var(--green); }
+    .dot.amber { background: var(--amber); }
+    .dot.red   { background: var(--red); }
+
+    /* ── Role badge ── */
+    .role { display: inline-block; background: #ede9fe; color: #6d28d9; border-radius: 6px; font-size: 0.78rem; font-weight: 600; padding: 2px 8px; }
+
+    /* ── Warning / tip boxes ── */
+    .box {
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 0.92rem;
+    }
+    .box.warn { background: var(--amber-bg); border-right: 4px solid var(--amber); color: #78350f; }
+    .box.danger { background: var(--red-bg); border-right: 4px solid var(--red); color: #7f1d1d; }
+    .box.info  { background: #eff6ff; border-right: 4px solid #3b82f6; color: #1e40af; }
+    .box.tip   { background: var(--green-bg); border-right: 4px solid var(--green); color: #14532d; }
+
+    /* ── KPI card grid ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px;
+      margin: 16px 0 24px;
+    }
+    .kpi-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .kpi-card .label { font-size: 0.8rem; color: var(--muted); margin-bottom: 4px; }
+    .kpi-card .value { font-size: 1.2rem; font-weight: 700; color: var(--primary-dk); }
+    .kpi-card .target { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── Color legend ── */
+    .color-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin: 16px 0;
+    }
+    .color-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 0.9rem;
+      flex: 1;
+      min-width: 160px;
+    }
+    .color-circle {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ── Steps ── */
+    .steps { counter-reset: step; padding: 0; list-style: none; margin: 14px 0; }
+    .steps li {
+      counter-increment: step;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+      font-size: 0.95rem;
+    }
+    .steps li::before {
+      content: counter(step);
+      background: var(--primary);
+      color: white;
+      font-size: 0.8rem;
+      font-weight: 700;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── Module header card ── */
+    .module-header {
+      background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+      color: white;
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .module-header .icon {
+      width: 48px;
+      height: 48px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    .module-header .title { font-size: 1.2rem; font-weight: 700; }
+    .module-header .route { font-size: 0.8rem; opacity: 0.75; font-family: monospace; }
+
+    /* ── Sub-page header ── */
+    .subpage-header {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 18px;
+      margin: 24px 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+    }
+    .subpage-header .sp-route {
+      font-family: monospace;
+      color: var(--primary-dk);
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+    .subpage-header .sp-title {
+      font-weight: 600;
+      color: var(--text);
+    }
+    .subpage-header .sp-role {
+      margin-right: auto;
+    }
+
+    /* ── Permission table check/cross ── */
+    .yes { color: var(--green); font-weight: 700; font-size: 1.1rem; }
+    .no  { color: #cbd5e1; font-size: 1.1rem; }
+
+    /* ── FAQ ── */
+    .faq-item { margin-bottom: 20px; }
+    .faq-q {
+      font-weight: 600;
+      color: var(--primary-dk);
+      margin-bottom: 6px;
+      font-size: 0.97rem;
+    }
+    .faq-a { font-size: 0.95rem; color: var(--text); }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+      margin-top: 40px;
+    }
+
+    /* ── Print ── */
+    @media print {
+      body { font-size: 13px; }
+      .page { padding: 20px 24px; max-width: 100%; }
+      section { page-break-inside: avoid; }
+      h2 { page-break-after: avoid; }
+      h3 { page-break-after: avoid; }
+      .toc { page-break-after: always; }
+      .module-header { background: #0d9488 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      thead tr { background: #0d9488 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      a { color: inherit; text-decoration: none; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- COVER -->
+  <div class="cover">
+    <div class="cover-logo">
+      <img src="../public/logo.png" alt="Wisal" />
+    </div>
+    <h1>دليل المستخدم<br>مركز قيادة وصال</h1>
+    <h2>نظام إدارة علاقات المستفيدين | هيئة الرعاية الصحية (HHC)</h2>
+    <div class="meta">آخر تحديث: يونيو 2026 &nbsp;·&nbsp; الإصدار 1.2 &nbsp;·&nbsp; سري — للاستخدام الداخلي فقط</div>
+  </div>
+
+  <div class="notice">
+    هذا الدليل مخصص للمستخدمين من غير المختصين تقنياً. كل شيء مشروح بلغة بسيطة.
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <h2>الفهرس</h2>
+    <ol>
+      <li><a href="#sec1">ما هو مركز قيادة وصال؟</a></li>
+      <li><a href="#sec2">كيف تدخل للنظام؟</a></li>
+      <li><a href="#sec3">الشاشة الرئيسية — الأجزاء الثابتة</a></li>
+      <li><a href="#sec3b">صفحة النظرة العامة (Overview)</a></li>
+      <li><a href="#sec4">الوحدة الأولى — العمليات المباشرة</a></li>
+      <li><a href="#sec5">الوحدة الثانية — ذكاء وصال</a></li>
+      <li><a href="#sec6">الوحدة الثالثة — الحوكمة والامتثال</a></li>
+      <li><a href="#sec7">الوحدة الرابعة — القوى العاملة والجودة</a></li>
+      <li><a href="#sec8">الوحدة الخامسة — التقارير التنفيذية</a></li>
+      <li><a href="#sec9">الوحدة السادسة — العمليات والتكاملات</a></li>
+      <li><a href="#sec10">الألوان ومعناها</a></li>
+      <li><a href="#sec11">الصلاحيات — من يرى ماذا؟</a></li>
+      <li><a href="#sec12">أسئلة شائعة</a></li>
+    </ol>
+  </div>
+
+  <!-- ─────────────────────────────── SEC 1 ── -->
+  <section id="sec1">
+    <h2><span class="num">١</span> ما هو مركز قيادة وصال؟</h2>
+    <p>
+      مركز قيادة وصال هو <strong>لوحة تحكم مركزية</strong> تُظهر كل ما يحدث في مراكز خدمة المستفيدين التابعة لهيئة الرعاية الصحية عبر المملكة العربية السعودية (20 مجموعة إقليمية).
+    </p>
+
+    <h3>ماذا يفعل النظام؟</h3>
+    <ul>
+      <li>يُظهر أداء مراكز الاتصال <strong>في الوقت الفعلي</strong> (مكالمات، واتساب، دردشة، بريد إلكتروني، فيديو لغة الإشارة).</li>
+      <li>يتابع مستوى الخدمة ومؤشرات الجودة والامتثال للأنظمة.</li>
+      <li>يساعد المشرفين والمديرين على اتخاذ قرارات سريعة بناءً على بيانات حية.</li>
+      <li>يحفظ سجلاً كاملاً لكل الإجراءات لأغراض المراجعة والمساءلة.</li>
+    </ul>
+
+    <h3>المجموعات الإقليمية الـ 20</h3>
+    <p>يغطي النظام 20 مجموعة عبر مناطق المملكة:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>اسم المجموعة</th><th>المنطقة</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>الرياض المركزية</td><td>الرياض</td></tr>
+          <tr><td>2</td><td>شمال الرياض</td><td>الرياض</td></tr>
+          <tr><td>3</td><td>جنوب الرياض</td><td>الرياض</td></tr>
+          <tr><td>4</td><td>جدة</td><td>مكة المكرمة</td></tr>
+          <tr><td>5</td><td>مكة المكرمة</td><td>مكة المكرمة</td></tr>
+          <tr><td>6</td><td>الطائف</td><td>مكة المكرمة</td></tr>
+          <tr><td>7</td><td>الدمام</td><td>المنطقة الشرقية</td></tr>
+          <tr><td>8</td><td>الخبر</td><td>المنطقة الشرقية</td></tr>
+          <tr><td>9</td><td>الأحساء</td><td>المنطقة الشرقية</td></tr>
+          <tr><td>10</td><td>المدينة المنورة</td><td>المدينة المنورة</td></tr>
+          <tr><td>11</td><td>تبوك</td><td>تبوك</td></tr>
+          <tr><td>12</td><td>حائل</td><td>حائل</td></tr>
+          <tr><td>13</td><td>القصيم</td><td>القصيم</td></tr>
+          <tr><td>14</td><td>عسير</td><td>عسير</td></tr>
+          <tr><td>15</td><td>نجران</td><td>نجران</td></tr>
+          <tr><td>16</td><td>جازان</td><td>جازان</td></tr>
+          <tr><td>17</td><td>الباحة</td><td>الباحة</td></tr>
+          <tr><td>18</td><td>الجوف</td><td>الجوف</td></tr>
+          <tr><td>19</td><td>الحدود الشمالية</td><td>الحدود الشمالية</td></tr>
+          <tr><td>20</td><td>ينبع</td><td>المدينة المنورة</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>لمن هو؟</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>الدور</th><th>ماذا يستطيع؟</th></tr></thead>
+        <tbody>
+          <tr><td><span class="role">مشغّل</span></td><td>يرى لوحات العمليات المباشرة والتنبيهات</td></tr>
+          <tr><td><span class="role">مشرف</span></td><td>يدير الموظفين، يوافق على طلبات الإجازة، يتابع التذاكر</td></tr>
+          <tr><td><span class="role">امتثال</span></td><td>يراجع سجلات المحتوى الطبي والموافقات والامتثال، يصل لمفتاح الإيقاف الطارئ</td></tr>
+          <tr><td><span class="role">تنفيذي</span></td><td>يرى التقارير العليا والمؤشرات الاستراتيجية، يصل لمفتاح الإيقاف الطارئ</td></tr>
+          <tr><td><span class="role">مدير المنصة</span></td><td>صلاحيات كاملة بما فيها مفتاح الإيقاف الطارئ وإدارة التكاملات</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────── SEC 2 ── -->
+  <section id="sec2">
+    <h2><span class="num">٢</span> كيف تدخل للنظام؟</h2>
+
+    <h3>خطوات الدخول</h3>
+    <ol class="steps">
+      <li>افتح المتصفح واذهب إلى رابط النظام.</li>
+      <li>ستظهر لك <strong>صفحة تسجيل الدخول</strong>.</li>
+      <li>اكتب <strong>البريد الإلكتروني</strong> الخاص بك وكلمة المرور.</li>
+      <li>اضغط <strong>"تسجيل الدخول"</strong>.</li>
+    </ol>
+
+    <div class="box warn">
+      ⚠️ إذا أدخلت بيانات خاطئة 3 مرات، ستُحجب الجلسة. تواصل مع مدير النظام.
+    </div>
+
+    <h3>تسجيل الخروج</h3>
+    <ul>
+      <li>اضغط على أيقونة حسابك في الزاوية العليا.</li>
+      <li>اختر <strong>"تسجيل الخروج"</strong>.</li>
+      <li>الجلسة تنتهي تلقائياً بعد <strong>8 ساعات</strong> من عدم النشاط.</li>
+    </ul>
+  </section>
+
+  <!-- ─────────────────────────────── SEC 3 ── -->
+  <section id="sec3">
+    <h2><span class="num">٣</span> الشاشة الرئيسية — الأجزاء الثابتة</h2>
+    <p>بعد تسجيل الدخول، ستجد هذه الأجزاء دائماً على الشاشة:</p>
+
+    <h3>الشريط الجانبي (القائمة)</h3>
+    <p>يحتوي على <strong>6 وحدات رئيسية</strong> بالإضافة لصفحة النظرة العامة. كل وحدة تحوي صفحات فرعية تفتح عند الضغط على اسمها:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>الوحدة</th><th>الصفحات الفرعية</th><th>الرابط</th></tr></thead>
+        <tbody>
+          <tr><td><strong>النظرة العامة</strong></td><td>لوحة واحدة — ملخص وطني</td><td><code>/overview</code></td></tr>
+          <tr><td><strong>العمليات المباشرة</strong></td><td>العمليات · خريطة مستوى الخدمة · حالة الموظفين</td><td><code>/live-operations</code></td></tr>
+          <tr><td><strong>ذكاء وصال</strong></td><td>أداء الذكاء الاصطناعي · المخاطر والسلامة · مراجعة مقدّم الرعاية</td><td><code>/intelligence</code></td></tr>
+          <tr><td><strong>الحوكمة والامتثال</strong></td><td>الامتثال والتدقيق · النوايا المحظورة · قاعدة المعرفة</td><td><code>/governance</code></td></tr>
+          <tr><td><strong>القوى العاملة والجودة</strong></td><td>التذاكر والموظفون · الجداول والجودة · أثر التدريب</td><td><code>/workforce</code></td></tr>
+          <tr><td><strong>التقارير التنفيذية</strong></td><td>المؤشرات والترتيب · الرؤى والحملات</td><td><code>/executive</code></td></tr>
+          <tr><td><strong>العمليات والتكاملات</strong></td><td>التكاملات وصحة النظام · الملف الشامل للمستفيد</td><td><code>/operations</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>الشريط الجانبي قابل للطي والتوسيع بالضغط على زر الطي في أعلاه. في الشاشات الصغيرة يتحول لقائمة منبثقة (درّاور جانبي).</p>
+
+    <h3>الشريط العلوي</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>العنصر</th><th>ما يفعله</th></tr></thead>
+        <tbody>
+          <tr><td><strong>اختيار المجموعة</strong></td><td>تصفية كل البيانات على منطقة معينة — أو "كل المجموعات" للصورة الوطنية</td></tr>
+          <tr><td><strong>الفترة الزمنية</strong></td><td>مباشر (Live) / اليوم / آخر 7 أيام / آخر 30 يوماً / مخصص</td></tr>
+          <tr><td><strong>البحث العام</strong></td><td>ابحث عن رقم هوية مستفيد، اسم موظف، أو اسم مجموعة (من حرفين فأكثر)</td></tr>
+          <tr><td><strong>تبديل اللغة</strong></td><td>التبديل بين العربية والإنجليزية — يُغيّر واجهة النظام كاملاً ويحفظ تفضيلك</td></tr>
+          <tr><td><strong>تبديل السمة</strong></td><td>التبديل بين الوضع الفاتح والداكن</td></tr>
+          <tr><td><strong>أيقونة الحساب</strong></td><td>معلوماتك وتسجيل الخروج</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="box tip">
+      💡 عندما تختار منطقة أو فترة زمنية، <strong>كل</strong> البيانات في كل الوحدات تتحدث تلقائياً لتعكس اختيارك. الفلتر يُحفظ في رابط الصفحة (<code>?cluster=</code> و<code>?range=</code>) ويمكن مشاركته مباشرة.
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────── SEC 3b ── -->
+  <section id="sec3b">
+    <div class="module-header" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);">
+      <div class="icon">🗺️</div>
+      <div>
+        <div class="title">صفحة النظرة العامة — Overview</div>
+        <div class="route">/overview &nbsp;·&nbsp; متاحة لجميع الأدوار</div>
+      </div>
+    </div>
+    <p>
+      صفحة مدمجة تعطيك <strong>لقطة سريعة للأداء الوطني</strong> عبر جميع الوحدات في مكان واحد، دون الحاجة للتنقل بين القوائم.
+      تجدها في الشريط الجانبي (أول عنصر في القائمة).
+    </p>
+
+    <h3>٣ب.١ بطاقات المؤشرات السريعة</h3>
+    <p>أربع بطاقات في الأعلى تعرض لمحة فورية عن الوضع الحالي:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>البطاقة</th><th>ما تعرضه</th></tr></thead>
+        <tbody>
+          <tr><td><strong>مستوى الخدمة</strong></td><td>النسبة الوطنية الحالية مع شارة الحالة (أخضر/أصفر/أحمر)</td></tr>
+          <tr><td><strong>الحوادث النشطة</strong></td><td>عدد الحوادث الحرجة والتحذيرات في الوقت الفعلي</td></tr>
+          <tr><td><strong>معدل إتمام الذكاء الاصطناعي</strong></td><td>نسبة التفاعلات التي حلّها الذكاء الاصطناعي بالكامل</td></tr>
+          <tr><td><strong>رضا المستفيدين (CSAT)</strong></td><td>آخر قراءة لمؤشر رضا المستفيدين مقابل الهدف (95%)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>٣ب.٢ مخطط اتجاه مستوى الخدمة الوطني</h3>
+    <p>مخطط مساحي يعرض مستوى الخدمة خلال آخر 7 أيام. الخط المتقطع يمثّل <strong>هدف 80%</strong>. يعمل مع فلتر المجموعة في الشريط العلوي.</p>
+
+    <h3>٣ب.٣ توزيع الحل بالذكاء الاصطناعي</h3>
+    <p>مخطط دائري (donut) يعرض توزيع التفاعلات: ذكاء اصطناعي كامل (T1) · ذكاء اصطناعي جزئي (T2) · إنساني كامل (T3). النسبة الإجمالية للذكاء الاصطناعي تظهر في المنتصف.</p>
+
+    <h3>٣ب.٤ الحوادث النشطة المختصرة</h3>
+    <p>قائمة مختصرة بأبرز الحوادث الحالية. اضغط <strong>"عرض الكل في العمليات الحية"</strong> للانتقال للقائمة الكاملة.</p>
+
+    <h3>٣ب.٥ صحة التجمعات</h3>
+    <p>قائمة بأفضل 5 وأسوأ 5 مجموعات حسب الأداء المركّب. اضغط <strong>"الترتيب الكامل في ملخص تنفيذي"</strong> للانتقال لصفحة الترتيب التفصيلية.</p>
+
+    <h3>٣ب.٦ حجم القنوات</h3>
+    <p>مخطط شريطي يعرض حجم التفاعلات الحالي لكل قناة (مكالمات، واتساب، دردشة، بريد، فيديو إشارة، اجتماعي). اللون يدل على حالة وقت الانتظار لكل قناة.</p>
+
+    <h3>٣ب.٧ روابط الانتقال السريع</h3>
+    <p>بطاقات بجميع وحدات النظام الست. اضغط على أي بطاقة للانتقال مباشرة للوحدة المطلوبة.</p>
+
+    <div class="box tip">
+      💡 صفحة النظرة العامة هي نقطة البداية المثالية لأي مستخدم يريد فهم الوضع العام قبل الغوص في التفاصيل. جميع المخططات تستجيب لفلتر المجموعة والفترة الزمنية في الشريط العلوي.
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────── SEC 4 ── -->
+  <section id="sec4">
+    <div class="module-header">
+      <div class="icon">⚡</div>
+      <div>
+        <div class="title">الوحدة الأولى — العمليات المباشرة</div>
+        <div class="route">/live-operations &nbsp;·&nbsp; الصفحة الافتراضية عند الدخول &nbsp;·&nbsp; جميع الأدوار</div>
+      </div>
+    </div>
+    <p>تعطيك صورة فورية عما يحدث الآن في جميع مراكز الخدمة. تتكون من <strong>3 صفحات فرعية</strong> تجدها في الشريط الجانبي:</p>
+
+    <!-- Sub-page 1 -->
+    <div class="subpage-header">
+      <span class="sp-route">/live-operations</span>
+      <span style="color:var(--muted)">·</span>
+      <span class="sp-title">العمليات — الحوادث ونبض القنوات</span>
+    </div>
+
+    <h3>٤.١ الحوادث النشطة</h3>
+    <p>قائمة بالمشاكل مرتبة حسب الأهمية. مستويان:</p>
+    <ul>
+      <li><span class="chip red">حرجة</span> — مشكلة كبيرة تحتاج تصرف فوري.</li>
+      <li><span class="chip amber">تحذير</span> — مشكلة متوسطة تحتاج متابعة.</li>
+    </ul>
+    <p>اضغط <strong>"إقرار"</strong> على أي حادثة لتأكيد أنك رأيتها — يُسجَّل اسمك وتوقيت الإقرار تلقائياً في سجل التدقيق.</p>
+
+    <h3>٤.٢ نبض القنوات</h3>
+    <p>شريط يعرض حالة كل قناة: المكالمات الصوتية · واتساب · الدردشة المباشرة · البريد الإلكتروني · فيديو لغة الإشارة · التواصل الاجتماعي.</p>
+    <p>لكل قناة: عدد التفاعلات الحالية · متوسط وقت الانتظار · شارة الحالة.</p>
+
+    <!-- Sub-page 2 -->
+    <div class="subpage-header">
+      <span class="sp-route">/live-operations/sla-heatmap</span>
+      <span style="color:var(--muted)">·</span>
+      <span class="sp-title">خريطة مستوى الخدمة والأهداف</span>
+    </div>
+
+    <h3>٤.٣ اليوم مقابل الهدف</h3>
+    <p>مقياس دائري (عداد) يعرض مدى قرب الأداء الكلي من الهدف اليومي، مع 4 مقاييس فرعية:</p>
+    <ul>
+      <li><strong>مستوى الخدمة</strong> — هدف 80%</li>
+      <li><strong>المكالمات المهجورة</strong> — هدف أقل من 5%</li>
+      <li><strong>متوسط وقت التعامل (AHT)</strong> — هدف 5 دقائق (300 ثانية)</li>
+      <li><strong>معدل الحل من أول اتصال (FCR)</strong> — هدف 90%</li>
+    </ul>
+
+    <h3>٤.٤ خريطة مستوى الخدمة الوطنية (SLA Heatmap)</h3>
+    <p>شبكة بطاقات لكل مجموعة من الـ20 مجموعة، ملوّنة حسب أداء مركز خدمتها:</p>
+    <ul>
+      <li>البطاقات <span class="chip green"><span class="dot green"></span>خضراء</span> = مستوى الخدمة ضمن الهدف (80%+ من المكالمات تُردّ في أقل من 20 ثانية).</li>
+      <li>البطاقات <span class="chip amber"><span class="dot amber"></span>صفراء</span> = الأداء قريب من حد التحذير (78%–80%).</li>
+      <li>البطاقات <span class="chip red"><span class="dot red"></span>حمراء</span> = الأداء دون المقبول، يحتاج تدخل.</li>
+    </ul>
+
+    <!-- Sub-page 3 -->
+    <div class="subpage-header">
+      <span class="sp-route">/live-operations/agent-status</span>
+      <span style="color:var(--muted)">·</span>
+      <span class="sp-title">لوحة حالة الموظفين المباشرة</span>
+    </div>
+
+    <h3>٤.٥ لوحة حالة الموظفين</h3>
+    <p>جدول حي يعرض كل موظف وحالته الآنية. تتجدد البيانات <strong>تلقائياً كل 30 ثانية</strong>. حالات الموظفين الستة:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>الحالة</th><th>المعنى</th></tr></thead>
+        <tbody>
+          <tr><td><span class="chip green">متاح</span></td><td>الموظف جاهز لاستقبال تفاعل جديد</td></tr>
+          <tr><td><span class="chip red">في مكالمة</span></td><td>الموظف يتعامل مع تفاعل حالياً</td></tr>
+          <tr><td><span class="chip amber">إنهاء المكالمة</span></td><td>التفاعل انتهى، الموظف يُنهي التفاصيل (Wrap-up)</td></tr>
+          <tr><td><span class="chip amber">ما بعد المكالمة</span></td><td>مرحلة المعالجة اللاحقة قبل العودة للاستعداد (After Call Work)</td></tr>
+          <tr><td><span class="chip amber">استراحة</span></td><td>الموظف في استراحة مجدولة</td></tr>
+          <tr><td>غير متصل</td><td>الموظف خارج الشبكة أو انتهى دوامه</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>تساعد هذه اللوحة المشرفين على رؤية نقص الموظفين المتاحين في أي لحظة واتخاذ إجراء فوري.</p>
+  </section>
+
+  <!-- ─────────────────────────────── SEC 5 ── -->
+  <section id="sec5">
+    <div class="module-header">
+      <div class="icon">🧠</div>
+      <div>
+        <div class="title">الوحدة الثانية — ذكاء وصال</div>
+        <div class="route">/intelligence</div>
+      </div>
+    </div>
+    <p>تعرض كيف يعمل نظام الذكاء الاصطناعي (وصال) وما مدى فعاليته. تتكون من <strong>3 صفحات فرعية</strong>:</p>
+
+    <!-- Sub-page 1 -->
+    <div class="subpage-header">
+      <span class="sp-route">/intelligence</span>
+      <span style="color:var(--muted)">·</span>
+      <span class="sp-title">أداء الذكاء الاصطناعي</span>
+    </div>
+
+    <h3>٥.١ مراقب الطبقات التكيفي</h3>
+    <p>رسم بياني مساحي متراكم يعرض توزيع كل تفاعل بين ثلاث طبقات:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>الطبقة</th><th>المعنى</th></tr></thead>
+        <tbody>
+          <tr><td><strong>T1</strong></td><td>الذكاء الاصطناعي يحل المشكلة وحده بالكامل</td></tr>
+          <tr><td><strong>T2</strong></td><td>الذكاء الاصطناعي يساعد الموظف جزئياً</td></tr>
+          <tr><td><strong>T3</strong></td><td>الحالة تحتاج موظف إنساني متخصص (مقدّم رعاية)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>فوق الرسم البياني: ملخص 3 أعمدة بأحدث لقطة (نسب T1/T2/T3) + معدل التصحيح التلقائي للذكاء الاصطناعي. يمكن تصفية الرسم على طبقة معينة بأزرار الفلتر.</p>
+    <div class="box tip">💡 كلما ارتفعت نسبة T1، كلما كان الذكاء الاصطناعي أكثر كفاءة وقلّت الحاجة لتدخل بشري. الهدف 80% أو أكثر.</div>
+
+    <h3>٥.٢ انقسام الذكاء الاصطناعي مقابل الإنسان</h3>
+    <p>رسم بياني دائري (donut) يعرض نسبة الحلول: ذكاء اصطناعي كامل / ذكاء اصطناعي جزئي / إنساني. يمكن التبديل بين عرض حسب القناة أو المجموعة. النسبة الإجمالية للذكاء الاصطناعي تظهر في المنتصف.</p>
+
+    <!-- Sub-page 2 -->
+    <div class="subpage-header">
+      <span class="sp-route">/intelligence/risk-safety</span>
+      <span style="color:var(--muted)">·</span>
+      <span class="sp-title">المخاطر والسلامة</span>
+    </div>
+
+    <h3>٥.٣ مراقبة الانجراف اللغوي (Drift Watch)</h3>
+    <p>مخطط متعدد الخطوط يعرض مستوى ثقة الذكاء الاصطناعي في فهم اللهجات (حتى 8 مجموعات في آنٍ واحد) عبر الوقت. التنبيهات الحمراء = دقة بدأت تتراجع تحت عتبة القبول. اضغط على أي تنبيه لتحديد مسلسله في الرسم البياني. يمكن تعيين مسؤول لمتابعة أي تنبيه مباشرة من هنا.</p>
+
+    <h3>٥.٤ لوحة مفتاح الإيقاف الطارئ (Kill Switch) <span class="role">Compliance+</span></h3>
+    <div class="box danger">⛔ هذه اللوحة للمستخدمين من مستوى (امتثال / Compliance) وما فوق فقط — لا يراها المشرفون والمشغّلون.</div>
+    <p><strong>ما هو؟</strong> زر طارئ لإيقاف الذكاء الاصطناعي فوراً وتحويل <em>كل</em> التفاعلات لموظفين بشريين.</p>
+    <p><strong>حالتان:</strong></p>
+    <ul>
+      <li><strong>مُسلَّح (ARMED)</strong> — النظام جاهز، الذكاء الاصطناعي يعمل بشكل طبيعي.</li>
+      <li><strong>مُفعَّل (ACTIVE)</strong> — الذكاء الاصطناعي أُوقف، كل التفاعلات تذهب لموظفين.</li>
+    </ul>
+    <p><strong>للتفعيل:</strong> يجب كتابة عبارة التأكيد <code>ACTIVATE KILL SWITCH</code> بالضبط ثم الضغط على زر التفعيل. كل إجراء يُسجَّل تلقائياً في سجل التدقيق باسم المستخدم والتوقيت.</p>
+
+    <!-- Sub-page 3 -->
+    <div class="subpage-header">
+      <span class="sp-route">/intelligence/caregiver-audit</span>
+      <span style="color:var(--muted)">·</span>
+      <span class="sp-title">مراجعة أحداث مقدّم الرعاية</span>
+      <span class="sp-role"><span class="role">Compliance+</span></span>
+    </div>
+
+    <h3>٥.٥ مراجعة أحداث مقدّم الرعاية</h3>
+    <div class="box warn">⚠️ هذه الصفحة للمستخدمين ذوي صلاحية (امتثال / Compliance) فقط.</div>
+    <p>جدول قابل للبحث بكل الحالات التي وصلت للطبقة الثالثة (T3) ووصل إليها مقدّم رعاية بشري. الأعمدة: رقم القضية · المجموعة · التاريخ · حالة تأكيد الوكيل · الإجراء المتخذ.</p>
+    <p>اضغط على أي سطر لتوسيع <strong>مسار التدقيق الكامل</strong> للقضية (كل خطوة في معالجة الحالة).</p>
+  </section>
+
+  <!-- ─────────────────────────────── SEC 6 ── -->
+  <section id="sec6">
+    <div class="module-header">
+      <div class="icon">🛡️</div>
+      <div>
+        <div class="title">الوحدة الثالثة — الحوكمة والامتثال</div>
+        <div class="route">/governance &nbsp;·&nbsp; <span style="opacity:.8">Compliance+</span></div>
+      </div>
+    </div>
+    <p>تتكون من <strong>3 صفحات فرعية</strong>:</p>
+
+    <!-- Sub-page 1 -->
+    <div class="subpage-header">
+      <span class="sp-route">/governance</span>
+      <span style="color:var(--muted)">·</span>
+      <span class="sp-title">الامتثال والتدقيق</span>
+    </div>
+
+    <h3>٦.١ بطاقة الامتثال</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">NCA</div><div class="value">الأمن السيبراني</div><div class="target">معايير المركز الوطني</div></div>
+      <div class="kpi-card"><div class="label">PDPL</div><div class="value">حماية البيانات</div><div class="target">البيانات الشخصية</div></div>
+      <div class="kpi-card"><div class="label">DGA</div><div class="value">الحكومة الرقمية</div><div class="target">هيئة DGA</div></div>
+      <div class="kpi-card"><div class="label">NDMO</div><div class="value">الذكاء الاصطناعي</div><div class="target">هيئة البيانات والذكاء</div></div>
+    </div>
+    <p>لكل بطاقة: نقاط الامتثال (درجة من 100) + حالة + زر تصدير الأدلة. يمكن تصدير <strong>حزمة الامتثال الكاملة</strong> (جميع الأطر في ملف واحد).</p>
+
+    <h3>٦.٢ سجل اعتماد المحتوى الطبي</h3>
+    <p>جدول بكل الردود الطبية التي قدّمها الذكاء الاصطناعي وتحتاج مراجعة واعتماداً. الأعمدة: رقم القضية · المحتوى · الحالة (معتمد/قيد الانتظار/مرفوض) · اعتمد بواسطة · التاريخ.</p>
+    <p>يمكن البحث بأي كلمة أو رقم، والتصدير كملف CSV للمراجعة الخارجية.</p>
+
+    <h3>٦.٣ تدقيق الموافقة والإفصاح</h3>
+    <p>جدول يتحقق من أن كل حالات الطبقة الثالثة لها موافقة مسجّلة. <strong>عداد التحذير</strong> في رأس اللوحة يظهر عدد الحالات التي تنقصها الموافقة.</p>
+
+    <!-- Sub-page 2 -->
+    <div class="subpage-header">
+      <span class="sp-route">/governance/forbidden-intent</span>
+      <span style="color:var(--muted)">·</span>
+      <span class="sp-title">تنبيهات النوايا المحظورة</span>
+    </div>
+
+    <h3>٦.٤ تنبيهات النوايا المحظورة</h3>
+    <p>رسم بياني زمني للمحاولات المحظورة يومياً + سجل تفاصيل لكل حادثة. اضغط على أي نقطة في الرسم لتصفية السجل على ذلك اليوم. الجدول يعرض: نوع النية · المجموعة · التاريخ · الإجراء المتخذ.</p>
+
+    <!-- Sub-page 3 -->
+    <div class="subpage-header">
+      <span class="sp-route">/governance/knowledge-base</span>
+      <span style="color:var(--muted)">·</span>
+      <span class="sp-title">مدير قاعدة المعرفة</span>
+    </div>
+
+    <h3>٦.٥ مدير قاعدة المعرفة</h3>
+    <p>قائمة بمقالات قاعدة المعرفة الثنائية اللغة (عربي/إنجليزي). يمكن عرض أي مقال، نشره، سحبه، أو إعادته للمسودة. كل إجراء يُسجَّل في سجل التدقيق. المقالات لها نسخ تاريخية كاملة يمكن الرجوع إليها.</p>
+  </section>
+
+  <!-- ─────────────────────────────── SEC 7 ── -->
+  <section id="sec7">
+    <div class="module-header">
+      <div class="icon">👥</div>
+      <div>
+        <div class="title">الوحدة الرابعة — القوى العاملة والجودة</div>
+        <div class="route">/workforce &nbsp;·&nbsp; <span style="opacity:.8">Supervisor+</span></div>
+      </div>
+    </div>
+    <p>تتكون من <strong>3 صفحات فرعية</strong>:</p>
+
+    <!-- Sub-page 1 -->
+    <div class="subpage-header">
+      <span class="sp-route">/workforce</span>
+      <span style="color:var(--muted)">·</span>
+      <span class="sp-title">التذاكر والموظفون</span>
+    </div>
+
+    <h3>٧.١ قائمة التذاكر والشكاوى</h3>
+    <p>جدول بكل الشكاوى والطلبات المفتوحة. الصفوف الحمراء = تجاوزت مدة SLA المسموحة!</p>
+    <p>يمكن تعيين موظف مسؤول عن التذكرة من قائمة منسدلة مباشرة. اضغط أيقونة "الملف الكامل" للانتقال لملف المستفيد 360°.</p>
+
+    <h3>٧.٢ شبكة أداء الموظفين</h3>
+    <p>جدول قابل للترتيب بكل الموظفين وأرقام أدائهم:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>المؤشر</th><th>الرمز</th><th>الهدف</th></tr></thead>
+        <tbody>
+          <tr><td>متوسط وقت التعامل</td><td>AHT</td><td>5 دقائق (300 ثانية)</td></tr>
+          <tr><td>الحل من أول اتصال</td><td>FCR</td><td>90% أو أكثر</td></tr>
+          <tr><td>درجة الجودة</td><td>QA</td><td>—</td></tr>
+          <tr><td>رضا المستفيد</td><td>CSAT</td><td>95% أو أكثر</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>اللون يدل على الحالة: أخضر/أصفر/أحمر. اضغط على أي موظف لرؤية سجل تدريبه.</p>
+
+    <!-- Sub-page 2 -->
+    <div class="subpage-header">
+      <span class="sp-route">/workforce/scheduling</span>
+      <span style="color:var(--muted)">·</span>
+      <span class="sp-title">الجداول والجودة</span>
+    </div>
+
+    <h3>٧.٣ الجداول والتغطية</h3>
+    <p>مخطط بياني (24 ساعة) يعرض الطلب المتوقع مقابل الموظفين الفعليين. الأحمر = نقص واضح في التغطية البشرية.</p>
+
+    <h3>٧.٤ قائمة أخذ العينات للجودة</h3>
+    <p>قائمة التفاعلات التي تحتاج مراجعة جودة، مرتبة بالأولوية (أسوأ مشاعر + أدنى ثقة للذكاء الاصطناعي أولاً). اضغط على أي تفاعل → أعطه درجة 1–5 + ملاحظات → إرسال.</p>
+
+    <!-- Sub-page 3 -->
+    <div class="subpage-header">
+      <span class="sp-route">/workforce/training-impact</span>
+      <span style="color:var(--muted)">·</span>
+      <span class="sp-title">أثر التدريب</span>
+    </div>
+
+    <h3>٧.٥ متتبع أثر التدريب</h3>
+    <p>رسم بياني يعرض درجات الموظفين <strong>قبل</strong> و<strong>بعد</strong> كل وحدة تدريبية. يمكن تصفية النتائج حسب الوحدة التدريبية المحددة. اضغط على اسم أي موظف لرؤية تطور أدائه عبر الوقت.</p>
+  </section>
+
+  <!-- ─────────────────────────────── SEC 8 ── -->
+  <section id="sec8">
+    <div class="module-header">
+      <div class="icon">📊</div>
+      <div>
+        <div class="title">الوحدة الخامسة — التقارير التنفيذية</div>
+        <div class="route">/executive &nbsp;·&nbsp; <span style="opacity:.8">Executive+</span></div>
+      </div>
+    </div>
+    <p>تتكون من <strong>صفحتين فرعيتين</strong>:</p>
+
+    <!-- Sub-page 1 -->
+    <div class="subpage-header">
+      <span class="sp-route">/executive</span>
+      <span style="color:var(--muted)">·</span>
+      <span class="sp-title">المؤشرات والترتيب</span>
+    </div>
+
+    <h3>٨.١ بطاقة المؤشرات الوطنية</h3>
+    <p>شبكة من 7 بطاقات، واحدة لكل مؤشر رئيسي:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>المؤشر</th><th>الهدف</th><th>حد التحذير</th></tr></thead>
+        <tbody>
+          <tr><td>مستوى الخدمة (SL)</td><td>80% من المكالمات تُردّ في 20 ثانية</td><td>78%</td></tr>
+          <tr><td>المكالمات المهجورة</td><td>أقل من 5%</td><td>أقل من 8%</td></tr>
+          <tr><td>متوسط وقت التعامل (AHT)</td><td>300 ثانية (5 دقائق)</td><td>360 ثانية</td></tr>
+          <tr><td>متوسط سرعة الرد (ASA)</td><td>أقل من 20 ثانية</td><td>أقل من 30 ثانية</td></tr>
+          <tr><td>معدل الحل من أول اتصال (FCR)</td><td>90% أو أكثر</td><td>85%</td></tr>
+          <tr><td>رضا المستفيدين (CSAT)</td><td>95% أو أكثر</td><td>85%</td></tr>
+          <tr><td>معدل إتمام الذكاء الاصطناعي</td><td>80% أو أكثر</td><td>70%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>اضغط على أي بطاقة للانتقال مباشرة للوحدة المسؤولة عن ذلك المؤشر.</p>
+
+    <h3>٨.٢ ترتيب المجموعات</h3>
+    <p>قائمة تنافسية لأداء الـ20 مجموعة. أول 3 مجموعات تحصل على رمز ميدالية. يمكن الترتيب حسب أي مؤشر. اضغط اسم مجموعة لتصفية كل بيانات النظام عليها.</p>
+
+    <h3>٨.٣ المدخرات والكفاءة</h3>
+    <p>رسم بياني يعرض: ساعات العمل الموفّرة بفضل الذكاء الاصطناعي · حجم التفاعلات التي حلّها · الوقت الموفّر. يمكن تصدير تقرير المدخرات CSV.</p>
+
+    <!-- Sub-page 2 -->
+    <div class="subpage-header">
+      <span class="sp-route">/executive/insights</span>
+      <span style="color:var(--muted)">·</span>
+      <span class="sp-title">الرؤى والحملات</span>
+    </div>
+
+    <h3>٨.٤ صوت المستفيد</h3>
+    <p>بطاقات لأبرز المواضيع التي يذكرها المستفيدون مع نسبة المشاعر واتجاه الأسبوع وأمثلة مجهولة الهوية. اضغط أي بطاقة لرؤية المزيد من التفاصيل.</p>
+
+    <h3>٨.٥ نتائج الحملات</h3>
+    <p>أداء حملات التواصل الخارجية (تذكيرات، استطلاعات، توعية، إعادة جدولة). رسم بياني مقارن للمرسَلة/المستلَمة/التي استُجيب لها لكل نوع.</p>
+
+    <h3>٨.٦ الغرامات والأثر المالي</h3>
+    <p>جدول بكل المؤشرات المحتملة لغرامات مالية. الصفوف الحمراء = تجاوز مستوى الغرامة فعلاً. يمكن التصفية للخروقات فقط أو تصدير التقرير.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>العمود</th><th>المعنى</th></tr></thead>
+        <tbody>
+          <tr><td>المجموعة</td><td>أي منطقة إقليمية</td></tr>
+          <tr><td>المؤشر</td><td>أي KPI</td></tr>
+          <tr><td>نسبة الفشل</td><td>كم % من الأهداف لم تتحقق</td></tr>
+          <tr><td>الحد المسموح</td><td>الهامش المسموح قبل الغرامة</td></tr>
+          <tr><td>خُرق؟</td><td>نعم / لا</td></tr>
+          <tr><td>مبلغ الغرامة</td><td>القيمة بالريال السعودي</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────── SEC 9 ── -->
+  <section id="sec9">
+    <div class="module-header">
+      <div class="icon">🔗</div>
+      <div>
+        <div class="title">الوحدة السادسة — العمليات والتكاملات</div>
+        <div class="route">/operations</div>
+      </div>
+    </div>
+    <p>تتكون من <strong>صفحتين فرعيتين</strong>:</p>
+
+    <!-- Sub-page 1 -->
+    <div class="subpage-header">
+      <span class="sp-route">/operations</span>
+      <span style="color:var(--muted)">·</span>
+      <span class="sp-title">التكاملات وصحة النظام</span>
+      <span class="sp-role"><span class="role">Platform Admin</span></span>
+    </div>
+
+    <h3>٩.١ حالة التكاملات وخلاصة NMR</h3>
+    <p>5 بطاقات لكل نظام خارجي مرتبط:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>النظام</th><th>ما هو؟</th></tr></thead>
+        <tbody>
+          <tr><td><strong>نفاذ (Nafath)</strong></td><td>التحقق من هوية المستفيد</td></tr>
+          <tr><td><strong>موعد (Mawid)</strong></td><td>نظام المواعيد</td></tr>
+          <tr><td><strong>صحتي (Sehhaty)</strong></td><td>السجلات الصحية</td></tr>
+          <tr><td><strong>HR</strong></td><td>بيانات الموظفين</td></tr>
+          <tr><td><strong>NMR</strong></td><td>السجل الوطني للموارد — مصدر بيانات حيّة مباشر</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>لكل نظام: الحالة (يعمل/متأثر/متوقف) · زمن الاستجابة · نمط التكامل · آخر مزامنة.</p>
+
+    <h3>٩.٢ صحة النظام والاستمرارية</h3>
+    <ul>
+      <li><strong>نسبة التوافر</strong>: هدف 99.9999% — الخدمة لا تتوقف أكثر من 32 ثانية في السنة.</li>
+      <li><strong>شارة السيادة الرقمية</strong>: تؤكد أن كل البيانات محفوظة داخل المملكة.</li>
+      <li><strong>آخر اختبار DR</strong>: متى آخر اختبار التعافي من الكوارث ونتائجه.</li>
+      <li><strong>جدول RTO/RPO</strong>: لكل قناة، وقت الاسترداد وأقصى فقدان للبيانات مسموح.</li>
+    </ul>
+
+    <!-- Sub-page 2 -->
+    <div class="subpage-header">
+      <span class="sp-route">/operations/beneficiary-360</span>
+      <span style="color:var(--muted)">·</span>
+      <span class="sp-title">الملف الشامل للمستفيد 360°</span>
+      <span class="sp-role"><span class="role">Supervisor+</span></span>
+    </div>
+
+    <h3>٩.٣ البحث الشامل للمستفيد 360°</h3>
+    <ol class="steps">
+      <li>اكتب اسم المستفيد أو رقم هويته في صندوق البحث.</li>
+      <li>اختر المستفيد من قائمة النتائج.</li>
+      <li>تظهر بطاقة الملف الكامل: الاسم (عربي/إنجليزي) · رقم الهوية · المجموعة · الهاتف · الجنس · تاريخ الميلاد · الطبقة · حالة الموافقة.</li>
+      <li>اختر التبويب: <strong>التفاعلات</strong> (كل مكالمة ورسالة) أو <strong>التذاكر</strong> (كل شكوى وطلب). الصفوف الحمراء = تجاوزت مدة SLA.</li>
+    </ol>
+    <div class="box info">💡 يمكن الوصول لهذا الملف بالضغط على اسم مستفيد من أي شاشة أخرى (التذاكر، لوحة الموظفين، البحث العام في الشريط العلوي).</div>
+  </section>
+
+  <!-- ─────────────────────────────── SEC 10 ── -->
+  <section id="sec10">
+    <h2><span class="num">١٠</span> الألوان ومعناها</h2>
+    <p>الألوان في النظام لها معنى موحّد في كل مكان:</p>
+    <div class="color-legend" style="flex-direction:column; gap:10px;">
+      <div class="color-item">
+        <span class="color-circle" style="background:var(--green)"></span>
+        <div><strong style="color:var(--green)">أخضر</strong> — الأداء ضمن الهدف، كل شيء جيد</div>
+      </div>
+      <div class="color-item">
+        <span class="color-circle" style="background:var(--amber)"></span>
+        <div><strong style="color:var(--amber)">أصفر / عنبري</strong> — تحذير، الأداء قريب من حد القبول، يحتاج متابعة</div>
+      </div>
+      <div class="color-item">
+        <span class="color-circle" style="background:var(--red)"></span>
+        <div><strong style="color:var(--red)">أحمر</strong> — خرق، الأداء تجاوز الحد المسموح، يحتاج تدخل فوري</div>
+      </div>
+    </div>
+
+    <h3>عتبات الحالة للمؤشرات الرئيسية</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>المؤشر</th><th class="center" style="background:inherit; color:var(--green)">أخضر ✓</th><th class="center" style="background:inherit; color:var(--amber)">أصفر ⚠</th><th class="center" style="background:inherit; color:var(--red)">أحمر ✗</th></tr></thead>
+        <tbody>
+          <tr><td>مستوى الخدمة</td><td class="center">≥ 80%</td><td class="center">78%–80%</td><td class="center">&lt; 78%</td></tr>
+          <tr><td>المكالمات المهجورة</td><td class="center">≤ 5%</td><td class="center">5%–8%</td><td class="center">&gt; 8%</td></tr>
+          <tr><td>AHT</td><td class="center">≤ 300 ث</td><td class="center">300–360 ث</td><td class="center">&gt; 360 ث</td></tr>
+          <tr><td>ASA</td><td class="center">≤ 20 ث</td><td class="center">20–30 ث</td><td class="center">&gt; 30 ث</td></tr>
+          <tr><td>FCR</td><td class="center">≥ 90%</td><td class="center">85%–90%</td><td class="center">&lt; 85%</td></tr>
+          <tr><td>CSAT</td><td class="center">≥ 95%</td><td class="center">85%–95%</td><td class="center">&lt; 85%</td></tr>
+          <tr><td>إتمام الذكاء الاصطناعي</td><td class="center">≥ 80%</td><td class="center">70%–80%</td><td class="center">&lt; 70%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────── SEC 11 ── -->
+  <section id="sec11">
+    <h2><span class="num">١١</span> الصلاحيات — من يرى ماذا؟</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>الوحدة / اللوحة</th>
+            <th class="center">مشغّل</th>
+            <th class="center">مشرف</th>
+            <th class="center">امتثال</th>
+            <th class="center">تنفيذي</th>
+            <th class="center">مدير المنصة</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>النظرة العامة (Overview)</td><td class="center yes">✓</td><td class="center yes">✓</td><td class="center yes">✓</td><td class="center yes">✓</td><td class="center yes">✓</td></tr>
+          <tr><td>العمليات المباشرة (كل الصفحات)</td><td class="center yes">✓</td><td class="center yes">✓</td><td class="center yes">✓</td><td class="center yes">✓</td><td class="center yes">✓</td></tr>
+          <tr><td>ذكاء وصال — أداء AI + انقسام AI/إنساني</td><td class="center yes">✓</td><td class="center yes">✓</td><td class="center yes">✓</td><td class="center yes">✓</td><td class="center yes">✓</td></tr>
+          <tr><td>مراقبة الانجراف اللغوي (Drift Watch)</td><td class="center yes">✓</td><td class="center yes">✓</td><td class="center yes">✓</td><td class="center yes">✓</td><td class="center yes">✓</td></tr>
+          <tr><td>مراجعة أحداث مقدّم الرعاية (Caregiver Audit)</td><td class="center no">—</td><td class="center no">—</td><td class="center yes">✓</td><td class="center yes">✓</td><td class="center yes">✓</td></tr>
+          <tr><td>مفتاح الإيقاف الطارئ (Kill Switch)</td><td class="center no">—</td><td class="center no">—</td><td class="center yes">✓</td><td class="center yes">✓</td><td class="center yes">✓</td></tr>
+          <tr><td>الحوكمة والامتثال (كل الصفحات)</td><td class="center no">—</td><td class="center no">—</td><td class="center yes">✓</td><td class="center yes">✓</td><td class="center yes">✓</td></tr>
+          <tr><td>القوى العاملة والجودة</td><td class="center no">—</td><td class="center yes">✓</td><td class="center no">—</td><td class="center yes">✓</td><td class="center yes">✓</td></tr>
+          <tr><td>التقارير التنفيذية</td><td class="center no">—</td><td class="center no">—</td><td class="center no">—</td><td class="center yes">✓</td><td class="center yes">✓</td></tr>
+          <tr><td>التكاملات وصحة النظام</td><td class="center no">—</td><td class="center no">—</td><td class="center no">—</td><td class="center no">—</td><td class="center yes">✓</td></tr>
+          <tr><td>الملف الشامل للمستفيد 360°</td><td class="center no">—</td><td class="center yes">✓</td><td class="center yes">✓</td><td class="center yes">✓</td><td class="center yes">✓</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="box info">
+      💡 إذا حاولت الوصول لصفحة ليست ضمن صلاحياتك، ستظهر لك شاشة "مقفلة" — لن تُخفى الصفحة، بل ستعلمك أنك بحاجة صلاحية أعلى. تواصل مع مدير المنصة لرفع صلاحيتك.
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────── SEC 12 ── -->
+  <section id="sec12">
+    <h2><span class="num">١٢</span> أسئلة شائعة</h2>
+
+    <div class="faq-item">
+      <div class="faq-q">س: نسيت كلمة المرور، ماذا أفعل؟</div>
+      <div class="faq-a">تواصل مع مدير المنصة (Platform Admin) لإعادة تعيين كلمة المرور. لا يوجد حالياً خيار "نسيت كلمة المرور" ذاتي.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">س: البيانات التي أراها قديمة، كيف أحدّثها؟</div>
+      <div class="faq-a">بيانات لوحة حالة الموظفين تتحدث تلقائياً كل 30 ثانية. إذا رأيت بيانات قديمة في صفحات أخرى، جرّب تغيير الفلتر الزمني أو اختر "مباشر (Live)" من قائمة الفترة الزمنية في الشريط العلوي.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">س: أريد رؤية بيانات منطقة معينة فقط، كيف؟</div>
+      <div class="faq-a">من الشريط العلوي، اضغط على قائمة "اختيار المجموعة" واختر المنطقة التي تريدها. كل البيانات ستتغير فوراً. يمكنك أيضاً مشاركة الرابط الحالي وسيحتفظ بالفلتر.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">س: كيف أصدّر تقريراً؟</div>
+      <div class="faq-a">في معظم الجداول واللوحات يوجد زر "تصدير" أو "CSV" في أعلى اللوحة. اضغط عليه وسيُنزَّل الملف مباشرة. في وحدة الحوكمة يمكن تصدير حزمة الامتثال الكاملة دفعة واحدة.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">س: أرى رسالة "مقفل — تحتاج صلاحية أعلى"، ماذا يعني هذا؟</div>
+      <div class="faq-a">هذه اللوحة تتطلب دوراً وظيفياً أعلى من دورك الحالي. راجع جدول الصلاحيات في القسم 11 لمعرفة من يستطيع الوصول. تواصل مع مدير المنصة إذا كنت تحتاج الوصول لها.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">س: هل كل الإجراءات التي أقوم بها مسجّلة؟</div>
+      <div class="faq-a">نعم، كل إجراء (موافقة، رفض، تعيين، تعديل، تفعيل Kill Switch، إقرار حادثة) يُسجَّل تلقائياً مع اسمك وتوقيت الإجراء في سجل التدقيق.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">س: لا أجد مستفيداً معيناً في البحث الشامل، ماذا أفعل؟</div>
+      <div class="faq-a">تأكد من كتابة الاسم أو رقم الهوية بشكل صحيح. البحث يبدأ من حرفين. إذا استمرت المشكلة، قد لا يكون المستفيد مسجلاً في النظام — تواصل مع مدير المنصة.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">س: كيف أبدّل لغة الواجهة؟</div>
+      <div class="faq-a">من الشريط العلوي، اضغط زر تبديل اللغة (AR / EN). ستتغير كل الواجهة فوراً ويُحفظ تفضيلك للمرة القادمة.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">س: ما الفرق بين "إنهاء المكالمة" و"ما بعد المكالمة" في حالة الموظف؟</div>
+      <div class="faq-a">"إنهاء المكالمة (Wrap-up)" هي اللحظة مباشرة بعد انتهاء التفاعل حيث يُدخل الموظف الملاحظات. "ما بعد المكالمة (After Call Work)" هي مرحلة المعالجة الإضافية قبل أن يعود الموظف لحالة "متاح". كلاهما يُسجَّل وقته بدقة في لوحة حالة الموظفين.</div>
+    </div>
+  </section>
+
+  <footer>
+    مركز قيادة وصال — هيئة الرعاية الصحية (HHC) &nbsp;·&nbsp; الإصدار 1.2 — يونيو 2026 &nbsp;·&nbsp; سري — للاستخدام الداخلي فقط
+  </footer>
+
+</div>
+</body>
+</html>

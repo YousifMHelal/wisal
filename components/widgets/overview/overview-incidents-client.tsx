@@ -76,7 +76,10 @@ export function OverviewIncidentsMini({ incidents }: Props) {
             <div className="min-w-0 flex-1">
               <p className="text-xs font-medium text-foreground truncate">{inc.type}</p>
               {inc.clusterName && (
-                <p className="text-[10px] text-muted-foreground truncate">{inc.clusterName}</p>
+                <p className="text-[10px] text-muted-foreground truncate">
+                  <span className="[html[dir=rtl]_&]:hidden">{inc.clusterName}</span>
+                  <span className="hidden [html[dir=rtl]_&]:inline">{inc.clusterNameAr ?? inc.clusterName}</span>
+                </p>
               )}
             </div>
             <div className="flex items-center gap-1 shrink-0 text-muted-foreground">

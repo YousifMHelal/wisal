@@ -24,6 +24,7 @@ import type { TierMonitorData } from "@/lib/queries/intelligence"
 
 interface Props {
   data: TierMonitorData
+  locale?: string
 }
 
 type TierFilter = "T1" | "T2" | "T3" | null
@@ -34,13 +35,20 @@ const TIER_COLORS = {
   T3: "var(--status-red)",
 }
 
-const TIER_LABELS: Record<string, string> = {
+const TIER_LABELS_AR: Record<string, string> = {
   T1: "المستوى ١ (ذكاء اصطناعي)",
   T2: "المستوى ٢ (مساعد)",
   T3: "المستوى ٣ (مقدم رعاية)",
 }
+const TIER_LABELS_EN: Record<string, string> = {
+  T1: "T1 (Full AI)",
+  T2: "T2 (Assisted)",
+  T3: "T3 (Caregiver)",
+}
 
-export function AdaptiveTierMonitorClient({ data }: Props) {
+export function AdaptiveTierMonitorClient({ data, locale = "ar" }: Props) {
+  const isAr = locale === "ar"
+  const TIER_LABELS = isAr ? TIER_LABELS_AR : TIER_LABELS_EN
   const [activeTier, setActiveTier] = useState<TierFilter>(null)
 
   const { trend, latest } = data
@@ -60,7 +68,7 @@ export function AdaptiveTierMonitorClient({ data }: Props) {
     [trend]
   )
 
-  if (!trend.length) return <WidgetEmpty message="لا توجد بيانات مستويات لهذه الفترة." />
+  if (!trend.length) return <WidgetEmpty message="No tier data for this period." messageAr="لا توجد بيانات مستويات لهذه الفترة." />
 
   const filteredData = activeTier
     ? chartData.map((d) => ({
@@ -101,7 +109,7 @@ export function AdaptiveTierMonitorClient({ data }: Props) {
             onClick={() => setActiveTier(null)}
             className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer px-2"
           >
-            مسح الفلتر
+            {isAr ? "مسح الفلتر" : "Clear filter"}
           </button>
         )}
       </div>
@@ -183,7 +191,7 @@ export function AdaptiveTierMonitorClient({ data }: Props) {
       {/* Tier-1 autocorrect mini-trend */}
       <div className="border-t pt-3 space-y-1">
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <span>معدل التصحيح الذاتي للمستوى ١</span>
+          <span>{isAr ? "معدل التصحيح الذاتي للمستوى ١" : "T1 Auto-correction Rate"}</span>
           <TooltipProvider>
             <UITooltip>
               <TooltipTrigger>
@@ -191,7 +199,9 @@ export function AdaptiveTierMonitorClient({ data }: Props) {
               </TooltipTrigger>
               <TooltipContent>
                 <p className="max-w-50">
-                  نسبة تفاعلات المستوى ١ التي صحّح فيها الذكاء الاصطناعي نفسه قبل الرد النهائي. الهدف ≥ ٨٠٪.
+                  {isAr
+                    ? "نسبة تفاعلات المستوى ١ التي صحّح فيها الذكاء الاصطناعي نفسه قبل الرد النهائي. الهدف ≥ ٨٠٪."
+                    : "Share of T1 interactions where the AI self-corrected before final reply. Target ≥ 80%."}
                 </p>
               </TooltipContent>
             </UITooltip>
@@ -224,7 +234,7 @@ export function AdaptiveTierMonitorClient({ data }: Props) {
                   borderRadius: 8,
                   fontSize: 11,
                 }}
-                formatter={(v) => [`${(v as number).toFixed(1)}%`, "التصحيح الذاتي"]}
+                formatter={(v) => [`${(v as number).toFixed(1)}%`, isAr ? "التصحيح الذاتي" : "Auto-correction"]}
               />
               <Line
                 type="monotone"
@@ -242,9 +252,9 @@ export function AdaptiveTierMonitorClient({ data }: Props) {
       {latest && (
         <div className="grid grid-cols-3 gap-2 border-t pt-3">
           {[
-            { label: "م١ (ذكاء اصطناعي)", value: latest.tier1Pct, color: TIER_COLORS.T1 },
-            { label: "م٢ (مساعد)", value: latest.tier2Pct, color: TIER_COLORS.T2 },
-            { label: "م٣ (مقدم رعاية)", value: latest.tier3Pct, color: TIER_COLORS.T3 },
+            { label: isAr ? "م١ (ذكاء اصطناعي)" : "T1 (AI)", value: latest.tier1Pct, color: TIER_COLORS.T1 },
+            { label: isAr ? "م٢ (مساعد)" : "T2 (Assisted)", value: latest.tier2Pct, color: TIER_COLORS.T2 },
+            { label: isAr ? "م٣ (مقدم رعاية)" : "T3 (Caregiver)", value: latest.tier3Pct, color: TIER_COLORS.T3 },
           ].map((item) => (
             <div key={item.label} className="text-center space-y-0.5">
               <div

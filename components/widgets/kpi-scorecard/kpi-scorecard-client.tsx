@@ -47,9 +47,11 @@ function DeltaIcon({ thisWeek, lastWeek, metric }: { thisWeek: number; lastWeek:
 
 interface Props {
   rows: KpiScorecardRow[]
+  locale?: string
 }
 
-export function KpiScorecardClient({ rows }: Props) {
+export function KpiScorecardClient({ rows, locale = "ar" }: Props) {
+  const isAr = locale === "ar"
   const router = useRouter()
 
   return (
@@ -103,7 +105,9 @@ export function KpiScorecardClient({ rows }: Props) {
 
             {/* target label */}
             <p className="text-[10px] text-muted-foreground tabular-nums">
-              الهدف: {formatValue(row.metric, row.target)} · الأسبوع الماضي: {formatValue(row.metric, row.lastWeek)}
+              {isAr
+                ? `الهدف: ${formatValue(row.metric, row.target)} · الأسبوع الماضي: ${formatValue(row.metric, row.lastWeek)}`
+                : `Target: ${formatValue(row.metric, row.target)} · Last week: ${formatValue(row.metric, row.lastWeek)}`}
             </p>
           </button>
         )

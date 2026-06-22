@@ -1,9 +1,11 @@
 import { Suspense } from "react"
+import { cookies } from "next/headers"
 import { Widget, WidgetSkeleton, WidgetLocked } from "@/components/widgets/widget"
 import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getConsentAuditData } from "@/lib/queries/governance"
 import { checkRole } from "@/lib/auth"
 import { ConsentAuditClient } from "./consent-audit-client"
+import { resolveLocale } from "@/lib/i18n"
 import type { Filters } from "@/lib/filters"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -21,6 +23,10 @@ interface Props {
 }
 
 async function ConsentAuditBody({ filters }: Props) {
+  const jar = await cookies()
+  const locale = resolveLocale(jar.get("locale")?.value)
+  const isAr = locale === "ar"
+
   const allowed = await checkRole("COMPLIANCE")
   if (!allowed) {
     return (
@@ -41,12 +47,16 @@ async function ConsentAuditBody({ filters }: Props) {
       titleAr="تدقيق الموافقة والإفصاح"
       actions={
         <span className={`text-xs tabular-nums font-medium ${missingCount > 0 ? "text-status-red-fg" : "text-muted-foreground"}`}>
-          {missingCount > 0 ? `${missingCount} مفقود` : `${rows.length} سجل`}
+          {missingCount > 0
+            ? `${missingCount} ${isAr ? "مفقود" : "missing"}`
+            : `${rows.length} ${isAr ? "سجل" : "records"}`}
         </span>
       }
-      footer="مرتبط بمراجعة مقدم الرعاية (الوحدة 02) · يتطلب دور الامتثال"
+      footer={isAr
+        ? "مرتبط بمراجعة مقدم الرعاية (الوحدة 02) · يتطلب دور الامتثال"
+        : "Linked to caregiver audit (module 02) · requires Compliance role"}
     >
-      <ConsentAuditClient rows={rows} exportUrl={exportUrl} />
+      <ConsentAuditClient rows={rows} exportUrl={exportUrl} locale={locale} />
     </Widget>
   )
 }

@@ -6,46 +6,53 @@ import { format } from "date-fns"
 import Link from "next/link"
 import type { ComplianceCard } from "@/lib/queries/governance"
 
-const FRAMEWORK_META: Record<string, { label: string; description: string; logLink: string }> = {
+const FRAMEWORK_META: Record<string, { label: string; descriptionAr: string; descriptionEn: string; logLink: string }> = {
   NCA: {
     label: "NCA",
-    description: "الهيئة الوطنية للأمن السيبراني",
+    descriptionAr: "الهيئة الوطنية للأمن السيبراني",
+    descriptionEn: "National Cybersecurity Authority",
     logLink: "/governance#medical-approval-log",
   },
   PDPL: {
     label: "PDPL",
-    description: "نظام حماية البيانات الشخصية",
+    descriptionAr: "نظام حماية البيانات الشخصية",
+    descriptionEn: "Personal Data Protection Law",
     logLink: "/governance#consent-audit",
   },
   DGA: {
     label: "DGA",
-    description: "هيئة الحكومة الرقمية",
+    descriptionAr: "هيئة الحكومة الرقمية",
+    descriptionEn: "Digital Government Authority",
     logLink: "/governance#medical-approval-log",
   },
   NDMO: {
     label: "NDMO",
-    description: "المكتب الوطني لإدارة البيانات",
+    descriptionAr: "المكتب الوطني لإدارة البيانات",
+    descriptionEn: "National Data Management Office",
     logLink: "/governance#consent-audit",
   },
 }
 
 const STATUS_CONFIG = {
   COMPLIANT: {
-    label: "ملتزم",
+    labelAr: "ملتزم",
+    labelEn: "Compliant",
     icon: CheckCircle2,
     className: "bg-status-green/15 text-status-green-fg border-status-green/30",
     ringClass: "ring-status-green/20",
     scoreClass: "text-status-green-fg",
   },
   PARTIAL: {
-    label: "جزئي",
+    labelAr: "جزئي",
+    labelEn: "Partial",
     icon: AlertTriangle,
     className: "bg-status-amber/15 text-status-amber-fg border-status-amber/30",
     ringClass: "ring-status-amber/20",
     scoreClass: "text-status-amber-fg",
   },
   NON_COMPLIANT: {
-    label: "غير ملتزم",
+    labelAr: "غير ملتزم",
+    labelEn: "Non-compliant",
     icon: XCircle,
     className: "bg-status-red/15 text-status-red-fg border-status-red/30",
     ringClass: "ring-status-red/20",
@@ -56,9 +63,11 @@ const STATUS_CONFIG = {
 interface Props {
   cards: ComplianceCard[]
   packExportUrl: string
+  locale?: string
 }
 
-export function ComplianceScorecardClient({ cards, packExportUrl }: Props) {
+export function ComplianceScorecardClient({ cards, packExportUrl, locale = "ar" }: Props) {
+  const isAr = locale === "ar"
   return (
     <div className="flex flex-col gap-4">
       {/* Export full pack */}
@@ -69,7 +78,7 @@ export function ComplianceScorecardClient({ cards, packExportUrl }: Props) {
           className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md border border-border bg-transparent text-sm font-medium text-foreground hover:bg-muted transition-colors duration-150 cursor-pointer"
         >
           <Download className="size-3.5" aria-hidden />
-          حزمة الامتثال
+          {isAr ? "حزمة الامتثال" : "Compliance pack"}
         </a>
       </div>
 
@@ -89,11 +98,11 @@ export function ComplianceScorecardClient({ cards, packExportUrl }: Props) {
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="text-base font-semibold text-foreground">{meta?.label ?? card.framework}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{meta?.description ?? ""}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{isAr ? (meta?.descriptionAr ?? "") : (meta?.descriptionEn ?? "")}</p>
                 </div>
                 <Badge variant="outline" className={`shrink-0 text-xs font-medium gap-1 ${cfg.className}`}>
                   <Icon className="size-3" aria-hidden />
-                  {cfg.label}
+                  {isAr ? cfg.labelAr : cfg.labelEn}
                 </Badge>
               </div>
 
@@ -128,7 +137,7 @@ export function ComplianceScorecardClient({ cards, packExportUrl }: Props) {
               {/* Footer */}
               <div className="flex items-center justify-between gap-2">
                 <p className="text-xs text-muted-foreground">
-                  تحديث {format(card.refreshedAt, "dd MMM yyyy")}
+                  {isAr ? "تحديث" : "Updated"} {format(card.refreshedAt, "dd MMM yyyy")}
                 </p>
                 <div className="flex items-center gap-2">
                   <a
@@ -138,7 +147,7 @@ export function ComplianceScorecardClient({ cards, packExportUrl }: Props) {
                     className="inline-flex items-center gap-1 h-6 px-2 rounded text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-150 cursor-pointer"
                   >
                     <Download className="size-3" aria-hidden />
-                    تصدير
+                    {isAr ? "تصدير" : "Export"}
                   </a>
                   {meta?.logLink && (
                     <Link
@@ -147,7 +156,7 @@ export function ComplianceScorecardClient({ cards, packExportUrl }: Props) {
                       aria-label={`View ${card.framework} supporting logs`}
                     >
                       <ExternalLink className="size-3" aria-hidden />
-                      السجلات
+                      {isAr ? "السجلات" : "Logs"}
                     </Link>
                   )}
                 </div>
@@ -158,7 +167,7 @@ export function ComplianceScorecardClient({ cards, packExportUrl }: Props) {
       </div>
 
       {cards.length === 0 && (
-        <p className="text-sm text-muted-foreground text-center py-8">لا توجد بيانات امتثال متاحة.</p>
+        <p className="text-sm text-muted-foreground text-center py-8">{isAr ? "لا توجد بيانات امتثال متاحة." : "No compliance data available."}</p>
       )}
     </div>
   )

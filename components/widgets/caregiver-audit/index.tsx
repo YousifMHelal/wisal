@@ -1,9 +1,11 @@
 import { Suspense } from "react"
+import { cookies } from "next/headers"
 import { Widget, WidgetSkeleton, WidgetLocked } from "@/components/widgets/widget"
 import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getCaregiverAuditData } from "@/lib/queries/intelligence"
 import { checkRole } from "@/lib/auth"
 import { CaregiverAuditClient } from "./caregiver-audit-client"
+import { resolveLocale } from "@/lib/i18n"
 import type { Filters } from "@/lib/filters"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -12,12 +14,16 @@ interface Props {
 }
 
 async function CaregiverAuditBody({ filters }: Props) {
+  const jar = await cookies()
+  const locale = resolveLocale(jar.get("locale")?.value)
+  const isAr = locale === "ar"
+
   const allowed = await checkRole("COMPLIANCE")
 
   if (!allowed) {
     return (
       <Widget title="Caregiver Mode Audit" titleAr="تدقيق نمط القائم بالرعاية">
-        <WidgetLocked requiredRole="COMPLIANCE" />
+        <WidgetLocked requiredRole="COMPLIANCE" requiredRoleAr="الامتثال" />
       </Widget>
     )
   }
@@ -30,12 +36,14 @@ async function CaregiverAuditBody({ filters }: Props) {
       titleAr="تدقيق نمط القائم بالرعاية"
       actions={
         <span className="text-xs text-muted-foreground tabular-nums">
-          {rows.length} حالة
+          {rows.length} {isAr ? "حالة" : "cases"}
         </span>
       }
-      footer="مقيّد بالصلاحيات · الامتثال وما فوق · جميع التفاعلات مسجّلة"
+      footer={isAr
+        ? "مقيّد بالصلاحيات · الامتثال وما فوق · جميع التفاعلات مسجّلة"
+        : "Role-restricted · Compliance and above · all interactions logged"}
     >
-      <CaregiverAuditClient rows={rows} />
+      <CaregiverAuditClient rows={rows} locale={locale} />
     </Widget>
   )
 }

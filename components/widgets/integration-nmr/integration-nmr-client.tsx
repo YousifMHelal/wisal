@@ -19,10 +19,22 @@ function StateIcon({ state }: { state: string }) {
   return <XCircle className="size-4 text-[var(--status-red-fg)]" aria-hidden="true" />
 }
 
-function StateLabel({ state }: { state: string }) {
-  if (state === "UP") return <span className="text-[var(--status-green-fg)] font-medium text-xs">متصل</span>
-  if (state === "DEGRADED") return <span className="text-[var(--status-amber-fg)] font-medium text-xs">متدهور</span>
-  return <span className="text-[var(--status-red-fg)] font-medium text-xs">منقطع</span>
+function StateLabel({ state, isAr }: { state: string; isAr: boolean }) {
+  if (state === "UP") return (
+    <span className="text-status-green-fg font-medium text-xs">
+      {isAr ? "متصل" : "Up"}
+    </span>
+  )
+  if (state === "DEGRADED") return (
+    <span className="text-status-amber-fg font-medium text-xs">
+      {isAr ? "متدهور" : "Degraded"}
+    </span>
+  )
+  return (
+    <span className="text-status-red-fg font-medium text-xs">
+      {isAr ? "منقطع" : "Down"}
+    </span>
+  )
 }
 
 function stateBg(state: string) {
@@ -33,9 +45,11 @@ function stateBg(state: string) {
 
 interface Props {
   rows: IntegrationRow[]
+  locale?: string
 }
 
-export function IntegrationNmrClient({ rows }: Props) {
+export function IntegrationNmrClient({ rows, locale = "ar" }: Props) {
+  const isAr = locale === "ar"
   const now = new Date()
 
   return (
@@ -69,7 +83,7 @@ export function IntegrationNmrClient({ rows }: Props) {
             </div>
 
             {/* Status */}
-            <StateLabel state={row.state} />
+            <StateLabel state={row.state} isAr={isAr} />
 
             {/* Pattern */}
             <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-1 shrink-0">
@@ -98,11 +112,15 @@ export function IntegrationNmrClient({ rows }: Props) {
       })}
 
       {rows.length === 0 && (
-        <p className="text-sm text-muted-foreground text-center py-6">لا توجد بيانات تكامل متاحة.</p>
+        <p className="text-sm text-muted-foreground text-center py-6">
+          {isAr ? "لا توجد بيانات تكامل متاحة." : "No integration data available."}
+        </p>
       )}
 
       <p className="text-xs text-muted-foreground text-end">
-        تحديث {formatDistanceToNow(now, { addSuffix: true })} · لا اتصالات مباشرة بين الأنظمة
+        {isAr
+          ? `تحديث ${formatDistanceToNow(now, { addSuffix: true })} · لا اتصالات مباشرة بين الأنظمة`
+          : `Updated ${formatDistanceToNow(now, { addSuffix: true })} · no direct system-to-system links`}
       </p>
     </div>
   )

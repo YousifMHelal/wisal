@@ -19,7 +19,7 @@ export function getDict(locale: Locale): Dict {
   return dictionaries[locale] ?? dictionaries[DEFAULT_LOCALE];
 }
 
-/** Always Arabic — language is fixed. */
-export function resolveLocale(_raw: string | undefined): Locale {
-  return "ar";
+export function resolveLocale(raw: string | undefined): Locale {
+  if (raw === "en" || raw === "ar") return raw;
+  return DEFAULT_LOCALE;
 }

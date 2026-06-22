@@ -65,18 +65,42 @@ export function WidgetSkeleton({ className }: { className?: string }) {
   )
 }
 
-export function WidgetError({ message, className }: { message?: string; className?: string }) {
+export function WidgetError({
+  message,
+  messageEn,
+  className,
+}: {
+  message?: string;
+  messageEn?: string;
+  className?: string;
+}) {
   return (
-    <section className={cn("rounded-xl border border-destructive/20 bg-card p-4 md:p-6 flex flex-col items-center justify-center gap-3 min-h-45", className)}>
+    <section
+      className={cn(
+        "rounded-xl border border-destructive/20 bg-card p-4 md:p-6 flex flex-col items-center justify-center gap-3 min-h-45",
+        className,
+      )}>
       <AlertCircle className="size-8 text-destructive/60" aria-hidden="true" />
       <div className="text-center space-y-1">
-        <p className="text-sm font-medium text-foreground">تعذّر تحميل البيانات</p>
+        <p className="text-sm font-medium text-foreground">
+          <span lang="en" className="[html[dir=rtl]_&]:hidden">
+            {messageEn ?? "Failed to load data"}
+          </span>
+          <span lang="ar" className="hidden [html[dir=rtl]_&]:inline">
+            {message ?? "تعذّر تحميل البيانات"}
+          </span>
+        </p>
         <p className="text-xs text-muted-foreground">
-          {message ?? "حدث خطأ. حاول تحديث الصفحة."}
+          <span lang="en" className="[html[dir=rtl]_&]:hidden">
+            An error occurred. Try refreshing the page.
+          </span>
+          <span lang="ar" className="hidden [html[dir=rtl]_&]:inline">
+            حدث خطأ. حاول تحديث الصفحة.
+          </span>
         </p>
       </div>
     </section>
-  )
+  );
 }
 
 export function WidgetEmpty({ message, messageAr, className }: { message?: string; messageAr?: string; className?: string }) {
@@ -105,24 +129,38 @@ export function WidgetLocked({
   className?: string
 }) {
   return (
-    <section className={cn("rounded-xl border bg-card p-4 md:p-6 flex flex-col items-center justify-center gap-4 min-h-45", className)}>
+    <section
+      className={cn(
+        "rounded-xl border bg-card p-4 md:p-6 flex flex-col items-center justify-center gap-4 min-h-45 h-fit",
+        className,
+      )}>
       <div className="size-12 rounded-full bg-muted flex items-center justify-center">
         <Lock className="size-5 text-muted-foreground" aria-hidden="true" />
       </div>
       <div className="text-center space-y-1.5">
         <p className="text-sm font-medium text-foreground">
-          <span lang="en" className="[html[dir=rtl]_&]:hidden">Elevated permission required</span>
-          <span lang="ar" className="hidden [html[dir=rtl]_&]:inline">صلاحية متقدمة مطلوبة</span>
+          <span lang="en" className="[html[dir=rtl]_&]:hidden">
+            Elevated permission required
+          </span>
+          <span lang="ar" className="hidden [html[dir=rtl]_&]:inline">
+            صلاحية متقدمة مطلوبة
+          </span>
         </p>
         <p className="text-xs text-muted-foreground">
-          <span lang="en" className="[html[dir=rtl]_&]:hidden">Requires: {requiredRole}</span>
+          <span lang="en" className="[html[dir=rtl]_&]:hidden">
+            Requires: {requiredRole}
+          </span>
           {requiredRoleAr ? (
-            <span lang="ar" className="hidden [html[dir=rtl]_&]:inline">مطلوب: {requiredRoleAr}</span>
+            <span lang="ar" className="hidden [html[dir=rtl]_&]:inline">
+              مطلوب: {requiredRoleAr}
+            </span>
           ) : (
-            <span lang="ar" className="hidden [html[dir=rtl]_&]:inline">مطلوب: {requiredRole}</span>
+            <span lang="ar" className="hidden [html[dir=rtl]_&]:inline">
+              مطلوب: {requiredRole}
+            </span>
           )}
         </p>
       </div>
     </section>
-  )
+  );
 }

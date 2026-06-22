@@ -1,12 +1,18 @@
 import { Suspense } from "react"
+import { cookies } from "next/headers"
 import { Widget, WidgetLocked } from "@/components/widgets/widget"
 import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { checkRole } from "@/lib/auth"
 import { getBeneficiaryVoiceData } from "@/lib/queries/executive"
 import { BeneficiaryVoiceClient } from "./beneficiary-voice-client"
+import { resolveLocale } from "@/lib/i18n"
 
 async function BeneficiaryVoiceBody() {
+  const jar = await cookies()
+  const locale = resolveLocale(jar.get("locale")?.value)
+  const isAr = locale === "ar"
+
   const allowed = await checkRole("EXECUTIVE")
   if (!allowed) {
     return (
@@ -22,9 +28,11 @@ async function BeneficiaryVoiceBody() {
     <Widget
       title="Beneficiary Voice"
       titleAr="صوت المستفيد"
-      footer="موضوعات من تفاعلات المستفيد · وسّع لأمثلة مجهولة الهوية + التوجه"
+      footer={isAr
+        ? "موضوعات من تفاعلات المستفيد · وسّع لأمثلة مجهولة الهوية + التوجه"
+        : "Themes from beneficiary interactions · expand for anonymized examples + trend"}
     >
-      <BeneficiaryVoiceClient themes={themes} />
+      <BeneficiaryVoiceClient themes={themes} locale={locale} />
     </Widget>
   )
 }

@@ -8,11 +8,13 @@ import type { KillSwitchData } from "@/lib/queries/intelligence"
 
 interface Props {
   killSwitch: KillSwitchData
+  locale?: string
 }
 
 const CONFIRM_PHRASE = "ACTIVATE KILL SWITCH"
 
-export function KillSwitchClient({ killSwitch }: Props) {
+export function KillSwitchClient({ killSwitch, locale = "ar" }: Props) {
+  const isAr = locale === "ar"
   const [showConfirm, setShowConfirm] = useState(false)
   const [confirmText, setConfirmText] = useState("")
   const [error, setError] = useState<string | null>(null)
@@ -72,19 +74,21 @@ export function KillSwitchClient({ killSwitch }: Props) {
                 isActive ? "text-[var(--status-red-fg)]" : "text-[var(--status-green-fg)]",
               ].join(" ")}
             >
-              {isActive ? "مفتاح الإيقاف الطارئ مفعّل" : "النظام في وضع الاستعداد"}
+              {isActive
+                ? (isAr ? "مفتاح الإيقاف الطارئ مفعّل" : "Kill switch is ACTIVE")
+                : (isAr ? "النظام في وضع الاستعداد" : "System is armed and ready")}
             </span>
             <StatusBadge status={isActive ? "red" : "green"} />
           </div>
 
           <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-muted-foreground">
-            <span>النطاق: {killSwitch.scope}</span>
-            {killSwitch.scopeRef && <span>المرجع: {killSwitch.scopeRef}</span>}
+            <span>{isAr ? "النطاق:" : "Scope:"} {killSwitch.scope}</span>
+            {killSwitch.scopeRef && <span>{isAr ? "المرجع:" : "Ref:"} {killSwitch.scopeRef}</span>}
             {killSwitch.lastTriggeredAt && (
               <span className="flex items-center gap-1">
                 <Clock className="size-3" aria-hidden />
-                آخر تفعيل:{" "}
-                {killSwitch.lastTriggeredAt.toLocaleString([], {
+                {isAr ? "آخر تفعيل:" : "Last triggered:"}{" "}
+                {killSwitch.lastTriggeredAt.toLocaleString(isAr ? "ar-SA" : "en-US", {
                   month: "short",
                   day: "numeric",
                   hour: "2-digit",
@@ -112,7 +116,9 @@ export function KillSwitchClient({ killSwitch }: Props) {
           aria-label={isActive ? "Disarm kill switch" : "Activate kill switch"}
         >
           <ShieldAlert className="size-4" aria-hidden />
-          {isActive ? "تعطيل مفتاح الإيقاف" : "تفعيل مفتاح الإيقاف الطارئ"}
+          {isActive
+            ? (isAr ? "تعطيل مفتاح الإيقاف" : "Disarm kill switch")
+            : (isAr ? "تفعيل مفتاح الإيقاف الطارئ" : "Activate kill switch")}
         </button>
       ) : (
         /* Confirmation step — deliberately heavy */
@@ -124,11 +130,15 @@ export function KillSwitchClient({ killSwitch }: Props) {
             />
             <div className="space-y-1">
               <p className="text-sm font-semibold text-[var(--status-red-fg)]">
-                {isActive ? "تأكيد: تعطيل مفتاح الإيقاف" : "تأكيد: تفعيل مفتاح الإيقاف الطارئ"}
+                {isActive
+                ? (isAr ? "تأكيد: تعطيل مفتاح الإيقاف" : "Confirm: Disarm kill switch")
+                : (isAr ? "تأكيد: تفعيل مفتاح الإيقاف الطارئ" : "Confirm: Activate kill switch")}
               </p>
               {!isActive && (
                 <p className="text-xs text-muted-foreground">
-                  سيؤدي هذا إلى إيقاف جميع تفاعلات الذكاء الاصطناعي فوراً. يبقى الموظفون البشريون نشطين. هذا الإجراء مُدقَّق ولا يمكن التراجع عنه دون إعادة التهيئة.
+                  {isAr
+                    ? "سيؤدي هذا إلى إيقاف جميع تفاعلات الذكاء الاصطناعي فوراً. يبقى الموظفون البشريون نشطين. هذا الإجراء مُدقَّق ولا يمكن التراجع عنه دون إعادة التهيئة."
+                    : "This will immediately halt all AI interactions. Human agents remain active. This action is audited and cannot be reversed without re-initialisation."}
                 </p>
               )}
             </div>
@@ -141,11 +151,11 @@ export function KillSwitchClient({ killSwitch }: Props) {
                 htmlFor="kill-switch-confirm"
                 className="text-xs text-muted-foreground"
               >
-                اكتب{" "}
+                {isAr ? "اكتب" : "Type"}{" "}
                 <code className="font-mono font-semibold text-foreground">
                   {CONFIRM_PHRASE}
                 </code>{" "}
-                للتأكيد:
+                {isAr ? "للتأكيد:" : "to confirm:"}
               </label>
               <input
                 id="kill-switch-confirm"
@@ -176,10 +186,10 @@ export function KillSwitchClient({ killSwitch }: Props) {
               ].join(" ")}
             >
               {isPending
-                ? "جارٍ المعالجة…"
+                ? (isAr ? "جارٍ المعالجة…" : "Processing…")
                 : isActive
-                ? "تأكيد التعطيل"
-                : "تأكيد التفعيل"}
+                ? (isAr ? "تأكيد التعطيل" : "Confirm disarm")
+                : (isAr ? "تأكيد التفعيل" : "Confirm activation")}
             </button>
             <button
               onClick={() => {
@@ -189,14 +199,16 @@ export function KillSwitchClient({ killSwitch }: Props) {
               }}
               className="flex-1 sm:flex-none rounded-md border px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             >
-              إلغاء
+              {isAr ? "إلغاء" : "Cancel"}
             </button>
           </div>
         </div>
       )}
 
       <p className="text-xs text-muted-foreground">
-        كل تغيير في الحالة يُسجَّل في سجل تدقيق غير قابل للتعديل.
+        {isAr
+          ? "كل تغيير في الحالة يُسجَّل في سجل تدقيق غير قابل للتعديل."
+          : "Every state change is recorded in an immutable audit log."}
       </p>
     </div>
   )

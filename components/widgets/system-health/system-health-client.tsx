@@ -7,39 +7,41 @@ import type { SystemHealthData } from "@/lib/queries/operations"
 
 const AVAILABILITY_TARGET = 99.9999
 
-function AvailabilityStatus({ pct }: { pct: number }) {
+function AvailabilityStatus({ pct, isAr }: { pct: number; isAr: boolean }) {
   const onTarget = pct >= AVAILABILITY_TARGET
   const nearTarget = pct >= 99.99
 
   if (onTarget) {
     return (
-      <span className="flex items-center gap-1.5 text-[var(--status-green-fg)]">
+      <span className="flex items-center gap-1.5 text-status-green-fg">
         <CheckCircle className="size-4 shrink-0" aria-hidden="true" />
-        في الهدف
+        {isAr ? "في الهدف" : "On target"}
       </span>
     )
   }
   if (nearTarget) {
     return (
-      <span className="flex items-center gap-1.5 text-[var(--status-amber-fg)]">
+      <span className="flex items-center gap-1.5 text-status-amber-fg">
         <AlertTriangle className="size-4 shrink-0" aria-hidden="true" />
-        عند الحد المسموح
+        {isAr ? "عند الحد المسموح" : "Near limit"}
       </span>
     )
   }
   return (
-    <span className="flex items-center gap-1.5 text-[var(--status-red-fg)]">
+    <span className="flex items-center gap-1.5 text-status-red-fg">
       <AlertTriangle className="size-4 shrink-0" aria-hidden="true" />
-      خرق
+      {isAr ? "خرق" : "Breach"}
     </span>
   )
 }
 
 interface Props {
   data: SystemHealthData
+  locale?: string
 }
 
-export function SystemHealthClient({ data }: Props) {
+export function SystemHealthClient({ data, locale = "ar" }: Props) {
+  const isAr = locale === "ar"
   const onTarget = data.availabilityPct >= AVAILABILITY_TARGET
 
   return (
@@ -49,16 +51,18 @@ export function SystemHealthClient({ data }: Props) {
         "rounded-lg border p-4 flex flex-col gap-1",
         onTarget ? "border-s-4 border-s-[var(--status-green)]" : "border-s-4 border-s-[var(--status-red)]",
       ].join(" ")}>
-        <span className="text-xs text-muted-foreground uppercase tracking-wide">الإتاحة</span>
+        <span className="text-xs text-muted-foreground uppercase tracking-wide">
+          {isAr ? "الإتاحة" : "Availability"}
+        </span>
         <div className="flex items-end gap-3 flex-wrap">
           <span className="text-2xl font-bold tabular-nums text-foreground leading-tight">
             {data.availabilityPct.toFixed(4)}%
           </span>
           <span className="text-xs text-muted-foreground mb-0.5">
-            الهدف: {AVAILABILITY_TARGET}%
+            {isAr ? `الهدف: ${AVAILABILITY_TARGET}%` : `Target: ${AVAILABILITY_TARGET}%`}
           </span>
         </div>
-        <AvailabilityStatus pct={data.availabilityPct} />
+        <AvailabilityStatus pct={data.availabilityPct} isAr={isAr} />
       </div>
 
       {/* Meta cards row */}
@@ -67,9 +71,13 @@ export function SystemHealthClient({ data }: Props) {
         <div className="rounded-lg border bg-muted/30 p-3 flex flex-col gap-1 min-w-0">
           <div className="flex items-center gap-1.5">
             <MapPin className="size-3.5 text-primary shrink-0" aria-hidden="true" />
-            <p className="text-xs text-muted-foreground truncate">إقامة البيانات</p>
+            <p className="text-xs text-muted-foreground truncate">
+              {isAr ? "إقامة البيانات" : "Data Residency"}
+            </p>
           </div>
-          <p className="text-sm font-medium text-foreground truncate">منطقة {data.region}</p>
+          <p className="text-sm font-medium text-foreground truncate">
+            {isAr ? `منطقة ${data.region}` : `Region: ${data.region}`}
+          </p>
           <Badge className="self-start text-[10px] bg-primary/20 text-primary border-primary/30 mt-0.5">
             Sovereign
           </Badge>
@@ -79,12 +87,14 @@ export function SystemHealthClient({ data }: Props) {
         <div className="rounded-lg border bg-muted/30 p-3 flex flex-col gap-1 min-w-0">
           <div className="flex items-center gap-1.5">
             <CalendarCheck className="size-3.5 text-muted-foreground shrink-0" aria-hidden="true" />
-            <p className="text-xs text-muted-foreground truncate">آخر اختبار DR</p>
+            <p className="text-xs text-muted-foreground truncate">
+              {isAr ? "آخر اختبار DR" : "Last DR Test"}
+            </p>
           </div>
           <p className="text-sm font-medium text-foreground truncate">
             {data.lastDrTestAt
               ? format(data.lastDrTestAt, "d MMM yyyy")
-              : "لم يُختبر مطلقًا"}
+              : (isAr ? "لم يُختبر مطلقًا" : "Never tested")}
           </p>
           {data.lastDrTestAt && (
             <p className="text-xs text-muted-foreground truncate">
@@ -100,7 +110,9 @@ export function SystemHealthClient({ data }: Props) {
           <table className="w-full text-sm border-collapse" role="table" aria-label="DR RTO/RPO by channel">
             <thead>
               <tr className="border-b border-border">
-                <th className="text-start py-2 px-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">القناة</th>
+                <th className="text-start py-2 px-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  {isAr ? "القناة" : "Channel"}
+                </th>
                 <th className="text-start py-2 px-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">RTO</th>
                 <th className="text-start py-2 px-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">RPO</th>
               </tr>
@@ -119,7 +131,9 @@ export function SystemHealthClient({ data }: Props) {
       )}
 
       {data.drChannels.length === 0 && (
-        <p className="text-xs text-muted-foreground text-center py-2">لا توجد بيانات قنوات DR مضبوطة.</p>
+        <p className="text-xs text-muted-foreground text-center py-2">
+          {isAr ? "لا توجد بيانات قنوات DR مضبوطة." : "No DR channel data configured."}
+        </p>
       )}
     </div>
   )

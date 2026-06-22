@@ -8,17 +8,19 @@ import { format } from "date-fns"
 import type { MedicalApprovalRow } from "@/lib/queries/governance"
 
 const STATUS_CONFIG = {
-  APPROVED: { label: "معتمد", className: "bg-status-green/15 text-status-green-fg border-status-green/30" },
-  PENDING: { label: "معلق", className: "bg-status-amber/15 text-status-amber-fg border-status-amber/30" },
-  REJECTED: { label: "مرفوض", className: "bg-status-red/15 text-status-red-fg border-status-red/30" },
+  APPROVED: { labelAr: "معتمد", labelEn: "Approved", className: "bg-status-green/15 text-status-green-fg border-status-green/30" },
+  PENDING: { labelAr: "معلق", labelEn: "Pending", className: "bg-status-amber/15 text-status-amber-fg border-status-amber/30" },
+  REJECTED: { labelAr: "مرفوض", labelEn: "Rejected", className: "bg-status-red/15 text-status-red-fg border-status-red/30" },
 } as const
 
 interface Props {
   rows: MedicalApprovalRow[]
   exportUrl: string
+  locale?: string
 }
 
-export function MedicalApprovalLogClient({ rows, exportUrl }: Props) {
+export function MedicalApprovalLogClient({ rows, exportUrl, locale = "ar" }: Props) {
+  const isAr = locale === "ar"
   const [search, setSearch] = useState("")
 
   const filtered = useMemo(() => {
@@ -42,7 +44,7 @@ export function MedicalApprovalLogClient({ rows, exportUrl }: Props) {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="ابحث برقم الحالة أو التجمع أو الحالة…"
+            placeholder={isAr ? "ابحث برقم الحالة أو التجمع أو الحالة…" : "Search by case ID, cluster, or status…"}
             className="ps-9 h-8 text-sm"
             aria-label="Search approvals"
           />
@@ -53,7 +55,7 @@ export function MedicalApprovalLogClient({ rows, exportUrl }: Props) {
           className="inline-flex items-center gap-1.5 h-8 px-3 shrink-0 rounded-md border border-border bg-transparent text-sm font-medium text-foreground hover:bg-muted transition-colors duration-150 cursor-pointer"
         >
           <Download className="size-3.5" aria-hidden />
-          <span className="hidden sm:inline">تصدير</span>
+          <span className="hidden sm:inline">{isAr ? "تصدير" : "Export"}</span>
         </a>
       </div>
 
@@ -62,18 +64,18 @@ export function MedicalApprovalLogClient({ rows, exportUrl }: Props) {
         <table className="w-full text-sm min-w-[600px]">
           <thead>
             <tr className="border-b border-border bg-muted/40">
-              <th className="py-2 ps-3 pe-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">رقم الحالة</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">التجمع</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">الحالة</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden md:table-cell">اعتمد بواسطة</th>
-              <th className="py-2 ps-2 pe-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">التاريخ</th>
+              <th className="py-2 ps-3 pe-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">{isAr ? "رقم الحالة" : "Case ID"}</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">{isAr ? "التجمع" : "Cluster"}</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">{isAr ? "الحالة" : "Status"}</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden md:table-cell">{isAr ? "اعتمد بواسطة" : "Approved by"}</th>
+              <th className="py-2 ps-2 pe-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">{isAr ? "التاريخ" : "Date"}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {filtered.length === 0 ? (
               <tr>
                 <td colSpan={5} className="py-8 text-center text-sm text-muted-foreground">
-                  لا توجد سجلات تطابق بحثك.
+                  {isAr ? "لا توجد سجلات تطابق بحثك." : "No records match your search."}
                 </td>
               </tr>
             ) : (
@@ -82,10 +84,12 @@ export function MedicalApprovalLogClient({ rows, exportUrl }: Props) {
                 return (
                   <tr key={row.id} className="hover:bg-muted/30 transition-colors duration-150">
                     <td className="py-2.5 ps-3 pe-2 font-mono text-xs tabular-nums text-foreground whitespace-nowrap">{row.caseId}</td>
-                    <td className="py-2.5 px-2 text-xs text-muted-foreground whitespace-nowrap">{row.clusterName ?? "—"}</td>
+                    <td className="py-2.5 px-2 text-xs text-muted-foreground whitespace-nowrap">
+                      {isAr ? (row.clusterNameAr ?? row.clusterName ?? "—") : (row.clusterName ?? "—")}
+                    </td>
                     <td className="py-2.5 px-2 whitespace-nowrap">
                       <Badge variant="outline" className={`text-xs font-medium ${cfg.className}`}>
-                        {cfg.label}
+                        {isAr ? cfg.labelAr : cfg.labelEn}
                       </Badge>
                     </td>
                     <td className="py-2.5 px-2 text-xs text-muted-foreground hidden md:table-cell">{row.approvedBy ?? "—"}</td>
@@ -101,7 +105,7 @@ export function MedicalApprovalLogClient({ rows, exportUrl }: Props) {
       </div>
 
       <p className="text-xs text-muted-foreground text-end tabular-nums">
-        عرض {filtered.length} من {rows.length} سجل
+        {isAr ? `عرض ${filtered.length} من ${rows.length} سجل` : `Showing ${filtered.length} of ${rows.length} records`}
       </p>
     </div>
   )

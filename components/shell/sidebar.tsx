@@ -357,10 +357,8 @@ export function SidebarRail({
           "flex items-center h-14 border-b border-sidebar-border shrink-0",
           collapsed ? "justify-center px-0" : "px-4 gap-2.5",
         )}>
-        <div className="size-8 rounded-lg bg-primary flex items-center justify-center shrink-0 shadow-sm shadow-primary/30">
-          <span className="text-primary-foreground text-sm font-bold leading-none">
-            W
-          </span>
+        <div className="size-8 rounded-lg overflow-hidden shrink-0">
+          <img src="/logo.png" alt="Wisal" className="size-8 object-contain" />
         </div>
         {!collapsed && (
           <div className="min-w-0">

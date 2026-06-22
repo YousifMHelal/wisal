@@ -8,6 +8,7 @@ export interface MedicalApprovalRow {
   id: string
   caseId: string
   clusterName: string | null
+  clusterNameAr: string | null
   content: string
   status: "APPROVED" | "PENDING" | "REJECTED"
   approvedBy: string | null
@@ -22,7 +23,7 @@ export async function getMedicalApprovalData(filters: Filters): Promise<MedicalA
       timestamp: { gte: from, lte: to },
       ...(filters.cluster ? { clusterId: filters.cluster } : {}),
     },
-    include: { cluster: { select: { name: true } } },
+    include: { cluster: { select: { name: true, nameAr: true } } },
     orderBy: { timestamp: "desc" },
     take: 500,
   })
@@ -31,6 +32,7 @@ export async function getMedicalApprovalData(filters: Filters): Promise<MedicalA
     id: r.id,
     caseId: r.caseId,
     clusterName: r.cluster?.name ?? null,
+    clusterNameAr: r.cluster?.nameAr ?? null,
     content: r.content,
     status: r.status as "APPROVED" | "PENDING" | "REJECTED",
     approvedBy: r.approvedBy,

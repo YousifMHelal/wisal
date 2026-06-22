@@ -1,17 +1,22 @@
 import { Suspense } from "react"
+import { cookies } from "next/headers"
 import { Widget, WidgetSkeleton } from "@/components/widgets/widget"
 import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getAgentStatusBoard } from "@/lib/queries/live-operations"
 import { AgentStatusBoardClient } from "./agent-status-board-client"
+import { resolveLocale } from "@/lib/i18n"
 import type { Filters } from "@/lib/filters"
 import { Skeleton } from "@/components/ui/skeleton"
 
 interface Props {
   filters: Filters
-  locale?: string
 }
 
-async function BoardBody({ filters, locale = "en" }: Props) {
+async function BoardBody({ filters }: Props) {
+  const jar = await cookies()
+  const locale = resolveLocale(jar.get("locale")?.value)
+  const isAr = locale === "ar"
+
   const data = await getAgentStatusBoard(filters)
 
   const totalAgents = data.reduce((s, c) => s + c.total, 0)
@@ -24,30 +29,30 @@ async function BoardBody({ filters, locale = "en" }: Props) {
       titleAr="حالة الوكلاء المباشرة"
       actions={
         <span className="text-xs text-muted-foreground tabular">
-          {totalAvail + totalOnCall}/{totalAgents} نشط
+          {totalAvail + totalOnCall}/{totalAgents} {isAr ? "نشط" : "active"}
         </span>
       }
       footer={
         <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
             <span className="size-2 rounded-full inline-block" style={{ background: "var(--status-green)" }} />
-            متاح
+            {isAr ? "متاح" : "Available"}
           </span>
           <span className="flex items-center gap-1">
             <span className="size-2 rounded-full inline-block" style={{ background: "var(--primary)" }} />
-            في مكالمة
+            {isAr ? "في مكالمة" : "On Call"}
           </span>
           <span className="flex items-center gap-1">
             <span className="size-2 rounded-full inline-block" style={{ background: "var(--status-amber)" }} />
-            إنهاء/بعد المكالمة
+            {isAr ? "إنهاء/بعد المكالمة" : "Wrap-up"}
           </span>
           <span className="flex items-center gap-1">
             <span className="size-2 rounded-full inline-block" style={{ background: "var(--muted-foreground)" }} />
-            استراحة
+            {isAr ? "استراحة" : "Break"}
           </span>
           <span className="flex items-center gap-1">
             <span className="size-2 rounded-full inline-block" style={{ background: "var(--status-red)" }} />
-            غير متصل
+            {isAr ? "غير متصل" : "Offline"}
           </span>
         </div>
       }
@@ -69,11 +74,11 @@ function BoardSkeleton() {
   )
 }
 
-export function AgentStatusBoardWidget({ filters, locale }: Props) {
+export function AgentStatusBoardWidget({ filters }: Props) {
   return (
     <WidgetErrorBoundary widgetTitle="Live Agent Status">
       <Suspense fallback={<BoardSkeleton />}>
-        <BoardBody filters={filters} locale={locale} />
+        <BoardBody filters={filters} />
       </Suspense>
     </WidgetErrorBoundary>
   )

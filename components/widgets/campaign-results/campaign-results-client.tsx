@@ -26,7 +26,7 @@ const STATUS_MAP: Record<string, "green" | "amber" | "red"> = {
   DRAFT: "red",
 }
 
-function aggregateByType(campaigns: CampaignRow[]): Array<{
+function aggregateByType(campaigns: CampaignRow[], isAr: boolean): Array<{
   type: string
   label: string
   sent: number
@@ -48,7 +48,7 @@ function aggregateByType(campaigns: CampaignRow[]): Array<{
     const agg = map.get(t)!
     return {
       type: t,
-      label: TYPE_LABELS[t]?.label ?? t,
+      label: isAr ? (TYPE_LABELS[t]?.labelAr ?? t) : (TYPE_LABELS[t]?.label ?? t),
       sent: agg.sent,
       delivered: agg.delivered,
       responded: agg.responded,
@@ -58,9 +58,10 @@ function aggregateByType(campaigns: CampaignRow[]): Array<{
   })
 }
 
-interface Props { campaigns: CampaignRow[] }
+interface Props { campaigns: CampaignRow[]; locale?: string }
 
-export function CampaignResultsClient({ campaigns }: Props) {
+export function CampaignResultsClient({ campaigns, locale = "ar" }: Props) {
+  const isAr = locale === "ar"
   const [activeType, setActiveType] = useState<CampaignType | "ALL">("ALL")
 
   const filtered = useMemo(
@@ -68,12 +69,14 @@ export function CampaignResultsClient({ campaigns }: Props) {
     [campaigns, activeType]
   )
 
-  const byType = useMemo(() => aggregateByType(campaigns), [campaigns])
+  const byType = useMemo(() => aggregateByType(campaigns, isAr), [campaigns, isAr])
 
   if (!campaigns.length) {
     return (
       <div className="flex items-center justify-center min-h-[120px]">
-        <p className="text-sm text-muted-foreground">لا توجد بيانات حملات لهذه الفترة.</p>
+        <p className="text-sm text-muted-foreground">
+          {isAr ? "لا توجد بيانات حملات لهذه الفترة." : "No campaign data for this period."}
+        </p>
       </div>
     )
   }
@@ -91,7 +94,7 @@ export function CampaignResultsClient({ campaigns }: Props) {
               : "bg-muted text-muted-foreground hover:bg-muted/80"
           )}
         >
-          الكل
+          {isAr ? "الكل" : "All"}
         </button>
         {CAMPAIGN_TYPES.map((t) => (
           <button
@@ -104,7 +107,7 @@ export function CampaignResultsClient({ campaigns }: Props) {
                 : "bg-muted text-muted-foreground hover:bg-muted/80"
             )}
           >
-            {TYPE_LABELS[t]?.labelAr ?? t}
+            {isAr ? (TYPE_LABELS[t]?.labelAr ?? t) : (TYPE_LABELS[t]?.label ?? t)}
           </button>
         ))}
       </div>
@@ -134,9 +137,9 @@ export function CampaignResultsClient({ campaigns }: Props) {
             }}
           />
           <Legend wrapperStyle={{ fontSize: 11, color: "var(--color-muted-foreground)" }} />
-          <Bar dataKey="sent" name="مُرسَل" fill="var(--color-muted-foreground)" radius={[3, 3, 0, 0]} />
-          <Bar dataKey="delivered" name="مُستلَم" fill="var(--color-primary)" radius={[3, 3, 0, 0]} />
-          <Bar dataKey="responded" name="استجاب" fill="var(--status-green)" radius={[3, 3, 0, 0]} />
+          <Bar dataKey="sent" name={isAr ? "مُرسَل" : "Sent"} fill="var(--color-muted-foreground)" radius={[3, 3, 0, 0]} />
+          <Bar dataKey="delivered" name={isAr ? "مُستلَم" : "Delivered"} fill="var(--color-primary)" radius={[3, 3, 0, 0]} />
+          <Bar dataKey="responded" name={isAr ? "استجاب" : "Responded"} fill="var(--status-green)" radius={[3, 3, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
 
@@ -145,12 +148,24 @@ export function CampaignResultsClient({ campaigns }: Props) {
         <table className="w-full min-w-[560px] text-sm border-collapse">
           <thead>
             <tr className="border-b border-border">
-              <th className="py-2 ps-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide">الحملة</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide">النوع</th>
-              <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide">مُرسَل</th>
-              <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide">% التسليم</th>
-              <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide">% الاستجابة</th>
-              <th className="py-2 pe-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide">الحالة</th>
+              <th className="py-2 ps-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                {isAr ? "الحملة" : "Campaign"}
+              </th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                {isAr ? "النوع" : "Type"}
+              </th>
+              <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                {isAr ? "مُرسَل" : "Sent"}
+              </th>
+              <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                {isAr ? "% التسليم" : "Delivery %"}
+              </th>
+              <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                {isAr ? "% الاستجابة" : "Response %"}
+              </th>
+              <th className="py-2 pe-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                {isAr ? "الحالة" : "Status"}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -162,7 +177,9 @@ export function CampaignResultsClient({ campaigns }: Props) {
                 </td>
                 <td className="py-2.5 px-2">
                   <span className="text-xs text-muted-foreground">
-                    {TYPE_LABELS[c.type as CampaignType]?.labelAr ?? c.type}
+                    {isAr
+                      ? (TYPE_LABELS[c.type as CampaignType]?.labelAr ?? c.type)
+                      : (TYPE_LABELS[c.type as CampaignType]?.label ?? c.type)}
                   </span>
                 </td>
                 <td className="py-2.5 px-2 text-end tabular-nums text-foreground">{c.sent.toLocaleString()}</td>

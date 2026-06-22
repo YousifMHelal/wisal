@@ -1,10 +1,12 @@
 import { Suspense } from "react"
+import { cookies } from "next/headers"
 import { Widget, WidgetLocked } from "@/components/widgets/widget"
 import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { checkRole } from "@/lib/auth"
 import { getScheduleCoverageData } from "@/lib/queries/workforce"
 import { ScheduleCoverageClient } from "./schedule-coverage-client"
+import { resolveLocale } from "@/lib/i18n"
 import type { Filters } from "@/lib/filters"
 
 interface Props {
@@ -12,6 +14,10 @@ interface Props {
 }
 
 async function ScheduleCoverageBody({ filters }: Props) {
+  const jar = await cookies()
+  const locale = resolveLocale(jar.get("locale")?.value)
+  const isAr = locale === "ar"
+
   const allowed = await checkRole("SUPERVISOR")
   if (!allowed) {
     return (
@@ -29,12 +35,16 @@ async function ScheduleCoverageBody({ filters }: Props) {
       titleAr="الجدول والتغطية"
       actions={
         <span className="text-xs text-muted-foreground tabular-nums">
-          {data.swaps.length} طلب تبادل معلّق{data.swaps.length !== 1 ? "" : ""}
+          {isAr
+            ? `${data.swaps.length} طلب تبادل معلّق`
+            : `${data.swaps.length} pending swap request${data.swaps.length !== 1 ? "s" : ""}`}
         </span>
       }
-      footer="الموظفون مقابل الطلب المتوقع بالساعة · يتطلب دور المشرف لموافقة التبادلات"
+      footer={isAr
+        ? "الموظفون مقابل الطلب المتوقع بالساعة · يتطلب دور المشرف لموافقة التبادلات"
+        : "Staffed vs. forecast demand by hour · Supervisor role required to approve swaps"}
     >
-      <ScheduleCoverageClient slots={data.slots} swaps={data.swaps} />
+      <ScheduleCoverageClient slots={data.slots} swaps={data.swaps} locale={locale} />
     </Widget>
   )
 }

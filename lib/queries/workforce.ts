@@ -10,6 +10,7 @@ export interface AgentRow {
   nameAr: string
   team: string
   clusterName: string
+  clusterNameAr: string
   clusterId: string
   aht: number
   fcr: number
@@ -31,7 +32,7 @@ export async function getAgentGridData(filters: Filters): Promise<AgentRow[]> {
   const agents = await prisma.agent.findMany({
     where: filters.cluster ? { clusterId: filters.cluster } : undefined,
     include: {
-      cluster: { select: { name: true } },
+      cluster: { select: { name: true, nameAr: true } },
       agentStatus: { select: { state: true } },
     },
     orderBy: { name: "asc" },
@@ -44,6 +45,7 @@ export async function getAgentGridData(filters: Filters): Promise<AgentRow[]> {
     nameAr: a.nameAr,
     team: a.team,
     clusterName: a.cluster.name,
+    clusterNameAr: a.cluster.nameAr,
     clusterId: a.clusterId,
     aht: a.aht,
     fcr: a.fcr * 100,
@@ -146,6 +148,7 @@ export interface QaItem {
   id: string
   interactionId: string
   clusterName: string
+  clusterNameAr: string
   sentimentScore: number
   botConfidence: number
   priority: number
@@ -158,7 +161,7 @@ export async function getQaQueueData(filters: Filters): Promise<QaItem[]> {
       reviewed: false,
       ...(filters.cluster ? { clusterId: filters.cluster } : {}),
     },
-    include: { cluster: { select: { name: true } } },
+    include: { cluster: { select: { name: true, nameAr: true } } },
     orderBy: [{ priority: "desc" }, { sentimentScore: "asc" }],
     take: 100,
   })
@@ -167,6 +170,7 @@ export async function getQaQueueData(filters: Filters): Promise<QaItem[]> {
     id: i.id,
     interactionId: i.interactionId,
     clusterName: i.cluster.name,
+    clusterNameAr: i.cluster.nameAr,
     sentimentScore: i.sentimentScore,
     botConfidence: i.botConfidence * 100,
     priority: i.priority,
@@ -270,6 +274,7 @@ export interface TicketRow {
   beneficiaryName: string
   beneficiaryId: string
   clusterName: string
+  clusterNameAr: string
   type: "COMPLAINT" | "REQUEST"
   status: "OPEN" | "IN_PROGRESS" | "ESCALATED" | "RESOLVED" | "CLOSED"
   priority: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL"
@@ -298,7 +303,7 @@ export async function getTicketQueueData(filters: Filters): Promise<TicketRow[]>
     },
     include: {
       beneficiary: { select: { name: true } },
-      cluster: { select: { name: true } },
+      cluster: { select: { name: true, nameAr: true } },
       assignedAgent: { select: { name: true } },
     },
     orderBy: [{ priority: "desc" }, { slaDueAt: "asc" }],
@@ -310,6 +315,7 @@ export async function getTicketQueueData(filters: Filters): Promise<TicketRow[]>
     beneficiaryName: t.beneficiary.name,
     beneficiaryId: t.beneficiaryId,
     clusterName: t.cluster.name,
+    clusterNameAr: t.cluster.nameAr,
     type: t.type as "COMPLAINT" | "REQUEST",
     status: t.status as "OPEN" | "IN_PROGRESS" | "ESCALATED" | "RESOLVED" | "CLOSED",
     priority: t.priority as "LOW" | "MEDIUM" | "HIGH" | "CRITICAL",

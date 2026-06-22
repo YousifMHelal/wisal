@@ -1,20 +1,14 @@
 "use client"
 
 import { useState, useTransition, useCallback } from "react"
-import { Search, User, Phone, MapPin, Shield, ChevronRight, CheckCircle, AlertTriangle, XCircle, Clock, ExternalLink } from "lucide-react"
+import { Search, User, Phone, MapPin, Shield, ChevronRight, CheckCircle, AlertTriangle, XCircle, Clock } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Tabs } from "@/components/ui/tabs"
-import { format, formatDistanceToNow, isPast } from "date-fns"
+import { format, isPast } from "date-fns"
 import { searchBeneficiaryAction, getBeneficiary360Action } from "@/lib/actions/operations"
 import type { BeneficiarySearchResult, Beneficiary360 } from "@/lib/queries/operations"
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-const CHANNEL_ICONS: Record<string, string> = {
-  Voice: "📞", WhatsApp: "💬", LiveChat: "🖥", Email: "✉️",
-  SignLanguageVideo: "🤟", Social: "📢",
-}
 
 function SentimentDot({ value }: { value: number }) {
   if (value > 0.2) return <span className="size-2 rounded-full bg-[var(--status-green)] inline-block shrink-0" aria-label="Positive" />
@@ -39,27 +33,30 @@ function TicketStatusBadge({ status }: { status: string }) {
   return <Badge className={`text-[10px] px-1.5 py-0 ${cls}`}>{status.replace("_", " ")}</Badge>
 }
 
-function ConsentBadge({ status }: { status: string }) {
+function ConsentBadge({ status, isAr }: { status: string; isAr: boolean }) {
   if (status === "GIVEN") return (
-    <span className="flex items-center gap-1 text-[var(--status-green-fg)] text-xs font-medium">
-      <CheckCircle className="size-3.5" aria-hidden="true" /> موافقة ممنوحة
+    <span className="flex items-center gap-1 text-status-green-fg text-xs font-medium">
+      <CheckCircle className="size-3.5" aria-hidden="true" />
+      {isAr ? "موافقة ممنوحة" : "Consent given"}
     </span>
   )
   if (status === "WITHDRAWN") return (
-    <span className="flex items-center gap-1 text-[var(--status-red-fg)] text-xs font-medium">
-      <XCircle className="size-3.5" aria-hidden="true" /> موافقة مسحوبة
+    <span className="flex items-center gap-1 text-status-red-fg text-xs font-medium">
+      <XCircle className="size-3.5" aria-hidden="true" />
+      {isAr ? "موافقة مسحوبة" : "Consent withdrawn"}
     </span>
   )
   return (
-    <span className="flex items-center gap-1 text-[var(--status-amber-fg)] text-xs font-medium">
-      <AlertTriangle className="size-3.5" aria-hidden="true" /> موافقة معلقة
+    <span className="flex items-center gap-1 text-status-amber-fg text-xs font-medium">
+      <AlertTriangle className="size-3.5" aria-hidden="true" />
+      {isAr ? "موافقة معلقة" : "Consent pending"}
     </span>
   )
 }
 
 // ── Profile card ──────────────────────────────────────────────────────────────
 
-function ProfileCard({ profile }: { profile: Beneficiary360["profile"] }) {
+function ProfileCard({ profile, isAr }: { profile: Beneficiary360["profile"]; isAr: boolean }) {
   return (
     <div className="rounded-lg border bg-muted/20 p-4 flex flex-col sm:flex-row gap-4">
       <div className="flex items-center gap-3 sm:gap-4">
@@ -86,10 +83,10 @@ function ProfileCard({ profile }: { profile: Beneficiary360["profile"] }) {
         )}
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Shield className="size-3.5 shrink-0" aria-hidden="true" />
-          {profile.gender} · تاريخ الميلاد {format(profile.dateOfBirth, "d MMM yyyy")}
+          {profile.gender} · {isAr ? "تاريخ الميلاد" : "DOB"} {format(profile.dateOfBirth, "d MMM yyyy")}
         </div>
         <Badge variant="outline" className="text-[10px] px-1.5 py-0">{profile.tier}</Badge>
-        <ConsentBadge status={profile.consentStatus} />
+        <ConsentBadge status={profile.consentStatus} isAr={isAr} />
       </div>
     </div>
   )
@@ -97,9 +94,13 @@ function ProfileCard({ profile }: { profile: Beneficiary360["profile"] }) {
 
 // ── Interactions tab ──────────────────────────────────────────────────────────
 
-function InteractionsTab({ interactions }: { interactions: Beneficiary360["interactions"] }) {
+function InteractionsTab({ interactions, isAr }: { interactions: Beneficiary360["interactions"]; isAr: boolean }) {
   if (interactions.length === 0) {
-    return <p className="text-sm text-muted-foreground text-center py-8">لا توجد تفاعلات مسجلة.</p>
+    return (
+      <p className="text-sm text-muted-foreground text-center py-8">
+        {isAr ? "لا توجد تفاعلات مسجلة." : "No interactions recorded."}
+      </p>
+    )
   }
   return (
     <div className="flex flex-col gap-2 max-h-72 overflow-y-auto pe-1">
@@ -111,9 +112,7 @@ function InteractionsTab({ interactions }: { interactions: Beneficiary360["inter
           <SentimentDot value={i.sentiment} />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-medium text-foreground">
-                {i.channelName}
-              </span>
+              <span className="text-xs font-medium text-foreground">{i.channelName}</span>
               <span className="text-[10px] text-muted-foreground">
                 {format(i.startedAt, "d MMM yyyy HH:mm")}
               </span>
@@ -136,20 +135,24 @@ function InteractionsTab({ interactions }: { interactions: Beneficiary360["inter
 
 // ── Tickets tab ───────────────────────────────────────────────────────────────
 
-function TicketsTab({ tickets }: { tickets: Beneficiary360["tickets"] }) {
+function TicketsTab({ tickets, isAr }: { tickets: Beneficiary360["tickets"]; isAr: boolean }) {
   if (tickets.length === 0) {
-    return <p className="text-sm text-muted-foreground text-center py-8">لا توجد تذاكر.</p>
+    return (
+      <p className="text-sm text-muted-foreground text-center py-8">
+        {isAr ? "لا توجد تذاكر." : "No tickets."}
+      </p>
+    )
   }
   return (
     <div className="overflow-x-auto -mx-1">
       <table className="w-full text-xs border-collapse min-w-[480px]" aria-label="Tickets">
         <thead>
           <tr className="border-b border-border">
-            <th className="text-start py-2 px-2 text-muted-foreground font-medium">النوع</th>
-            <th className="text-start py-2 px-2 text-muted-foreground font-medium">الأولوية</th>
-            <th className="text-start py-2 px-2 text-muted-foreground font-medium">الحالة</th>
-            <th className="text-start py-2 px-2 text-muted-foreground font-medium">موعد SLA</th>
-            <th className="text-start py-2 px-2 text-muted-foreground font-medium">الموظف</th>
+            <th className="text-start py-2 px-2 text-muted-foreground font-medium">{isAr ? "النوع" : "Type"}</th>
+            <th className="text-start py-2 px-2 text-muted-foreground font-medium">{isAr ? "الأولوية" : "Priority"}</th>
+            <th className="text-start py-2 px-2 text-muted-foreground font-medium">{isAr ? "الحالة" : "Status"}</th>
+            <th className="text-start py-2 px-2 text-muted-foreground font-medium">{isAr ? "موعد SLA" : "SLA Due"}</th>
+            <th className="text-start py-2 px-2 text-muted-foreground font-medium">{isAr ? "الموظف" : "Agent"}</th>
           </tr>
         </thead>
         <tbody>
@@ -167,7 +170,7 @@ function TicketsTab({ tickets }: { tickets: Beneficiary360["tickets"] }) {
                 <td className="py-2.5 px-2"><TicketPriorityBadge priority={t.priority} /></td>
                 <td className="py-2.5 px-2"><TicketStatusBadge status={t.status} /></td>
                 <td className="py-2.5 px-2">
-                  <span className={slaBreached ? "text-[var(--status-red-fg)] font-medium" : "text-muted-foreground"}>
+                  <span className={slaBreached ? "text-status-red-fg font-medium" : "text-muted-foreground"}>
                     {format(t.slaDueAt, "d MMM HH:mm")}
                     {slaBreached && " ⚠"}
                   </span>
@@ -186,11 +189,13 @@ function TicketsTab({ tickets }: { tickets: Beneficiary360["tickets"] }) {
 
 interface Props {
   initialBeneficiaryId?: string
+  locale?: string
 }
 
 type TabKey = "interactions" | "tickets"
 
-export function Beneficiary360Client({ initialBeneficiaryId }: Props) {
+export function Beneficiary360Client({ initialBeneficiaryId, locale = "ar" }: Props) {
+  const isAr = locale === "ar"
   const [query, setQuery] = useState("")
   const [searchResults, setSearchResults] = useState<BeneficiarySearchResult[]>([])
   const [showDropdown, setShowDropdown] = useState(false)
@@ -239,9 +244,11 @@ export function Beneficiary360Client({ initialBeneficiaryId }: Props) {
             onChange={(e) => handleSearch(e.target.value)}
             onFocus={() => searchResults.length > 0 && setShowDropdown(true)}
             onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
-            placeholder="ابحث بالهوية الوطنية أو الاسم…"
+            placeholder={isAr ? "ابحث بالهوية الوطنية أو الاسم…" : "Search by national ID or name…"}
             className="ps-9"
-            aria-label="ابحث عن مستفيد بالهوية الوطنية أو الاسم"
+            aria-label={isAr
+              ? "ابحث عن مستفيد بالهوية الوطنية أو الاسم"
+              : "Search for a beneficiary by national ID or name"}
             aria-expanded={showDropdown}
             aria-haspopup="listbox"
             autoComplete="off"
@@ -279,13 +286,19 @@ export function Beneficiary360Client({ initialBeneficiaryId }: Props) {
 
         {showDropdown && searchResults.length === 0 && query.length >= 2 && !isPending && (
           <div className="absolute z-20 top-full mt-1 start-0 end-0 bg-popover border border-border rounded-lg shadow-lg px-3 py-2.5">
-            <p className="text-sm text-muted-foreground">لم يتم العثور على مستفيدين. جرّب اسمًا أو هوية مختلفة.</p>
+            <p className="text-sm text-muted-foreground">
+              {isAr
+                ? "لم يتم العثور على مستفيدين. جرّب اسمًا أو هوية مختلفة."
+                : "No beneficiaries found. Try a different name or ID."}
+            </p>
           </div>
         )}
       </div>
 
       {isPending && (
-        <p className="text-xs text-muted-foreground animate-pulse">جارٍ البحث…</p>
+        <p className="text-xs text-muted-foreground animate-pulse">
+          {isAr ? "جارٍ البحث…" : "Searching…"}
+        </p>
       )}
 
       {error && (
@@ -302,9 +315,8 @@ export function Beneficiary360Client({ initialBeneficiaryId }: Props) {
       {/* Profile */}
       {profile && !isLoadingProfile && (
         <div className="flex flex-col gap-4">
-          <ProfileCard profile={profile.profile} />
+          <ProfileCard profile={profile.profile} isAr={isAr} />
 
-          {/* Tabs — manual impl to avoid base-ui Tabs breaking changes */}
           <div className="flex flex-col gap-3">
             <div className="flex gap-1 border-b border-border" role="tablist">
               {(["interactions", "tickets"] as TabKey[]).map((tab) => (
@@ -320,18 +332,19 @@ export function Beneficiary360Client({ initialBeneficiaryId }: Props) {
                       : "border-transparent text-muted-foreground hover:text-foreground",
                   ].join(" ")}
                 >
-                  {tab === "interactions" ? "التفاعلات" : "التذاكر"}
+                  {tab === "interactions"
+                    ? (isAr ? "التفاعلات" : "Interactions")
+                    : (isAr ? "التذاكر" : "Tickets")}
                   <span className="ms-1.5 text-xs text-muted-foreground">
                     {tab === "interactions" ? `(${profile.interactions.length})` : `(${profile.tickets.length})`}
-
                   </span>
                 </button>
               ))}
             </div>
 
             <div role="tabpanel">
-              {activeTab === "interactions" && <InteractionsTab interactions={profile.interactions} />}
-              {activeTab === "tickets" && <TicketsTab tickets={profile.tickets} />}
+              {activeTab === "interactions" && <InteractionsTab interactions={profile.interactions} isAr={isAr} />}
+              {activeTab === "tickets" && <TicketsTab tickets={profile.tickets} isAr={isAr} />}
             </div>
           </div>
         </div>
@@ -340,8 +353,12 @@ export function Beneficiary360Client({ initialBeneficiaryId }: Props) {
       {!profile && !isPending && !isLoadingProfile && !error && (
         <div className="flex flex-col items-center justify-center min-h-[140px] text-center gap-2">
           <Search className="size-8 text-muted-foreground/40" aria-hidden="true" />
-          <p className="text-sm text-muted-foreground">ابحث عن مستفيد لعرض ملفه الشامل</p>
-          <p className="text-xs text-muted-foreground">الهوية الوطنية أو الاسم (عربي أو إنجليزي)</p>
+          <p className="text-sm text-muted-foreground">
+            {isAr ? "ابحث عن مستفيد لعرض ملفه الشامل" : "Search for a beneficiary to view their profile"}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {isAr ? "الهوية الوطنية أو الاسم (عربي أو إنجليزي)" : "National ID or name (Arabic or English)"}
+          </p>
         </div>
       )}
     </div>

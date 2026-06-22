@@ -1,8 +1,10 @@
 import { Suspense } from "react"
+import { cookies } from "next/headers"
 import { Widget, WidgetSkeleton } from "@/components/widgets/widget"
 import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getTierMonitorData } from "@/lib/queries/intelligence"
 import { AdaptiveTierMonitorClient } from "./adaptive-tier-monitor-client"
+import { resolveLocale } from "@/lib/i18n"
 import type { Filters } from "@/lib/filters"
 import { Skeleton } from "@/components/ui/skeleton"
 import { BrainCircuit } from "lucide-react"
@@ -12,6 +14,10 @@ interface Props {
 }
 
 async function TierMonitorBody({ filters }: Props) {
+  const jar = await cookies()
+  const locale = resolveLocale(jar.get("locale")?.value)
+  const isAr = locale === "ar"
+
   const data = await getTierMonitorData(filters)
 
   return (
@@ -21,16 +27,16 @@ async function TierMonitorBody({ filters }: Props) {
       actions={
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <BrainCircuit className="size-3.5" aria-hidden />
-          <span>{data.trend.length} لقطة</span>
+          <span>{data.trend.length} {isAr ? "لقطة" : "snapshots"}</span>
         </div>
       }
       footer={
         data.latest
-          ? `T1: ${data.latest.tier1Pct.toFixed(0)}% · T2: ${data.latest.tier2Pct.toFixed(0)}% · T3: ${data.latest.tier3Pct.toFixed(0)}% · انقر على نطاق المستوى للتصفية`
+          ? `T1: ${data.latest.tier1Pct.toFixed(0)}% · T2: ${data.latest.tier2Pct.toFixed(0)}% · T3: ${data.latest.tier3Pct.toFixed(0)}% · ${isAr ? "انقر على نطاق المستوى للتصفية" : "click tier band to filter"}`
           : undefined
       }
     >
-      <AdaptiveTierMonitorClient data={data} />
+      <AdaptiveTierMonitorClient data={data} locale={locale} />
     </Widget>
   )
 }

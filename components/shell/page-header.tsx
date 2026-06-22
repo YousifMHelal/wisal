@@ -1,6 +1,8 @@
+import { cookies } from "next/headers"
 import { cn } from "@/lib/utils"
 import type { KpiStatus } from "@/lib/kpi"
 import { StatusBadge } from "@/components/ui/status-badge"
+import { resolveLocale } from "@/lib/i18n"
 
 interface Crumb {
   labelEn: string
@@ -18,20 +20,29 @@ interface PageHeaderProps {
   className?: string
 }
 
-export function PageHeader({
+export async function PageHeader({
+  titleEn,
   titleAr,
+  subtitleEn,
   subtitleAr,
   crumbs,
   status,
   actions,
   className,
 }: PageHeaderProps) {
+  const jar = await cookies()
+  const locale = resolveLocale(jar.get("locale")?.value)
+  const isAr = locale === "ar"
+  const dir = isAr ? "rtl" : "ltr"
+
+  const title = isAr ? titleAr : titleEn
+  const subtitle = isAr ? subtitleAr : subtitleEn
+
   return (
     <div className={cn("mb-6 flex flex-col gap-1.5 sm:flex-row sm:items-start sm:justify-between", className)}>
       <div className="min-w-0 flex-1 space-y-1">
-        {/* Breadcrumbs */}
         {crumbs && crumbs.length > 0 && (
-          <nav aria-label="breadcrumb" dir="rtl">
+          <nav aria-label="breadcrumb" dir={dir}>
             <ol className="flex items-center gap-1.5 flex-wrap">
               {crumbs.map((crumb, i) => (
                 <li key={i} className="flex items-center gap-1.5">
@@ -41,7 +52,7 @@ export function PageHeader({
                     </span>
                   )}
                   <span className="text-[11px] font-medium text-muted-foreground/50 tracking-wide">
-                    {crumb.labelAr}
+                    {isAr ? crumb.labelAr : crumb.labelEn}
                   </span>
                 </li>
               ))}
@@ -49,23 +60,20 @@ export function PageHeader({
           </nav>
         )}
 
-        {/* Title */}
-        <div className="flex items-center gap-3 flex-wrap" dir="rtl">
+        <div className="flex items-center gap-3 flex-wrap" dir={dir}>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground leading-tight">
-            {titleAr}
+            {title}
           </h1>
           {status && <StatusBadge status={status} dot className="shrink-0" />}
         </div>
 
-        {/* Subtitle */}
-        {subtitleAr && (
-          <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl" dir="rtl">
-            {subtitleAr}
+        {subtitle && (
+          <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl" dir={dir}>
+            {subtitle}
           </p>
         )}
       </div>
 
-      {/* Actions */}
       {actions && (
         <div className="flex items-center gap-2 shrink-0 sm:ms-4 mt-2 sm:mt-0">
           {actions}

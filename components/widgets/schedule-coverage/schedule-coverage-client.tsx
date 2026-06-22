@@ -7,8 +7,14 @@ import { format } from "date-fns"
 import { resolveShiftSwap } from "@/lib/actions/workforce"
 import type { HourSlot, ShiftSwapRow } from "@/lib/queries/workforce"
 
-function hourLabel(h: number): string {
+function hourLabelAr(h: number): string {
   const ampm = h < 12 ? "ص" : "م"
+  const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h
+  return `${h12}${ampm}`
+}
+
+function hourLabelEn(h: number): string {
+  const ampm = h < 12 ? "am" : "pm"
   const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h
   return `${h12}${ampm}`
 }
@@ -16,9 +22,12 @@ function hourLabel(h: number): string {
 interface CoverageBarProps {
   slot: HourSlot
   showLabel: boolean
+  isAr: boolean
 }
 
-function CoverageBar({ slot, showLabel }: CoverageBarProps) {
+function CoverageBar({ slot, showLabel, isAr }: CoverageBarProps) {
+  const hourFn = isAr ? hourLabelAr : hourLabelEn
+
   if (slot.forecastDemand === 0) {
     return (
       <div className="flex flex-col items-end gap-1 flex-1 min-w-0">
@@ -38,7 +47,7 @@ function CoverageBar({ slot, showLabel }: CoverageBarProps) {
     ? "bg-[var(--status-red)]"
     : "bg-[var(--status-amber)]"
 
-  const label = `${hourLabel(slot.hour)}: ${slot.staffed}/${slot.forecastDemand}`
+  const label = `${hourFn(slot.hour)}: ${slot.staffed}/${slot.forecastDemand}`
 
   return (
     <div className="flex flex-col items-end gap-1 flex-1 min-w-0 group" title={label}>
@@ -49,7 +58,7 @@ function CoverageBar({ slot, showLabel }: CoverageBarProps) {
         />
       </div>
       <span className="text-[9px] text-muted-foreground tabular-nums leading-none h-3 flex items-center self-center">
-        {showLabel ? hourLabel(slot.hour) : ""}
+        {showLabel ? hourFn(slot.hour) : ""}
       </span>
     </div>
   )
@@ -57,9 +66,10 @@ function CoverageBar({ slot, showLabel }: CoverageBarProps) {
 
 interface SwapCardProps {
   swap: ShiftSwapRow
+  isAr: boolean
 }
 
-function SwapCard({ swap }: SwapCardProps) {
+function SwapCard({ swap, isAr }: SwapCardProps) {
   const [isPending, startTransition] = useTransition()
   const [resolved, setResolved] = useState<"APPROVE" | "REJECT" | null>(null)
 
@@ -80,7 +90,12 @@ function SwapCard({ swap }: SwapCardProps) {
           ? <Check className="size-3.5 text-[var(--status-green-fg)]" />
           : <X className="size-3.5 text-[var(--status-red-fg)]" />
         }
-        <span>{swap.agentName} — تبديل {resolved === "APPROVE" ? "موافق عليه" : "مرفوض"}</span>
+        <span>
+          {swap.agentName} —{" "}
+          {isAr
+            ? `تبديل ${resolved === "APPROVE" ? "موافق عليه" : "مرفوض"}`
+            : `swap ${resolved === "APPROVE" ? "approved" : "rejected"}`}
+        </span>
       </div>
     )
   }
@@ -103,20 +118,20 @@ function SwapCard({ swap }: SwapCardProps) {
           disabled={isPending}
           onClick={() => handleAction("REJECT")}
           className="inline-flex items-center gap-1 h-7 px-2.5 rounded-md border border-[var(--status-red)] text-xs font-medium text-[var(--status-red-fg)] bg-[var(--status-red-bg)] hover:bg-[var(--status-red)]/20 transition-colors duration-150 cursor-pointer disabled:opacity-50"
-          aria-label={`رفض تبديل ${swap.agentName}`}
+          aria-label={isAr ? `رفض تبديل ${swap.agentName}` : `Reject swap for ${swap.agentName}`}
         >
           <X className="size-3" aria-hidden />
-          رفض
+          {isAr ? "رفض" : "Reject"}
         </button>
         <button
           type="button"
           disabled={isPending}
           onClick={() => handleAction("APPROVE")}
           className="inline-flex items-center gap-1 h-7 px-2.5 rounded-md border border-[var(--status-green)] text-xs font-medium text-[var(--status-green-fg)] bg-[var(--status-green-bg)] hover:bg-[var(--status-green)]/20 transition-colors duration-150 cursor-pointer disabled:opacity-50"
-          aria-label={`الموافقة على تبديل ${swap.agentName}`}
+          aria-label={isAr ? `الموافقة على تبديل ${swap.agentName}` : `Approve swap for ${swap.agentName}`}
         >
           <Check className="size-3" aria-hidden />
-          موافقة
+          {isAr ? "موافقة" : "Approve"}
         </button>
       </div>
     </div>
@@ -126,9 +141,11 @@ function SwapCard({ swap }: SwapCardProps) {
 interface Props {
   slots: HourSlot[]
   swaps: ShiftSwapRow[]
+  locale?: string
 }
 
-export function ScheduleCoverageClient({ slots, swaps }: Props) {
+export function ScheduleCoverageClient({ slots, swaps, locale = "ar" }: Props) {
+  const isAr = locale === "ar"
   const [view, setView] = useState<"day" | "peak">("day")
 
   const displaySlots = view === "peak"
@@ -145,15 +162,15 @@ export function ScheduleCoverageClient({ slots, swaps }: Props) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-5">
           <div>
-            <p className="text-[11px] text-muted-foreground">التغطية</p>
+            <p className="text-[11px] text-muted-foreground">{isAr ? "التغطية" : "Coverage"}</p>
             <p className="text-xl font-bold tabular-nums text-foreground leading-tight">{coveragePct}%</p>
           </div>
           <div>
-            <p className="text-[11px] text-muted-foreground">الموظفون</p>
+            <p className="text-[11px] text-muted-foreground">{isAr ? "الموظفون" : "Staffed"}</p>
             <p className="text-xl font-bold tabular-nums text-foreground leading-tight">{totalStaffed}</p>
           </div>
           <div>
-            <p className="text-[11px] text-muted-foreground">التوقع</p>
+            <p className="text-[11px] text-muted-foreground">{isAr ? "التوقع" : "Forecast"}</p>
             <p className="text-xl font-bold tabular-nums text-muted-foreground leading-tight">{totalForecast}</p>
           </div>
         </div>
@@ -169,7 +186,7 @@ export function ScheduleCoverageClient({ slots, swaps }: Props) {
                   : "bg-card text-muted-foreground hover:bg-muted"
               }`}
             >
-              {v === "day" ? "٢٤ ساعة" : "ذروة (٧–٢٢)"}
+              {v === "day" ? (isAr ? "٢٤ ساعة" : "24h") : (isAr ? "ذروة (٧–٢٢)" : "Peak (7–22)")}
             </button>
           ))}
         </div>
@@ -179,25 +196,26 @@ export function ScheduleCoverageClient({ slots, swaps }: Props) {
       <div className="flex items-center gap-4 text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5">
           <span className="size-2 rounded-full bg-status-green inline-block" />
-          فائض توظيف
+          {isAr ? "فائض توظيف" : "Overstaffed"}
         </span>
         <span className="flex items-center gap-1.5">
           <span className="size-2 rounded-full bg-status-amber inline-block" />
-          في الهدف
+          {isAr ? "في الهدف" : "On target"}
         </span>
         <span className="flex items-center gap-1.5">
           <span className="size-2 rounded-full bg-status-red inline-block" />
-          نقص توظيف
+          {isAr ? "نقص توظيف" : "Understaffed"}
         </span>
       </div>
 
       {/* Bar chart */}
       <div className="flex items-end gap-px">
-        {displaySlots.map((slot, i) => (
+        {displaySlots.map((slot) => (
           <CoverageBar
             key={slot.hour}
             slot={slot}
             showLabel={slot.hour % 4 === 0}
+            isAr={isAr}
           />
         ))}
       </div>
@@ -207,7 +225,7 @@ export function ScheduleCoverageClient({ slots, swaps }: Props) {
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              طلبات تبديل الوردية المعلقة
+              {isAr ? "طلبات تبديل الوردية المعلقة" : "Pending Shift Swap Requests"}
             </h3>
             <Badge variant="outline" className="text-xs">
               {swaps.length}
@@ -215,7 +233,7 @@ export function ScheduleCoverageClient({ slots, swaps }: Props) {
           </div>
           <div className="flex flex-col gap-2">
             {swaps.map((swap) => (
-              <SwapCard key={swap.id} swap={swap} />
+              <SwapCard key={swap.id} swap={swap} isAr={isAr} />
             ))}
           </div>
         </div>

@@ -10,17 +10,19 @@ import { setArticleStatus } from "@/lib/actions/governance"
 import type { KnowledgeArticleRow } from "@/lib/queries/governance"
 
 const STATUS_CONFIG = {
-  DRAFT: { label: "مسودة", className: "bg-muted text-muted-foreground border-border" },
-  PUBLISHED: { label: "منشور", className: "bg-status-green/15 text-status-green-fg border-status-green/30" },
-  UNPUBLISHED: { label: "غير منشور", className: "bg-status-amber/15 text-status-amber-fg border-status-amber/30" },
+  DRAFT: { labelAr: "مسودة", labelEn: "Draft", className: "bg-muted text-muted-foreground border-border" },
+  PUBLISHED: { labelAr: "منشور", labelEn: "Published", className: "bg-status-green/15 text-status-green-fg border-status-green/30" },
+  UNPUBLISHED: { labelAr: "غير منشور", labelEn: "Unpublished", className: "bg-status-amber/15 text-status-amber-fg border-status-amber/30" },
 } as const
 
 interface Props {
   rows: KnowledgeArticleRow[]
   canPublish: boolean
+  locale?: string
 }
 
-export function KnowledgeBaseClient({ rows, canPublish }: Props) {
+export function KnowledgeBaseClient({ rows, canPublish, locale = "ar" }: Props) {
+  const isAr = locale === "ar"
   const [search, setSearch] = useState("")
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const [previewLang, setPreviewLang] = useState<Record<string, "en" | "ar">>({})
@@ -71,7 +73,7 @@ export function KnowledgeBaseClient({ rows, canPublish }: Props) {
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="ابحث في المقالات (عربي أو إنجليزي)…"
+          placeholder={isAr ? "ابحث في المقالات (عربي أو إنجليزي)…" : "Search articles (Arabic or English)…"}
           className="ps-9 h-8 text-sm"
           aria-label="Search knowledge base articles"
         />
@@ -80,7 +82,7 @@ export function KnowledgeBaseClient({ rows, canPublish }: Props) {
       {/* Article list */}
       <div className="rounded-lg border border-border divide-y divide-border overflow-hidden">
         {filtered.length === 0 && (
-          <p className="py-8 text-center text-sm text-muted-foreground">لم يتم العثور على مقالات.</p>
+          <p className="py-8 text-center text-sm text-muted-foreground">{isAr ? "لم يتم العثور على مقالات." : "No articles found."}</p>
         )}
         {filtered.map((article) => {
           const isExpanded = expanded.has(article.id)
@@ -95,7 +97,7 @@ export function KnowledgeBaseClient({ rows, canPublish }: Props) {
                 <button
                   onClick={() => toggleExpand(article.id)}
                   className="shrink-0 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                  aria-label={isExpanded ? "طي المقالة" : "توسيع المقالة"}
+                  aria-label={isExpanded ? (isAr ? "طي المقالة" : "Collapse article") : (isAr ? "توسيع المقالة" : "Expand article")}
                   aria-expanded={isExpanded}
                 >
                   {isExpanded ? (
@@ -106,19 +108,20 @@ export function KnowledgeBaseClient({ rows, canPublish }: Props) {
                 </button>
 
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate" lang="en">{article.titleEn}</p>
-                  <p className="text-xs text-muted-foreground truncate" lang="ar" dir="rtl">{article.titleAr}</p>
+                  <p className="text-sm font-medium text-foreground truncate">
+                    {isAr ? article.titleAr : article.titleEn}
+                  </p>
                 </div>
 
                 {/* Meta */}
                 <div className="hidden sm:flex items-center gap-2 shrink-0">
                   <span className="text-xs text-muted-foreground tabular-nums">v{article.version}</span>
                   <Badge variant="outline" className={`text-xs font-medium ${cfg.className}`}>
-                    {cfg.label}
+                    {isAr ? cfg.labelAr : cfg.labelEn}
                   </Badge>
                   {article.publishAt && article.status === "DRAFT" && (
                     <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      مجدول {format(article.publishAt, "dd MMM")}
+                      {isAr ? "مجدول" : "Scheduled"} {format(article.publishAt, "dd MMM")}
                     </span>
                   )}
                 </div>
@@ -133,9 +136,9 @@ export function KnowledgeBaseClient({ rows, canPublish }: Props) {
                         className="h-6 px-2 text-xs gap-1"
                         onClick={() => handleAction(article.id, "PUBLISH")}
                         disabled={pending}
-                        aria-label={`نشر ${article.titleEn}`}
+                        aria-label={`${isAr ? "نشر" : "Publish"} ${article.titleEn}`}
                       >
-                        نشر
+                        {isAr ? "نشر" : "Publish"}
                       </Button>
                     )}
                     {article.status === "PUBLISHED" && (
@@ -145,16 +148,16 @@ export function KnowledgeBaseClient({ rows, canPublish }: Props) {
                         className="h-6 px-2 text-xs text-muted-foreground"
                         onClick={() => handleAction(article.id, "UNPUBLISH")}
                         disabled={pending}
-                        aria-label={`إلغاء نشر ${article.titleEn}`}
+                        aria-label={`${isAr ? "إلغاء نشر" : "Unpublish"} ${article.titleEn}`}
                       >
-                        إلغاء النشر
+                        {isAr ? "إلغاء النشر" : "Unpublish"}
                       </Button>
                     )}
                     {result && result !== "ok" && (
                       <span className="text-xs text-status-red-fg">{result}</span>
                     )}
                     {result === "ok" && (
-                      <span className="text-xs text-status-green-fg">تم الحفظ</span>
+                      <span className="text-xs text-status-green-fg">{isAr ? "تم الحفظ" : "Saved"}</span>
                     )}
                   </div>
                 )}
@@ -167,17 +170,17 @@ export function KnowledgeBaseClient({ rows, canPublish }: Props) {
                   <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground flex-wrap gap-y-1">
                     <div className="flex items-center gap-3">
                       <span>v{article.version}</span>
-                      <Badge variant="outline" className={`${cfg.className} sm:hidden`}>{cfg.label}</Badge>
-                      {article.publisherName && <span>نشر بواسطة {article.publisherName}</span>}
-                      <span>تحديث {format(article.updatedAt, "dd MMM yyyy")}</span>
+                      <Badge variant="outline" className={`${cfg.className} sm:hidden`}>{isAr ? cfg.labelAr : cfg.labelEn}</Badge>
+                      {article.publisherName && <span>{isAr ? "نشر بواسطة" : "Published by"} {article.publisherName}</span>}
+                      <span>{isAr ? "تحديث" : "Updated"} {format(article.updatedAt, "dd MMM yyyy")}</span>
                     </div>
                     <button
                       onClick={() => toggleLang(article.id)}
                       className="inline-flex items-center gap-1 text-xs text-primary hover:underline cursor-pointer"
-                      aria-label={`تبديل المعاينة إلى ${lang === "en" ? "عربي" : "إنجليزي"}`}
+                      aria-label={lang === "en" ? "Switch preview to Arabic" : "Switch preview to English"}
                     >
                       <Globe className="size-3" aria-hidden />
-                      {lang === "en" ? "عربي" : "إنجليزي"}
+                      {lang === "en" ? "AR" : "EN"}
                     </button>
                   </div>
 
@@ -197,8 +200,10 @@ export function KnowledgeBaseClient({ rows, canPublish }: Props) {
       </div>
 
       <p className="text-xs text-muted-foreground text-end tabular-nums">
-        {filtered.length} من {rows.length} مقالة
-        {!canPublish && " · للقراءة فقط (النشر يتطلب دور الامتثال)"}
+        {isAr
+          ? `${filtered.length} من ${rows.length} مقالة`
+          : `${filtered.length} of ${rows.length} articles`}
+        {!canPublish && (isAr ? " · للقراءة فقط (النشر يتطلب دور الامتثال)" : " · read-only (publishing requires Compliance role)")}
       </p>
     </div>
   )

@@ -19,6 +19,7 @@ import { formatDistanceToNow } from "date-fns"
 
 interface Props {
   data: IncidentRow[]
+  locale?: string
 }
 
 const SEVERITY_ICON: Record<string, React.ReactNode> = {
@@ -39,10 +40,12 @@ function TimeAgo({ date }: { date: Date }) {
   )
 }
 
-function TrendMiniChart({ trend }: { trend: { label: string; value: number }[] }) {
+function TrendMiniChart({ trend, isAr }: { trend: { label: string; value: number }[]; isAr: boolean }) {
   if (!trend.length) {
     return (
-      <p className="text-xs text-muted-foreground italic py-2">لا توجد بيانات اتجاه.</p>
+      <p className="text-xs text-muted-foreground italic py-2">
+        {isAr ? "لا توجد بيانات اتجاه." : "No trend data available."}
+      </p>
     )
   }
 
@@ -87,9 +90,10 @@ function TrendMiniChart({ trend }: { trend: { label: string; value: number }[] }
 
 interface IncidentItemProps {
   incident: IncidentRow
+  isAr: boolean
 }
 
-function IncidentItem({ incident }: IncidentItemProps) {
+function IncidentItem({ incident, isAr }: IncidentItemProps) {
   const [expanded, setExpanded] = useState(false)
   const [pending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -134,7 +138,9 @@ function IncidentItem({ incident }: IncidentItemProps) {
 
           <div className="flex items-center gap-3 mt-1.5 flex-wrap">
             {incident.clusterName && (
-              <span className="text-xs text-muted-foreground">{incident.clusterName}</span>
+              <span className="text-xs text-muted-foreground">
+                {isAr ? (incident.clusterNameAr ?? incident.clusterName) : incident.clusterName}
+              </span>
             )}
             {incident.channelType && (
               <span className="text-xs text-muted-foreground">{incident.channelType.replace("_", " ")}</span>
@@ -150,7 +156,9 @@ function IncidentItem({ incident }: IncidentItemProps) {
               aria-controls={`trend-${incident.id}`}
             >
               {expanded ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
-              {expanded ? "إخفاء الاتجاه" : "عرض الاتجاه"}
+              {expanded
+                ? (isAr ? "إخفاء الاتجاه" : "Hide trend")
+                : (isAr ? "عرض الاتجاه" : "View trend")}
             </button>
 
             {!acknowledged && !incident.acknowledgedAt && (
@@ -163,13 +171,17 @@ function IncidentItem({ incident }: IncidentItemProps) {
                   className="h-6 text-xs px-2 cursor-pointer"
                   aria-label={`Acknowledge incident: ${incident.type}`}
                 >
-                  {pending ? "جارٍ الإقرار…" : "إقرار"}
+                  {pending
+                    ? (isAr ? "جارٍ الإقرار…" : "Acknowledging…")
+                    : (isAr ? "إقرار" : "Acknowledge")}
                 </Button>
               </form>
             )}
 
             {(acknowledged || incident.acknowledgedAt) && (
-              <span className="text-xs text-status-green-fg">✓ تم الإقرار</span>
+              <span className="text-xs text-status-green-fg">
+                ✓ {isAr ? "تم الإقرار" : "Acknowledged"}
+              </span>
             )}
           </div>
 
@@ -179,7 +191,7 @@ function IncidentItem({ incident }: IncidentItemProps) {
 
           {expanded && (
             <div id={`trend-${incident.id}`} className="mt-3 border-t pt-3">
-              <TrendMiniChart trend={incident.metricTrend} />
+              <TrendMiniChart trend={incident.metricTrend} isAr={isAr} />
             </div>
           )}
         </div>
@@ -188,11 +200,15 @@ function IncidentItem({ incident }: IncidentItemProps) {
   )
 }
 
-export function ActiveIncidentsClient({ data }: Props) {
+export function ActiveIncidentsClient({ data, locale = "ar" }: Props) {
+  const isAr = locale === "ar"
+
   if (!data.length) {
     return (
       <div className="flex items-center justify-center min-h-30">
-        <p className="text-sm text-status-green-fg">✓ لا توجد حوادث نشطة</p>
+        <p className="text-sm text-status-green-fg">
+          ✓ {isAr ? "لا توجد حوادث نشطة" : "No active incidents"}
+        </p>
       </div>
     )
   }
@@ -202,9 +218,12 @@ export function ActiveIncidentsClient({ data }: Props) {
   const sorted = [...critical, ...warnings]
 
   return (
-    <ul className="space-y-2" aria-label="الحوادث النشطة مرتبة حسب الخطورة">
+    <ul
+      className="space-y-2"
+      aria-label={isAr ? "الحوادث النشطة مرتبة حسب الخطورة" : "Active incidents sorted by severity"}
+    >
       {sorted.map((inc) => (
-        <IncidentItem key={inc.id} incident={inc} />
+        <IncidentItem key={inc.id} incident={inc} isAr={isAr} />
       ))}
     </ul>
   )

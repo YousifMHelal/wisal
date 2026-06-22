@@ -14,10 +14,15 @@ function sentimentColor(s: number): string {
   return "var(--status-red)"
 }
 
-function sentimentLabel(s: number): string {
-  if (s >= 0.3) return "إيجابي"
-  if (s >= -0.2) return "محايد"
-  return "سلبي"
+function sentimentLabel(s: number, isAr: boolean): string {
+  if (isAr) {
+    if (s >= 0.3) return "إيجابي"
+    if (s >= -0.2) return "محايد"
+    return "سلبي"
+  }
+  if (s >= 0.3) return "Positive"
+  if (s >= -0.2) return "Neutral"
+  return "Negative"
 }
 
 function sentimentBg(s: number): string {
@@ -27,7 +32,6 @@ function sentimentBg(s: number): string {
 }
 
 function SentimentBar({ value }: { value: number }) {
-  // value: -1 to 1; map to 0–100% fill
   const pct = ((value + 1) / 2) * 100
   const color = sentimentColor(value)
   return (
@@ -72,9 +76,9 @@ function Sparkline({ trend }: SparklineProps) {
   )
 }
 
-interface ThemeCardProps { theme: VoiceTheme }
+interface ThemeCardProps { theme: VoiceTheme; isAr: boolean }
 
-function ThemeCard({ theme }: ThemeCardProps) {
+function ThemeCard({ theme, isAr }: ThemeCardProps) {
   const [expanded, setExpanded] = useState(false)
 
   return (
@@ -92,13 +96,13 @@ function ThemeCard({ theme }: ThemeCardProps) {
             <span className="hidden [html[dir=rtl]_&]:inline">{theme.themeAr}</span>
           </p>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {sentimentLabel(theme.sentiment)} · {(theme.sentiment * 100).toFixed(0)}%
+            {sentimentLabel(theme.sentiment, isAr)} · {(theme.sentiment * 100).toFixed(0)}%
           </p>
         </div>
         <button
           onClick={() => setExpanded((e) => !e)}
           className="shrink-0 p-1 rounded-md hover:bg-black/10 dark:hover:bg-white/10 transition-colors cursor-pointer"
-          aria-label={expanded ? "طي" : "توسيع"}
+          aria-label={expanded ? (isAr ? "طي" : "Collapse") : (isAr ? "توسيع" : "Expand")}
           aria-expanded={expanded}
         >
           {expanded ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
@@ -120,7 +124,9 @@ function ThemeCard({ theme }: ThemeCardProps) {
           {/* trend sparkline */}
           {theme.weekTrend.length > 1 && (
             <div>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">اتجاه الشعور لـ ٤ أسابيع</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">
+                {isAr ? "اتجاه الشعور لـ ٤ أسابيع" : "4-Week Sentiment Trend"}
+              </p>
               <Sparkline trend={theme.weekTrend} />
             </div>
           )}
@@ -128,7 +134,9 @@ function ThemeCard({ theme }: ThemeCardProps) {
           {/* anonymized examples */}
           {theme.examples.length > 0 && (
             <div className="space-y-1.5">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">أمثلة مجهولة الهوية</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
+                {isAr ? "أمثلة مجهولة الهوية" : "Anonymized Examples"}
+              </p>
               {theme.examples.slice(0, 3).map((ex, i) => (
                 <div key={i} className="flex items-start gap-2 text-xs text-foreground/80">
                   <MessageSquareQuote className="size-3.5 shrink-0 mt-0.5 text-muted-foreground" />
@@ -143,13 +151,17 @@ function ThemeCard({ theme }: ThemeCardProps) {
   )
 }
 
-interface Props { themes: VoiceTheme[] }
+interface Props { themes: VoiceTheme[]; locale?: string }
 
-export function BeneficiaryVoiceClient({ themes }: Props) {
+export function BeneficiaryVoiceClient({ themes, locale = "ar" }: Props) {
+  const isAr = locale === "ar"
+
   if (!themes.length) {
     return (
       <div className="flex items-center justify-center min-h-30">
-        <p className="text-sm text-muted-foreground">لا توجد موضوعات صوت المستفيدين.</p>
+        <p className="text-sm text-muted-foreground">
+          {isAr ? "لا توجد موضوعات صوت المستفيدين." : "No beneficiary voice themes found."}
+        </p>
       </div>
     )
   }
@@ -157,7 +169,7 @@ export function BeneficiaryVoiceClient({ themes }: Props) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
       {themes.map((t) => (
-        <ThemeCard key={t.id} theme={t} />
+        <ThemeCard key={t.id} theme={t} isAr={isAr} />
       ))}
     </div>
   )

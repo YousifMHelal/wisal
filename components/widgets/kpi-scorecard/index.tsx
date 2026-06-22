@@ -1,12 +1,18 @@
 import { Suspense } from "react"
+import { cookies } from "next/headers"
 import { Widget, WidgetSkeleton, WidgetLocked } from "@/components/widgets/widget"
 import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { checkRole } from "@/lib/auth"
 import { getKpiScorecardData } from "@/lib/queries/executive"
 import { KpiScorecardClient } from "./kpi-scorecard-client"
+import { resolveLocale } from "@/lib/i18n"
 
 async function KpiScorecardBody() {
+  const jar = await cookies()
+  const locale = resolveLocale(jar.get("locale")?.value)
+  const isAr = locale === "ar"
+
   const allowed = await checkRole("EXECUTIVE")
   if (!allowed) {
     return (
@@ -22,9 +28,11 @@ async function KpiScorecardBody() {
     <Widget
       title="National KPI Scorecard"
       titleAr="مؤشرات الأداء الوطنية"
-      footer="هذا الأسبوع مقابل الهدف مقابل الأسبوع الماضي · انقر على البطاقة للوحدة المسؤولة"
+      footer={isAr
+        ? "هذا الأسبوع مقابل الهدف مقابل الأسبوع الماضي · انقر على البطاقة للوحدة المسؤولة"
+        : "This week vs. target vs. last week · click a card to navigate to the owning module"}
     >
-      <KpiScorecardClient rows={rows} />
+      <KpiScorecardClient rows={rows} locale={locale} />
     </Widget>
   )
 }

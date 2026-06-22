@@ -1,9 +1,11 @@
 import { Suspense } from "react"
+import { cookies } from "next/headers"
 import { Widget, WidgetSkeleton, WidgetLocked } from "@/components/widgets/widget"
 import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getMedicalApprovalData } from "@/lib/queries/governance"
 import { checkRole } from "@/lib/auth"
 import { MedicalApprovalLogClient } from "./medical-approval-log-client"
+import { resolveLocale } from "@/lib/i18n"
 import type { Filters } from "@/lib/filters"
 import { Skeleton } from "@/components/ui/skeleton"
 interface Props {
@@ -20,6 +22,10 @@ function buildExportQs(filters: Filters): string {
 }
 
 async function MedicalApprovalLogBody({ filters }: Props) {
+  const jar = await cookies()
+  const locale = resolveLocale(jar.get("locale")?.value)
+  const isAr = locale === "ar"
+
   const allowed = await checkRole("COMPLIANCE")
   if (!allowed) {
     return (
@@ -37,11 +43,15 @@ async function MedicalApprovalLogBody({ filters }: Props) {
       title="Medical Content Approval Log"
       titleAr="سجل اعتماد المحتوى الطبي"
       actions={
-        <span className="text-xs text-muted-foreground tabular-nums">{rows.length} سجل</span>
+        <span className="text-xs text-muted-foreground tabular-nums">
+          {rows.length} {isAr ? "سجل" : "records"}
+        </span>
       }
-      footer="الحوكمة والامتثال · يتطلب دور الامتثال · جميع السجلات مدرجة في سجل التدقيق"
+      footer={isAr
+        ? "الحوكمة والامتثال · يتطلب دور الامتثال · جميع السجلات مدرجة في سجل التدقيق"
+        : "Governance & compliance · requires Compliance role · all records in audit log"}
     >
-      <MedicalApprovalLogClient rows={rows} exportUrl={exportUrl} />
+      <MedicalApprovalLogClient rows={rows} exportUrl={exportUrl} locale={locale} />
     </Widget>
   )
 }

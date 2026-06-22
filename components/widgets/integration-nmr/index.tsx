@@ -1,12 +1,18 @@
 import { Suspense } from "react"
+import { cookies } from "next/headers"
 import { Widget, WidgetSkeleton, WidgetLocked } from "@/components/widgets/widget"
 import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { checkRole } from "@/lib/auth"
 import { getIntegrationStatusData } from "@/lib/queries/operations"
 import { IntegrationNmrClient } from "./integration-nmr-client"
+import { resolveLocale } from "@/lib/i18n"
 
 async function IntegrationNmrBody() {
+  const jar = await cookies()
+  const locale = resolveLocale(jar.get("locale")?.value)
+  const isAr = locale === "ar"
+
   const allowed = await checkRole("PLATFORM_ADMIN")
   if (!allowed) {
     return (
@@ -22,9 +28,11 @@ async function IntegrationNmrBody() {
     <Widget
       title="Integration & NMR Status"
       titleAr="حالة التكاملات وـ NMR"
-      footer="صحة مصفوفة التكاملات · NMR = تغذية API مباشرة · لا وصلات مباشرة"
+      footer={isAr
+        ? "صحة مصفوفة التكاملات · NMR = تغذية API مباشرة · لا وصلات مباشرة"
+        : "Integration matrix health · NMR = live API feed · no direct system-to-system links"}
     >
-      <IntegrationNmrClient rows={rows} />
+      <IntegrationNmrClient rows={rows} locale={locale} />
     </Widget>
   )
 }

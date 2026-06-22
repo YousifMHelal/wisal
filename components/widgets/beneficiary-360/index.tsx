@@ -1,15 +1,21 @@
 import { Suspense } from "react"
+import { cookies } from "next/headers"
 import { Widget, WidgetLocked } from "@/components/widgets/widget"
 import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { checkRole } from "@/lib/auth"
 import { Beneficiary360Client } from "./beneficiary-360-client"
+import { resolveLocale } from "@/lib/i18n"
 
 interface Props {
   beneficiaryId?: string
 }
 
 async function Beneficiary360Body({ beneficiaryId }: Props) {
+  const jar = await cookies()
+  const locale = resolveLocale(jar.get("locale")?.value)
+  const isAr = locale === "ar"
+
   const allowed = await checkRole("SUPERVISOR")
   if (!allowed) {
     return (
@@ -23,9 +29,11 @@ async function Beneficiary360Body({ beneficiaryId }: Props) {
     <Widget
       title="Beneficiary 360"
       titleAr="ملف المستفيد الشامل"
-      footer="ابحث برقم الهوية (الإقامة) أو الاسم · سجل التفاعلات عبر القنوات · التذاكر النشطة"
+      footer={isAr
+        ? "ابحث برقم الهوية (الإقامة) أو الاسم · سجل التفاعلات عبر القنوات · التذاكر النشطة"
+        : "Search by national ID (iqama) or name · cross-channel interaction history · active tickets"}
     >
-      <Beneficiary360Client initialBeneficiaryId={beneficiaryId} />
+      <Beneficiary360Client initialBeneficiaryId={beneficiaryId} locale={locale} />
     </Widget>
   )
 }

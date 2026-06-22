@@ -27,12 +27,11 @@ interface CustomTooltipProps {
   label?: string
 }
 
-function SavingsTooltip({ active, payload, label }: CustomTooltipProps) {
+function SavingsTooltipAr({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload?.length) return null
   const agentHrs = payload.find((p) => p.name === "agentHoursSaved")?.value ?? 0
   const volume = payload.find((p) => p.name === "aiResolvedVolume")?.value ?? 0
   const ahtSaved = payload.find((p) => p.name === "estimatedHoursSaved")?.value ?? 0
-
   return (
     <div className="rounded-lg border border-border bg-card p-3 shadow-xl text-xs space-y-1.5 min-w-[200px]">
       <p className="font-medium text-foreground">{label}</p>
@@ -48,12 +47,34 @@ function SavingsTooltip({ active, payload, label }: CustomTooltipProps) {
   )
 }
 
+function SavingsTooltipEn({ active, payload, label }: CustomTooltipProps) {
+  if (!active || !payload?.length) return null
+  const agentHrs = payload.find((p) => p.name === "agentHoursSaved")?.value ?? 0
+  const volume = payload.find((p) => p.name === "aiResolvedVolume")?.value ?? 0
+  const ahtSaved = payload.find((p) => p.name === "estimatedHoursSaved")?.value ?? 0
+  return (
+    <div className="rounded-lg border border-border bg-card p-3 shadow-xl text-xs space-y-1.5 min-w-[200px]">
+      <p className="font-medium text-foreground">{label}</p>
+      <div className="space-y-1 text-muted-foreground">
+        <p>Agent hours saved: <span className="tabular-nums text-foreground font-medium">{agentHrs.toFixed(1)} hrs</span></p>
+        <p>AI resolved volume: <span className="tabular-nums text-foreground font-medium">{volume.toLocaleString()}</span></p>
+        <p>Est. hours saved (vol × AHT): <span className="tabular-nums text-foreground font-medium">{ahtSaved.toFixed(1)} hrs</span></p>
+      </div>
+      <p className="text-[10px] text-muted-foreground border-t border-border pt-1">
+        Calc: AI resolved volume × avg handle time saved ÷ 3600
+      </p>
+    </div>
+  )
+}
+
 interface Props {
   data: SavingsPoint[]
   filters: Filters
+  locale?: string
 }
 
-export function SavingsTrackerClient({ data, filters }: Props) {
+export function SavingsTrackerClient({ data, filters, locale = "ar" }: Props) {
+  const isAr = locale === "ar"
   const [isPending, startTransition] = useTransition()
 
   const chartData = data.map((d) => ({
@@ -81,7 +102,9 @@ export function SavingsTrackerClient({ data, filters }: Props) {
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[200px]">
-        <p className="text-sm text-muted-foreground">لا توجد بيانات توفير لهذه الفترة.</p>
+        <p className="text-sm text-muted-foreground">
+          {isAr ? "لا توجد بيانات توفير لهذه الفترة." : "No savings data for this period."}
+        </p>
       </div>
     )
   }
@@ -98,7 +121,7 @@ export function SavingsTrackerClient({ data, filters }: Props) {
           className="gap-2 cursor-pointer"
         >
           {isPending ? <Loader2 className="size-3.5 animate-spin" /> : <Download className="size-3.5" />}
-          تصدير للمجلس
+          {isAr ? "تصدير للمجلس" : "Export for Board"}
         </Button>
       </div>
 
@@ -129,15 +152,21 @@ export function SavingsTrackerClient({ data, filters }: Props) {
             axisLine={false}
             width={40}
           />
-          <Tooltip content={<SavingsTooltip />} />
+          <Tooltip content={isAr ? <SavingsTooltipAr /> : <SavingsTooltipEn />} />
           <Legend
             wrapperStyle={{ fontSize: 11, color: "var(--color-muted-foreground)" }}
             formatter={(value) =>
-              value === "agentHoursSaved"
-                ? "ساعات الموظفين الموفرة"
-                : value === "estimatedHoursSaved"
-                ? "الساعات المقدرة (حجم × AHT)"
-                : value
+              isAr
+                ? value === "agentHoursSaved"
+                  ? "ساعات الموظفين الموفرة"
+                  : value === "estimatedHoursSaved"
+                  ? "الساعات المقدرة (حجم × AHT)"
+                  : value
+                : value === "agentHoursSaved"
+                  ? "Agent Hours Saved"
+                  : value === "estimatedHoursSaved"
+                  ? "Est. Hours (vol × AHT)"
+                  : value
             }
           />
           <Area

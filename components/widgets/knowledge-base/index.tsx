@@ -1,9 +1,11 @@
 import { Suspense } from "react"
+import { cookies } from "next/headers"
 import { Widget, WidgetSkeleton } from "@/components/widgets/widget"
 import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { getKnowledgeBaseData } from "@/lib/queries/governance"
 import { checkRole } from "@/lib/auth"
 import { KnowledgeBaseClient } from "./knowledge-base-client"
+import { resolveLocale } from "@/lib/i18n"
 import type { Filters } from "@/lib/filters"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -12,6 +14,10 @@ interface Props {
 }
 
 async function KnowledgeBaseBody({ filters: _filters }: Props) {
+  const jar = await cookies()
+  const locale = resolveLocale(jar.get("locale")?.value)
+  const isAr = locale === "ar"
+
   const [rows, canPublish] = await Promise.all([
     getKnowledgeBaseData(),
     checkRole("COMPLIANCE"),
@@ -26,16 +32,20 @@ async function KnowledgeBaseBody({ filters: _filters }: Props) {
       titleAr="قاعدة المعرفة"
       actions={
         <span className="text-xs text-muted-foreground tabular-nums">
-          {publishedCount} منشور · {draftCount} مسودة
+          {isAr
+            ? `${publishedCount} منشور · ${draftCount} مسودة`
+            : `${publishedCount} published · ${draftCount} draft`}
         </span>
       }
-      footer={
-        canPublish
+      footer={isAr
+        ? canPublish
           ? "ثنائي اللغة · تتبع الإصدارات · النشر يتطلب دور الامتثال · جميع التغييرات مسجّلة"
           : "ثنائي اللغة · تتبع الإصدارات · عرض للقراءة فقط"
-      }
+        : canPublish
+          ? "Bilingual · version tracking · publishing requires Compliance role · all changes logged"
+          : "Bilingual · version tracking · read-only view"}
     >
-      <KnowledgeBaseClient rows={rows} canPublish={canPublish} />
+      <KnowledgeBaseClient rows={rows} canPublish={canPublish} locale={locale} />
     </Widget>
   )
 }

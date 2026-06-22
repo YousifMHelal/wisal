@@ -70,7 +70,6 @@ function ArcGauge({
 
 interface SubGaugeProps {
   label: string
-  labelAr?: string
   value: number
   target: number
   unit: string
@@ -81,7 +80,6 @@ interface SubGaugeProps {
 
 export function SubGauge({
   label,
-  labelAr,
   value,
   target,
   unit,
@@ -116,7 +114,12 @@ export function SubGauge({
       <span className="text-lg font-semibold tabular text-foreground leading-none">{displayValue}</span>
       <span className="text-xs text-muted-foreground text-center leading-tight">{label}</span>
       <span className="text-xs text-muted-foreground tabular">
-        الهدف: {unit === "s" && target >= 60 ? `${(target / 60).toFixed(1)}د` : `${target}${unit}`}
+        <span lang="en" className="[html[dir=rtl]_&]:hidden">
+          Target: {unit === "s" && target >= 60 ? `${(target / 60).toFixed(1)}m` : `${target}${unit}`}
+        </span>
+        <span lang="ar" className="hidden [html[dir=rtl]_&]:inline">
+          الهدف: {unit === "s" && target >= 60 ? `${(target / 60).toFixed(1)}د` : `${target}${unit}`}
+        </span>
       </span>
     </button>
   )
@@ -136,13 +139,22 @@ function worstStatus(statuses: KpiStatus[]): KpiStatus {
 }
 
 const SUB_GAUGE_CONFIG = [
-  { key: "serviceLevel" as const, label: "مستوى الخدمة", labelAr: "مستوى الخدمة", target: 80, unit: "%" },
-  { key: "abandonedCalls" as const, label: "المكالمات المتروكة", labelAr: "متروكة", target: 5, unit: "%" },
-  { key: "aht" as const, label: "متوسط وقت المعالجة", labelAr: "وقت المعالجة", target: 300, unit: "s" },
-  { key: "fcr" as const, label: "الحل من أول تواصل", labelAr: "الحل الأول", target: 90, unit: "%" },
+  { key: "serviceLevel" as const, label: "Service Level", labelAr: "مستوى الخدمة", target: 80, unit: "%" },
+  { key: "abandonedCalls" as const, label: "Abandoned Calls", labelAr: "متروكة", target: 5, unit: "%" },
+  { key: "aht" as const, label: "Avg Handle Time", labelAr: "وقت المعالجة", target: 300, unit: "s" },
+  { key: "fcr" as const, label: "First Contact Res.", labelAr: "الحل الأول", target: 90, unit: "%" },
 ]
 
-export function CompositeGauge({ serviceLevel, abandonedCalls, aht, fcr }: CompositeGaugeProps) {
+interface CompositeGaugeProps {
+  serviceLevel: { value: number; status: KpiStatus }
+  abandonedCalls: { value: number; status: KpiStatus }
+  aht: { value: number; status: KpiStatus }
+  fcr: { value: number; status: KpiStatus }
+  locale?: string
+}
+
+export function CompositeGauge({ serviceLevel, abandonedCalls, aht, fcr, locale = "ar" }: CompositeGaugeProps) {
+  const isAr = locale === "ar"
   const [active, setActive] = useState<string | null>(null)
 
   const data = { serviceLevel, abandonedCalls, aht, fcr }
@@ -153,7 +165,6 @@ export function CompositeGauge({ serviceLevel, abandonedCalls, aht, fcr }: Compo
 
   return (
     <div className="space-y-4">
-      {/* Hero composite arc */}
       <div className="flex flex-col items-center gap-2">
         <div className="relative">
           <ArcGauge value={overallPct} max={100} status={overall} size={120} />
@@ -161,18 +172,18 @@ export function CompositeGauge({ serviceLevel, abandonedCalls, aht, fcr }: Compo
             <StatusBadge status={overall} />
           </div>
         </div>
-        <p className="text-xs text-muted-foreground uppercase tracking-wide">الأداء الكلي اليوم</p>
+        <p className="text-xs text-muted-foreground uppercase tracking-wide">
+          {isAr ? "الأداء الكلي اليوم" : "Overall performance today"}
+        </p>
       </div>
 
-      {/* Sub-gauges grid — 2 cols mobile, 4 desktop */}
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {SUB_GAUGE_CONFIG.map((cfg) => {
           const kpiData = data[cfg.key]
           return (
             <SubGauge
               key={cfg.key}
-              label={cfg.label}
-              labelAr={cfg.labelAr}
+              label={isAr ? cfg.labelAr : cfg.label}
               value={kpiData.value}
               target={cfg.target}
               unit={cfg.unit}

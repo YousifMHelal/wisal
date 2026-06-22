@@ -50,6 +50,7 @@ interface Props {
   agentDetails: Record<string, TrainingAgentDetail>
   moduleList: string[]
   defaultModule?: string
+  locale?: string
 }
 
 export function TrainingImpactClient({
@@ -57,7 +58,9 @@ export function TrainingImpactClient({
   agentDetails,
   moduleList,
   defaultModule = "",
+  locale = "ar",
 }: Props) {
+  const isAr = locale === "ar"
   const [selectedModule, setSelectedModule] = useState(defaultModule)
   const [drilldown, setDrilldown] = useState<DrilldownData | null>(null)
 
@@ -104,13 +107,17 @@ export function TrainingImpactClient({
             className="inline-flex items-center gap-1 h-7 px-2 rounded-md border border-border text-xs text-muted-foreground hover:bg-muted transition-colors duration-150 cursor-pointer"
           >
             <ChevronLeft className="size-3" aria-hidden />
-            رجوع
+            {isAr ? "رجوع" : "Back"}
           </button>
-          <span className="text-sm font-medium text-foreground">{drilldown.agentName} — سجل التدريب</span>
+          <span className="text-sm font-medium text-foreground">
+            {drilldown.agentName} — {isAr ? "سجل التدريب" : "Training History"}
+          </span>
         </div>
 
         {trendData.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-8">لا توجد سجلات تدريب.</p>
+          <p className="text-sm text-muted-foreground text-center py-8">
+            {isAr ? "لا توجد سجلات تدريب." : "No training records."}
+          </p>
         ) : (
           <>
             <ResponsiveContainer width="100%" height={200}>
@@ -134,6 +141,7 @@ export function TrainingImpactClient({
                 <Line
                   type="monotone"
                   dataKey="QA Before"
+                  name={isAr ? "QA قبل" : "QA Before"}
                   stroke="var(--muted-foreground)"
                   strokeWidth={2}
                   dot={{ r: 3 }}
@@ -142,6 +150,7 @@ export function TrainingImpactClient({
                 <Line
                   type="monotone"
                   dataKey="QA After"
+                  name={isAr ? "QA بعد" : "QA After"}
                   stroke="var(--primary)"
                   strokeWidth={2}
                   dot={{ r: 3, fill: "var(--primary)" }}
@@ -153,10 +162,10 @@ export function TrainingImpactClient({
               <table className="w-full text-xs min-w-[360px]">
                 <thead className="sticky top-0 z-10">
                   <tr className="border-b border-border bg-muted">
-                    <th className="py-2 ps-3 text-start font-medium text-muted-foreground">الوحدة</th>
-                    <th className="py-2 px-2 text-start font-medium text-muted-foreground">تاريخ الإتمام</th>
-                    <th className="py-2 px-2 text-end font-medium text-muted-foreground tabular-nums">قبل</th>
-                    <th className="py-2 px-2 text-end font-medium text-muted-foreground tabular-nums">بعد</th>
+                    <th className="py-2 ps-3 text-start font-medium text-muted-foreground">{isAr ? "الوحدة" : "Module"}</th>
+                    <th className="py-2 px-2 text-start font-medium text-muted-foreground">{isAr ? "تاريخ الإتمام" : "Completed"}</th>
+                    <th className="py-2 px-2 text-end font-medium text-muted-foreground tabular-nums">{isAr ? "قبل" : "Before"}</th>
+                    <th className="py-2 px-2 text-end font-medium text-muted-foreground tabular-nums">{isAr ? "بعد" : "After"}</th>
                     <th className="py-2 pe-3 text-end font-medium text-muted-foreground tabular-nums">Δ</th>
                   </tr>
                 </thead>
@@ -188,26 +197,30 @@ export function TrainingImpactClient({
     <div className="flex flex-col gap-4">
       {/* Module filter */}
       <div className="flex flex-wrap items-center gap-2">
-        <label className="text-xs text-muted-foreground shrink-0">الوحدة</label>
+        <label className="text-xs text-muted-foreground shrink-0">{isAr ? "الوحدة" : "Module"}</label>
         <select
           value={selectedModule}
           onChange={(e) => onModuleChange(e.target.value)}
           className="h-8 rounded-md border border-border bg-card text-sm text-foreground px-2 cursor-pointer focus:outline-none focus:ring-1 focus:ring-ring"
-          aria-label="تصفية حسب وحدة التدريب"
+          aria-label={isAr ? "تصفية حسب وحدة التدريب" : "Filter by training module"}
         >
-          <option value="">كل الوحدات</option>
+          <option value="">{isAr ? "كل الوحدات" : "All modules"}</option>
           {moduleList.map((m) => (
             <option key={m} value={m}>{m}</option>
           ))}
         </select>
         <span className="text-xs text-muted-foreground ms-auto tabular-nums">
-          {summaries.reduce((s, m) => s + m.completions, 0)} إتمام
+          {isAr
+            ? `${summaries.reduce((s, m) => s + m.completions, 0)} إتمام`
+            : `${summaries.reduce((s, m) => s + m.completions, 0)} completions`}
         </span>
       </div>
 
       {summaries.length === 0 ? (
         <div className="flex items-center justify-center min-h-[160px]">
-          <p className="text-sm text-muted-foreground">لا توجد سجلات تدريب لهذا الاختيار.</p>
+          <p className="text-sm text-muted-foreground">
+            {isAr ? "لا توجد سجلات تدريب لهذا الاختيار." : "No training records for this selection."}
+          </p>
         </div>
       ) : (
         <>
@@ -232,14 +245,14 @@ export function TrainingImpactClient({
               <Legend wrapperStyle={{ fontSize: 10 }} />
               <Bar
                 dataKey="Avg Before"
-                name="متوسط قبل"
+                name={isAr ? "متوسط قبل" : "Avg Before"}
                 fill="var(--muted-foreground)"
                 radius={[3, 3, 0, 0]}
                 opacity={0.6}
               />
               <Bar
                 dataKey="Avg After"
-                name="متوسط بعد"
+                name={isAr ? "متوسط بعد" : "Avg After"}
                 fill="var(--primary)"
                 radius={[3, 3, 0, 0]}
               />
@@ -251,11 +264,11 @@ export function TrainingImpactClient({
             <table className="w-full text-sm min-w-[480px]">
               <thead className="sticky top-0 z-10">
                 <tr className="border-b border-border bg-muted">
-                  <th className="py-2 ps-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide">الوحدة</th>
-                  <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide tabular-nums">الإتمامات</th>
-                  <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide tabular-nums">قبل</th>
-                  <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide tabular-nums">بعد</th>
-                  <th className="py-2 pe-3 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide tabular-nums">Δ متوسط</th>
+                  <th className="py-2 ps-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide">{isAr ? "الوحدة" : "Module"}</th>
+                  <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide tabular-nums">{isAr ? "الإتمامات" : "Completions"}</th>
+                  <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide tabular-nums">{isAr ? "قبل" : "Before"}</th>
+                  <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide tabular-nums">{isAr ? "بعد" : "After"}</th>
+                  <th className="py-2 pe-3 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide tabular-nums">{isAr ? "Δ متوسط" : "Avg Δ"}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -277,7 +290,9 @@ export function TrainingImpactClient({
           {/* Agent-level drilldown: pick from available details */}
           {Object.keys(agentDetails).length > 0 && (
             <div className="flex flex-col gap-2">
-              <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">تحليل الموظف</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
+                {isAr ? "تحليل الموظف" : "Agent Drilldown"}
+              </p>
               <div className="flex flex-wrap gap-2">
                 {Object.values(agentDetails).map((d) => (
                   <button

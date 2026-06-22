@@ -1,10 +1,12 @@
 import { Suspense } from "react"
+import { cookies } from "next/headers"
 import { Widget, WidgetLocked } from "@/components/widgets/widget"
 import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { checkRole } from "@/lib/auth"
 import { getTicketQueueData, getAssignableAgents } from "@/lib/queries/workforce"
 import { TicketQueueClient } from "./ticket-queue-client"
+import { resolveLocale } from "@/lib/i18n"
 import type { Filters } from "@/lib/filters"
 
 interface Props {
@@ -12,6 +14,10 @@ interface Props {
 }
 
 async function TicketQueueBody({ filters }: Props) {
+  const jar = await cookies()
+  const locale = resolveLocale(jar.get("locale")?.value)
+  const isAr = locale === "ar"
+
   const allowed = await checkRole("SUPERVISOR")
   if (!allowed) {
     return (
@@ -36,17 +42,19 @@ async function TicketQueueBody({ filters }: Props) {
         <div className="flex items-center gap-2">
           {breachedCount > 0 && (
             <span className="text-xs text-[var(--status-red-fg)] tabular-nums font-medium">
-              {breachedCount} خرق اتفاقية الخدمة
+              {isAr ? `${breachedCount} خرق اتفاقية الخدمة` : `${breachedCount} SLA breach${breachedCount !== 1 ? "es" : ""}`}
             </span>
           )}
           <span className="text-xs text-muted-foreground tabular-nums">
-            {tickets.length} مفتوح
+            {isAr ? `${tickets.length} مفتوح` : `${tickets.length} open`}
           </span>
         </div>
       }
-      footer="الشكاوى والطلبات · الصف → ملف المستفيد ٣٦٠ · تكليف موظف يُسجّل في سجل التدقيق"
+      footer={isAr
+        ? "الشكاوى والطلبات · الصف → ملف المستفيد ٣٦٠ · تكليف موظف يُسجّل في سجل التدقيق"
+        : "Complaints & requests · queue → beneficiary 360 profile · assigning an agent is audit-logged"}
     >
-      <TicketQueueClient tickets={tickets} agents={agents} />
+      <TicketQueueClient tickets={tickets} agents={agents} locale={locale} />
     </Widget>
   )
 }

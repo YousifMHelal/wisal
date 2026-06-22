@@ -13,8 +13,10 @@ import {
   Menu,
   MapPin,
   Calendar,
-} from "lucide-react"
+  Languages,
+} from "lucide-react";
 import { signOutAction } from "@/lib/actions/auth"
+import { setLocale } from "@/lib/actions/locale";
 import { cn } from "@/lib/utils"
 import {
   DropdownMenu,
@@ -114,11 +116,12 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
+  const allClustersLabel = isAr ? "كل المجموعات" : "All Clusters"
   const clusterLabel = currentCluster
     ? (() => { const c = clusters.find((c) => c.id === currentCluster); return c ? (isAr ? c.nameAr : c.name) : currentCluster })()
-    : "كل المجموعات"
+    : allClustersLabel
 
-  const rangeLabel = DATE_RANGES.find((r) => r.value === currentRange)?.ar ?? "مباشر"
+  const rangeLabel = (() => { const r = DATE_RANGES.find((r) => r.value === currentRange); return r ? (isAr ? r.ar : r.en) : (isAr ? "مباشر" : "Live") })()
 
   return (
     <header className="h-14 flex items-center border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-30 gap-2 ps-3 pe-3">
@@ -131,8 +134,11 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
       </button>
 
       {/* Brand (mobile only) */}
-      <span className="lg:hidden text-sm font-semibold text-foreground flex-1 truncate">
-        {isAr ? "وصال" : "Wisal CC"}
+      <span className="lg:hidden flex items-center gap-2 flex-1 min-w-0">
+        <img src="/logo.png" alt="Wisal" className="size-6 object-contain shrink-0" />
+        <span className="text-sm font-semibold text-foreground truncate">
+          {isAr ? "وصال" : "Wisal CC"}
+        </span>
       </span>
 
       {/* Desktop: cluster + date selectors */}
@@ -146,7 +152,7 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-56 max-h-80">
             <DropdownMenuItem onSelect={() => updateParam("cluster", "")}>
-              كل المجموعات
+              {allClustersLabel}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             {clusters.map((c) => (
@@ -171,7 +177,7 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
               <DropdownMenuItem
                 key={r.value}
                 onSelect={() => updateParam("range", r.value)}>
-                {r.ar}
+                {isAr ? r.ar : r.en}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
@@ -190,9 +196,9 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
                 })
               }
               onFocus={() => searchResults.length > 0 && setSearchOpen(true)}
-              placeholder="بحث عن حالات أو وكلاء أو مجموعات…"
+              placeholder={isAr ? "بحث عن حالات أو وكلاء أو مجموعات…" : "Search cases, agents, clusters…"}
               className="w-full h-8 rounded-lg border border-input bg-transparent ps-8 pe-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/30 transition-colors"
-              aria-label="بحث عالمي"
+              aria-label={isAr ? "بحث عالمي" : "Global search"}
               aria-expanded={searchOpen}
               aria-haspopup="listbox"
             />
@@ -233,13 +239,28 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
       {/* Right: theme + lang + account */}
       <div className="flex items-center gap-1">
         {/* Theme toggle */}
-        {/* <button
+        <button
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           className="flex items-center justify-center size-9 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors cursor-pointer min-h-11 min-w-11"
-          aria-label={isAr ? "تبديل المظهر" : "Toggle theme"}
-        >
-          {mounted ? (theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />) : <Sun className="size-4 opacity-0" />}
-        </button> */}
+          aria-label={isAr ? "تبديل المظهر" : "Toggle theme"}>
+          {mounted ? (
+            theme === "dark" ? (
+              <Sun className="size-4" />
+            ) : (
+              <Moon className="size-4" />
+            )
+          ) : (
+            <Sun className="size-4 opacity-0" />
+          )}
+        </button>
+
+        {/* Lang toggle */}
+        <button
+          onClick={() => void setLocale(isAr ? "en" : "ar")}
+          className="flex items-center justify-center size-9 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors cursor-pointer min-h-11 min-w-11 text-xs font-semibold"
+          aria-label={isAr ? "Switch to English" : "التبديل إلى العربية"}>
+          <Languages className="size-4" />
+        </button>
 
         {/* Account menu */}
         <DropdownMenu>
@@ -272,8 +293,7 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
             <form action={signOutAction} className="w-full">
               <button
                 type="submit"
-                className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors w-full text-destructive focus:bg-destructive/10 hover:bg-destructive/10"
-              >
+                className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors w-full text-destructive focus:bg-destructive/10 hover:bg-destructive/10">
                 <LogOut className="size-4" />
                 {isAr ? "تسجيل الخروج" : "Sign out"}
               </button>
@@ -302,7 +322,7 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
       <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
         <SheetContent side="top" className="h-auto pb-6">
           <SheetHeader className="mb-4">
-            <SheetTitle>البحث والفلاتر</SheetTitle>
+            <SheetTitle>{isAr ? "البحث والفلاتر" : "Search & Filters"}</SheetTitle>
           </SheetHeader>
           <div className="flex flex-col gap-3 px-4">
             {/* Search */}
@@ -316,7 +336,7 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
                     void handleSearch(e.target.value);
                   })
                 }
-                placeholder="بحث عن حالات أو وكلاء أو مجموعات…"
+                placeholder={isAr ? "بحث عن حالات أو وكلاء أو مجموعات…" : "Search cases, agents, clusters…"}
                 className="w-full h-10 rounded-lg border border-input bg-transparent ps-9 pe-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/30 transition-colors"
               />
               {searchOpen && searchResults.length > 0 && (
@@ -345,13 +365,13 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">
-                  المجموعة
+                  {isAr ? "المجموعة" : "Cluster"}
                 </label>
                 <select
                   value={currentCluster}
                   onChange={(e) => updateParam("cluster", e.target.value)}
                   className="w-full h-10 rounded-lg border border-input bg-background text-sm px-2 focus:outline-none focus:border-ring">
-                  <option value="">كل المجموعات</option>
+                  <option value="">{allClustersLabel}</option>
                   {clusters.map((c) => (
                     <option key={c.id} value={c.id}>
                       {isAr ? c.nameAr : c.name}
@@ -361,7 +381,7 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
               </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">
-                  النطاق الزمني
+                  {isAr ? "النطاق الزمني" : "Date Range"}
                 </label>
                 <select
                   value={currentRange}
@@ -369,7 +389,7 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
                   className="w-full h-10 rounded-lg border border-input bg-background text-sm px-2 focus:outline-none focus:border-ring">
                   {DATE_RANGES.map((r) => (
                     <option key={r.value} value={r.value}>
-                      {r.ar}
+                      {isAr ? r.ar : r.en}
                     </option>
                   ))}
                 </select>
@@ -379,7 +399,7 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
             <button
               onClick={() => setFilterOpen(false)}
               className="flex items-center justify-center h-10 rounded-lg bg-primary text-primary-foreground text-sm font-medium cursor-pointer hover:opacity-90 transition-opacity">
-              تطبيق
+              {isAr ? "تطبيق" : "Apply"}
             </button>
           </div>
         </SheetContent>

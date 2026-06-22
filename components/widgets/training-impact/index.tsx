@@ -1,9 +1,11 @@
 import { Suspense } from "react"
+import { cookies } from "next/headers"
 import { Widget } from "@/components/widgets/widget"
 import { WidgetErrorBoundary } from "@/components/widgets/widget-error-boundary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getTrainingImpactData, getTrainingModuleList } from "@/lib/queries/workforce"
 import { TrainingImpactClient } from "./training-impact-client"
+import { resolveLocale } from "@/lib/i18n"
 import type { Filters } from "@/lib/filters"
 
 interface Props {
@@ -12,6 +14,10 @@ interface Props {
 }
 
 async function TrainingImpactBody({ filters, moduleFilter }: Props) {
+  const jar = await cookies()
+  const locale = resolveLocale(jar.get("locale")?.value)
+  const isAr = locale === "ar"
+
   const [summaries, moduleList] = await Promise.all([
     getTrainingImpactData(filters, moduleFilter),
     getTrainingModuleList(),
@@ -23,16 +29,17 @@ async function TrainingImpactBody({ filters, moduleFilter }: Props) {
       titleAr="أثر التدريب"
       actions={
         <span className="text-xs text-muted-foreground tabular-nums">
-          {summaries.length} وحدة{summaries.length !== 1 ? "" : ""}
+          {isAr ? `${summaries.length} وحدة` : `${summaries.length} module${summaries.length !== 1 ? "s" : ""}`}
         </span>
       }
-      footer="درجة الجودة قبل وبعد كل وحدة تدريبية"
+      footer={isAr ? "درجة الجودة قبل وبعد كل وحدة تدريبية" : "QA score before and after each training module"}
     >
       <TrainingImpactClient
         summaries={summaries}
         agentDetails={{}}
         moduleList={moduleList}
         defaultModule={moduleFilter ?? ""}
+        locale={locale}
       />
     </Widget>
   )

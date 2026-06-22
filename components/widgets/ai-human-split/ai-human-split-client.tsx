@@ -16,6 +16,7 @@ import type { AiHumanSplitData } from "@/lib/queries/intelligence"
 
 interface Props {
   data: AiHumanSplitData
+  locale?: string
 }
 
 type ViewMode = "donut" | "funnel"
@@ -30,13 +31,14 @@ const SPLIT_COLORS = [
   "#60a5fa",
 ]
 
-const DONUT_SLICE_COLORS = {
-  "ذكاء اصطناعي كامل": "var(--primary)",
-  "ذكاء اصطناعي جزئي": "var(--status-amber)",
-  "بشري": "var(--status-red)",
+const DONUT_SLICE_KEYS = {
+  full: { ar: "ذكاء اصطناعي كامل", en: "Full AI", color: "var(--primary)" },
+  partial: { ar: "ذكاء اصطناعي جزئي", en: "Partial AI", color: "var(--status-amber)" },
+  human: { ar: "بشري", en: "Human", color: "var(--status-red)" },
 }
 
-export function AiHumanSplitClient({ data }: Props) {
+export function AiHumanSplitClient({ data, locale = "ar" }: Props) {
+  const isAr = locale === "ar"
   const [viewMode, setViewMode] = useState<ViewMode>("donut")
   const [segment, setSegment] = useState<Segment>("channel")
 
@@ -44,34 +46,34 @@ export function AiHumanSplitClient({ data }: Props) {
 
   const hasData = byChannel.length > 0 || byCluster.length > 0
 
-  if (!hasData) return <WidgetEmpty message="لا توجد بيانات توزيع الحلول لهذه الفترة." />
+  if (!hasData) return <WidgetEmpty message="No resolution split data for this period." messageAr="لا توجد بيانات توزيع الحلول لهذه الفترة." />
 
   const donutData = [
-    { name: "ذكاء اصطناعي كامل", value: overall.aiFullPct },
-    { name: "ذكاء اصطناعي جزئي", value: overall.aiPartialPct },
-    { name: "بشري", value: overall.humanPct },
+    { name: isAr ? DONUT_SLICE_KEYS.full.ar : DONUT_SLICE_KEYS.full.en, color: DONUT_SLICE_KEYS.full.color, value: overall.aiFullPct },
+    { name: isAr ? DONUT_SLICE_KEYS.partial.ar : DONUT_SLICE_KEYS.partial.en, color: DONUT_SLICE_KEYS.partial.color, value: overall.aiPartialPct },
+    { name: isAr ? DONUT_SLICE_KEYS.human.ar : DONUT_SLICE_KEYS.human.en, color: DONUT_SLICE_KEYS.human.color, value: overall.humanPct },
   ].filter((d) => d.value > 0)
 
   const segmentRows = segment === "channel" ? byChannel : byCluster
 
   const funnelData = [
     {
-      name: "إجمالي التفاعلات",
+      name: isAr ? "إجمالي التفاعلات" : "Total interactions",
       value: segmentRows.reduce((s, r) => s + r.volume, 0),
       fill: "var(--primary)",
     },
     {
-      name: "حُل بالذكاء الاصطناعي",
+      name: isAr ? "حُل بالذكاء الاصطناعي" : "Resolved by AI",
       value: segmentRows.reduce((s, r) => s + Math.round((r.aiFullPct / 100) * r.volume), 0),
       fill: "var(--status-green)",
     },
     {
-      name: "حُل جزئياً",
+      name: isAr ? "حُل جزئياً" : "Partially resolved",
       value: segmentRows.reduce((s, r) => s + Math.round((r.aiPartialPct / 100) * r.volume), 0),
       fill: "var(--status-amber)",
     },
     {
-      name: "حُل بشرياً",
+      name: isAr ? "حُل بشرياً" : "Resolved by human",
       value: segmentRows.reduce((s, r) => s + Math.round((r.humanPct / 100) * r.volume), 0),
       fill: "var(--status-red)",
     },
@@ -95,7 +97,7 @@ export function AiHumanSplitClient({ data }: Props) {
               ].join(" ")}
               aria-pressed={viewMode === mode}
             >
-              {mode === "donut" ? "دائري" : "قمعي"}
+              {mode === "donut" ? (isAr ? "دائري" : "Donut") : (isAr ? "قمعي" : "Funnel")}
             </button>
           ))}
         </div>
@@ -114,7 +116,7 @@ export function AiHumanSplitClient({ data }: Props) {
               ].join(" ")}
               aria-pressed={segment === s}
             >
-              {s === "channel" ? "قناة" : "تجمع"}
+              {s === "channel" ? (isAr ? "قناة" : "Channel") : (isAr ? "تجمع" : "Cluster")}
             </button>
           ))}
         </div>
@@ -136,13 +138,7 @@ export function AiHumanSplitClient({ data }: Props) {
                   dataKey="value"
                 >
                   {donutData.map((entry) => (
-                    <Cell
-                      key={entry.name}
-                      fill={
-                        DONUT_SLICE_COLORS[entry.name as keyof typeof DONUT_SLICE_COLORS] ??
-                        "var(--muted)"
-                      }
-                    />
+                    <Cell key={entry.name} fill={entry.color ?? "var(--muted)"} />
                   ))}
                 </Pie>
                 <Tooltip
@@ -167,11 +163,7 @@ export function AiHumanSplitClient({ data }: Props) {
                   <div className="flex items-center gap-2">
                     <span
                       className="size-2.5 rounded-sm flex-shrink-0"
-                      style={{
-                        background:
-                          DONUT_SLICE_COLORS[d.name as keyof typeof DONUT_SLICE_COLORS] ??
-                          "var(--muted)",
-                      }}
+                      style={{ background: d.color ?? "var(--muted)" }}
                     />
                     <span className="text-xs text-muted-foreground">{d.name}</span>
                   </div>
@@ -185,7 +177,7 @@ export function AiHumanSplitClient({ data }: Props) {
             {/* AI total callout */}
             <div className="border-t pt-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">إجمالي الذكاء الاصطناعي</span>
+                <span className="text-xs text-muted-foreground">{isAr ? "إجمالي الذكاء الاصطناعي" : "Total AI"}</span>
                 <span
                   className="text-sm font-semibold tabular-nums"
                   style={{ color: "var(--primary)" }}
@@ -207,7 +199,7 @@ export function AiHumanSplitClient({ data }: Props) {
                     {row.label}
                   </span>
                   <span className="text-xs tabular-nums text-foreground flex-shrink-0">
-                    {row.aiTotalPct.toFixed(0)}% ذكاء
+                    {row.aiTotalPct.toFixed(0)}% {isAr ? "ذكاء" : "AI"}
                   </span>
                 </div>
               ))}

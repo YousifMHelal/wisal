@@ -19,6 +19,7 @@ import type { ForbiddenIntentData } from "@/lib/queries/governance"
 interface Props {
   data: ForbiddenIntentData
   exportUrl: string
+  locale?: string
 }
 
 interface CustomTooltipProps {
@@ -33,13 +34,16 @@ function ChartTooltip({ active, payload, label }: CustomTooltipProps) {
     <div className="rounded-lg border border-border bg-card px-3 py-2 text-xs shadow-lg">
       <p className="text-muted-foreground mb-0.5">{label}</p>
       <p className="font-semibold tabular-nums text-foreground">
-        {payload[0].value} حدث{payload[0].value !== 1 ? "" : ""}
+        {payload[0].value}{" "}
+        <span className="[html[dir=rtl]_&]:hidden">{payload[0].value !== 1 ? "events" : "event"}</span>
+        <span className="hidden [html[dir=rtl]_&]:inline">حدث</span>
       </p>
     </div>
   )
 }
 
-export function ForbiddenIntentClient({ data, exportUrl }: Props) {
+export function ForbiddenIntentClient({ data, exportUrl, locale = "ar" }: Props) {
+  const isAr = locale === "ar"
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [search, setSearch] = useState("")
 
@@ -80,7 +84,7 @@ export function ForbiddenIntentClient({ data, exportUrl }: Props) {
       <div className="flex items-center gap-4">
         <div>
           <p className="text-3xl font-semibold tabular-nums text-foreground">{totalEvents}</p>
-          <p className="text-xs text-muted-foreground">إجمالي الأحداث في الفترة</p>
+          <p className="text-xs text-muted-foreground">{isAr ? "إجمالي الأحداث في الفترة" : "Total events in period"}</p>
         </div>
         {selectedDate && (
           <Button
@@ -90,7 +94,7 @@ export function ForbiddenIntentClient({ data, exportUrl }: Props) {
             onClick={() => setSelectedDate(null)}
           >
             <X className="size-3" aria-hidden />
-            مسح الفلتر: {format(parseISO(selectedDate), "dd MMM")}
+            {isAr ? "مسح الفلتر:" : "Clear filter:"} {format(parseISO(selectedDate), "dd MMM")}
           </Button>
         )}
       </div>
@@ -140,7 +144,9 @@ export function ForbiddenIntentClient({ data, exportUrl }: Props) {
 
       {selectedDate && (
         <p className="text-xs text-primary font-medium">
-          مفلتر إلى {format(parseISO(selectedDate), "dd MMM yyyy")} — {filteredEvents.length} حدث
+          {isAr
+            ? `مفلتر إلى ${format(parseISO(selectedDate), "dd MMM yyyy")} — ${filteredEvents.length} حدث`
+            : `Filtered to ${format(parseISO(selectedDate), "dd MMM yyyy")} — ${filteredEvents.length} event${filteredEvents.length !== 1 ? "s" : ""}`}
         </p>
       )}
 
@@ -151,7 +157,7 @@ export function ForbiddenIntentClient({ data, exportUrl }: Props) {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="ابحث في الحالة أو النمط أو الرد…"
+            placeholder={isAr ? "ابحث في الحالة أو النمط أو الرد…" : "Search by case, pattern, or response…"}
             className="ps-9 h-8 text-sm"
             aria-label="Search forbidden intent events"
           />
@@ -162,7 +168,7 @@ export function ForbiddenIntentClient({ data, exportUrl }: Props) {
           className="inline-flex items-center gap-1.5 h-8 px-3 shrink-0 rounded-md border border-border bg-transparent text-sm font-medium text-foreground hover:bg-muted transition-colors duration-150 cursor-pointer"
         >
           <Download className="size-3.5" aria-hidden />
-          <span className="hidden sm:inline">تصدير</span>
+          <span className="hidden sm:inline">{isAr ? "تصدير" : "Export"}</span>
         </a>
       </div>
 
@@ -171,17 +177,19 @@ export function ForbiddenIntentClient({ data, exportUrl }: Props) {
         <table className="w-full text-sm min-w-[580px]">
           <thead>
             <tr className="border-b border-border bg-muted/40">
-              <th className="py-2 ps-3 pe-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">رقم الحالة</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">النمط</th>
-              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide hidden md:table-cell">رد وصال</th>
-              <th className="py-2 ps-2 pe-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">الوقت</th>
+              <th className="py-2 ps-3 pe-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">{isAr ? "رقم الحالة" : "Case ID"}</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">{isAr ? "النمط" : "Pattern"}</th>
+              <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide hidden md:table-cell">{isAr ? "رد وصال" : "Wisal response"}</th>
+              <th className="py-2 ps-2 pe-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">{isAr ? "الوقت" : "Time"}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {filteredEvents.length === 0 ? (
               <tr>
                 <td colSpan={4} className="py-8 text-center text-sm text-muted-foreground">
-                  لا توجد أحداث{selectedDate ? " في هذا التاريخ" : " تطابق بحثك"}.
+                  {isAr
+                    ? `لا توجد أحداث${selectedDate ? " في هذا التاريخ" : " تطابق بحثك"}.`
+                    : selectedDate ? "No events on this date." : "No events match your search."}
                 </td>
               </tr>
             ) : (
@@ -201,10 +209,14 @@ export function ForbiddenIntentClient({ data, exportUrl }: Props) {
       </div>
 
       <p className="text-xs text-muted-foreground text-end tabular-nums">
-        {filteredEvents.length > 100
-          ? `عرض ١٠٠ من ${filteredEvents.length} حدث`
-          : `${filteredEvents.length} حدث`}
-        {!selectedDate && " · انقر على شريط الرسم للفلترة بالتاريخ"}
+        {isAr
+          ? filteredEvents.length > 100
+            ? `عرض ١٠٠ من ${filteredEvents.length} حدث`
+            : `${filteredEvents.length} حدث`
+          : filteredEvents.length > 100
+            ? `Showing 100 of ${filteredEvents.length} events`
+            : `${filteredEvents.length} event${filteredEvents.length !== 1 ? "s" : ""}`}
+        {!selectedDate && (isAr ? " · انقر على شريط الرسم للفلترة بالتاريخ" : " · click chart bar to filter by date")}
       </p>
     </div>
   )

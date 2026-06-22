@@ -33,9 +33,11 @@ function SortIcon({ active, dir }: { active: boolean; dir: "asc" | "desc" }) {
 
 interface Props {
   rows: ClusterRankingRow[]
+  locale?: string
 }
 
-export function ClusterRankingClient({ rows }: Props) {
+export function ClusterRankingClient({ rows, locale = "ar" }: Props) {
+  const isAr = locale === "ar"
   const router = useRouter()
   const searchParams = useSearchParams()
   const [sortKey, setSortKey] = useState<SortKey>("compositeScore")
@@ -87,7 +89,7 @@ export function ClusterRankingClient({ rows }: Props) {
                 onClick={() => toggleSort("compositeScore")}
                 className="flex items-center gap-1 hover:text-foreground transition-colors cursor-pointer"
               >
-                التجمع <SortIcon active={sortKey === "compositeScore"} dir={sortDir} />
+                {isAr ? "التجمع" : "Cluster"} <SortIcon active={sortKey === "compositeScore"} dir={sortDir} />
               </button>
             </th>
             <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -95,7 +97,7 @@ export function ClusterRankingClient({ rows }: Props) {
                 onClick={() => toggleSort("compositeScore")}
                 className="flex items-center gap-1 ms-auto hover:text-foreground transition-colors cursor-pointer"
               >
-                النتيجة <SortIcon active={sortKey === "compositeScore"} dir={sortDir} />
+                {isAr ? "النتيجة" : "Score"} <SortIcon active={sortKey === "compositeScore"} dir={sortDir} />
               </button>
             </th>
             {KPI_COLUMNS.map((col) => (

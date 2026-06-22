@@ -29,9 +29,11 @@ function SortIcon({ active, dir }: { active: boolean; dir: "asc" | "desc" }) {
 interface Props {
   rows: PenaltyRow[]
   filters: Filters
+  locale?: string
 }
 
-export function PenaltyImpactClient({ rows, filters }: Props) {
+export function PenaltyImpactClient({ rows, filters, locale = "ar" }: Props) {
+  const isAr = locale === "ar"
   const [sortKey, setSortKey] = useState<SortKey>("penaltyAmount")
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc")
   const [showBreachedOnly, setShowBreachedOnly] = useState(false)
@@ -76,7 +78,9 @@ export function PenaltyImpactClient({ rows, filters }: Props) {
   if (!rows.length) {
     return (
       <div className="flex items-center justify-center min-h-[120px]">
-        <p className="text-sm text-muted-foreground">لا توجد سجلات غرامات لهذه الفترة.</p>
+        <p className="text-sm text-muted-foreground">
+          {isAr ? "لا توجد سجلات غرامات لهذه الفترة." : "No penalty records for this period."}
+        </p>
       </div>
     )
   }
@@ -94,7 +98,9 @@ export function PenaltyImpactClient({ rows, filters }: Props) {
               : "bg-muted text-muted-foreground hover:bg-muted/80"
           )}
         >
-          {showBreachedOnly ? "عرض الخروقات فقط" : "إظهار الخروقات فقط"}
+          {showBreachedOnly
+            ? (isAr ? "عرض الخروقات فقط" : "Breaches only")
+            : (isAr ? "إظهار الخروقات فقط" : "Show breaches only")}
         </button>
         <Button
           variant="outline"
@@ -104,7 +110,7 @@ export function PenaltyImpactClient({ rows, filters }: Props) {
           className="gap-2 cursor-pointer"
         >
           {isPending ? <Loader2 className="size-3.5 animate-spin" /> : <Download className="size-3.5" />}
-          تصدير
+          {isAr ? "تصدير" : "Export"}
         </Button>
       </div>
 
@@ -115,28 +121,30 @@ export function PenaltyImpactClient({ rows, filters }: Props) {
             <tr className="border-b border-border">
               <th className="py-2 ps-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 <button onClick={() => toggleSort("clusterName")} className="flex items-center gap-1 hover:text-foreground transition-colors cursor-pointer">
-                  التجمع <SortIcon active={sortKey === "clusterName"} dir={sortDir} />
+                  {isAr ? "التجمع" : "Cluster"} <SortIcon active={sortKey === "clusterName"} dir={sortDir} />
                 </button>
               </th>
               <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 <button onClick={() => toggleSort("kpi")} className="flex items-center gap-1 hover:text-foreground transition-colors cursor-pointer">
-                  المؤشر <SortIcon active={sortKey === "kpi"} dir={sortDir} />
+                  {isAr ? "المؤشر" : "KPI"} <SortIcon active={sortKey === "kpi"} dir={sortDir} />
                 </button>
               </th>
               <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 <button onClick={() => toggleSort("failurePct")} className="flex items-center gap-1 ms-auto hover:text-foreground transition-colors cursor-pointer">
-                  % الإخفاق <SortIcon active={sortKey === "failurePct"} dir={sortDir} />
+                  {isAr ? "% الإخفاق" : "Failure %"} <SortIcon active={sortKey === "failurePct"} dir={sortDir} />
                 </button>
               </th>
               <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide hidden md:table-cell">
                 <button onClick={() => toggleSort("permissibleTolerance")} className="flex items-center gap-1 ms-auto hover:text-foreground transition-colors cursor-pointer">
-                  الهامش <SortIcon active={sortKey === "permissibleTolerance"} dir={sortDir} />
+                  {isAr ? "الهامش" : "Tolerance"} <SortIcon active={sortKey === "permissibleTolerance"} dir={sortDir} />
                 </button>
               </th>
-              <th className="py-2 px-2 text-center text-xs font-medium text-muted-foreground uppercase tracking-wide">خرق</th>
+              <th className="py-2 px-2 text-center text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                {isAr ? "خرق" : "Breach"}
+              </th>
               <th className="py-2 pe-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 <button onClick={() => toggleSort("penaltyAmount")} className="flex items-center gap-1 ms-auto hover:text-foreground transition-colors cursor-pointer">
-                  الغرامة (ريال) <SortIcon active={sortKey === "penaltyAmount"} dir={sortDir} />
+                  {isAr ? "الغرامة (ريال)" : "Penalty (SAR)"} <SortIcon active={sortKey === "penaltyAmount"} dir={sortDir} />
                 </button>
               </th>
             </tr>
@@ -168,12 +176,12 @@ export function PenaltyImpactClient({ rows, filters }: Props) {
                   {row.breached ? (
                     <AlertTriangle
                       className="size-4 text-[var(--status-red-fg)] mx-auto"
-                      aria-label="Breached"
+                      aria-label={isAr ? "خرق" : "Breached"}
                     />
                   ) : (
                     <CheckCircle2
                       className="size-4 text-[var(--status-green-fg)] mx-auto"
-                      aria-label="Within tolerance"
+                      aria-label={isAr ? "ضمن الحدود" : "Within tolerance"}
                     />
                   )}
                 </td>
@@ -191,7 +199,9 @@ export function PenaltyImpactClient({ rows, filters }: Props) {
         </table>
         {sorted.length > 50 && (
           <p className="text-xs text-muted-foreground text-center py-2">
-            عرض ٥٠ من {sorted.length} سجل · صدّر للحصول على كامل البيانات
+            {isAr
+              ? `عرض ٥٠ من ${sorted.length} سجل · صدّر للحصول على كامل البيانات`
+              : `Showing 50 of ${sorted.length} records · export for full data`}
           </p>
         )}
       </div>
