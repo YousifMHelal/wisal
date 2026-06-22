@@ -80,7 +80,7 @@ export async function getCaregiverAuditData(filters: Filters): Promise<Caregiver
       timestamp: { gte: from, lte: to },
       ...(filters.cluster ? { clusterId: filters.cluster } : {}),
     },
-    include: { cluster: { select: { name: true } } },
+    include: { cluster: { select: { name: true, nameAr: true } } },
     orderBy: { timestamp: "desc" },
     take: 200,
   })
@@ -88,7 +88,7 @@ export async function getCaregiverAuditData(filters: Filters): Promise<Caregiver
   return rows.map((r) => ({
     id: r.id,
     caseId: r.caseId,
-    clusterName: r.cluster.name,
+    clusterName: r.cluster.nameAr ?? r.cluster.name,
     proxyConfirmed: r.proxyConfirmed,
     action: r.action,
     timestamp: r.timestamp,
@@ -239,14 +239,22 @@ export async function getDriftWatchData(filters: Filters): Promise<DriftWatchDat
       date: { gte: from, lte: to },
       ...(filters.cluster ? { clusterId: filters.cluster } : {}),
     },
-    include: { cluster: { select: { name: true } } },
+    include: { cluster: { select: { name: true, nameAr: true } } },
     orderBy: { date: "asc" },
   })
 
   // Group by clusterId + dialect
+  const DIALECT_AR: Record<string, string> = {
+    Najdi: "نجدي",
+    Hijazi: "حجازي",
+    Gulf: "خليجي",
+    Southern: "جنوبي",
+    Northern: "شمالي",
+  }
+
   const seriesMap = new Map<
     string,
-    { clusterId: string; clusterName: string; dialect: string; points: DriftSeriesPoint[]; flagged: boolean }
+    { clusterId: string; clusterName: string; dialect: string; dialectAr: string; points: DriftSeriesPoint[]; flagged: boolean }
   >()
 
   for (const s of snaps) {
@@ -254,8 +262,9 @@ export async function getDriftWatchData(filters: Filters): Promise<DriftWatchDat
     if (!seriesMap.has(key)) {
       seriesMap.set(key, {
         clusterId: s.clusterId,
-        clusterName: s.cluster.name,
+        clusterName: s.cluster.nameAr ?? s.cluster.name,
         dialect: s.dialect,
+        dialectAr: DIALECT_AR[s.dialect] ?? s.dialect,
         points: [],
         flagged: false,
       })
@@ -273,8 +282,8 @@ export async function getDriftWatchData(filters: Filters): Promise<DriftWatchDat
     const last = v.points[v.points.length - 1]
     return {
       id: key,
-      label: `${v.clusterName} / ${v.dialect}`,
-      dialect: v.dialect,
+      label: `${v.clusterName} / ${v.dialectAr}`,
+      dialect: v.dialectAr,
       clusterName: v.clusterName,
       clusterId: v.clusterId,
       points: v.points,
@@ -288,9 +297,9 @@ export async function getDriftWatchData(filters: Filters): Promise<DriftWatchDat
     .filter((s) => s.flagged)
     .map((s) => ({
       id: s.id,
-      clusterName: s.cluster.name,
+      clusterName: s.cluster.nameAr ?? s.cluster.name,
       clusterId: s.clusterId,
-      dialect: s.dialect,
+      dialect: DIALECT_AR[s.dialect] ?? s.dialect,
       date: s.date,
       nluConfidence: s.nluConfidence,
       message: s.message,

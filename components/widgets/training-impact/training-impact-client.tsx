@@ -149,10 +149,10 @@ export function TrainingImpactClient({
               </LineChart>
             </ResponsiveContainer>
 
-            <div className="overflow-x-auto rounded-lg border border-border">
+            <div className="overflow-x-auto overflow-y-auto max-h-120 rounded-lg border border-border">
               <table className="w-full text-xs min-w-[360px]">
-                <thead>
-                  <tr className="border-b border-border bg-muted/40">
+                <thead className="sticky top-0 z-10">
+                  <tr className="border-b border-border bg-muted">
                     <th className="py-2 ps-3 text-start font-medium text-muted-foreground">الوحدة</th>
                     <th className="py-2 px-2 text-start font-medium text-muted-foreground">تاريخ الإتمام</th>
                     <th className="py-2 px-2 text-end font-medium text-muted-foreground tabular-nums">قبل</th>
@@ -247,10 +247,10 @@ export function TrainingImpactClient({
           </ResponsiveContainer>
 
           {/* Module summary table with agent drill-in */}
-          <div className="overflow-x-auto rounded-lg border border-border">
+          <div className="overflow-x-auto overflow-y-auto max-h-120 rounded-lg border border-border">
             <table className="w-full text-sm min-w-[480px]">
-              <thead>
-                <tr className="border-b border-border bg-muted/40">
+              <thead className="sticky top-0 z-10">
+                <tr className="border-b border-border bg-muted">
                   <th className="py-2 ps-3 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide">الوحدة</th>
                   <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide tabular-nums">الإتمامات</th>
                   <th className="py-2 px-2 text-end text-xs font-medium text-muted-foreground uppercase tracking-wide tabular-nums">قبل</th>

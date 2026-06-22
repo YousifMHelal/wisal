@@ -10,22 +10,22 @@ const FRAMEWORK_META: Record<string, { label: string; description: string; logLi
   NCA: {
     label: "NCA",
     description: "الهيئة الوطنية للأمن السيبراني",
-    logLink: "/governance?filter=nca",
+    logLink: "/governance#medical-approval-log",
   },
   PDPL: {
     label: "PDPL",
     description: "نظام حماية البيانات الشخصية",
-    logLink: "/governance?filter=pdpl",
+    logLink: "/governance#consent-audit",
   },
   DGA: {
     label: "DGA",
     description: "هيئة الحكومة الرقمية",
-    logLink: "/governance?filter=dga",
+    logLink: "/governance#medical-approval-log",
   },
   NDMO: {
     label: "NDMO",
     description: "المكتب الوطني لإدارة البيانات",
-    logLink: "/governance?filter=ndmo",
+    logLink: "/governance#consent-audit",
   },
 }
 

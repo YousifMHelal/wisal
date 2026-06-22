@@ -46,7 +46,7 @@ export function ConsentAuditClient({ rows, exportUrl }: Props) {
           className="inline-flex items-center gap-1.5 h-8 px-3 shrink-0 rounded-md border border-border bg-transparent text-sm font-medium text-foreground hover:bg-muted transition-colors duration-150 cursor-pointer"
         >
           <Download className="size-3.5" aria-hidden />
-          <span className="hidden sm:inline">Export</span>
+          <span className="hidden sm:inline">تصدير</span>
         </a>
       </div>
 

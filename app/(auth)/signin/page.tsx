@@ -10,7 +10,7 @@ export default async function SignInPage({
   searchParams: Promise<{ callbackUrl?: string }>;
 }) {
   const session = await auth();
-  if (session?.user) redirect("/live-operations");
+  if (session?.user) redirect("/overview");
 
   const { callbackUrl } = await searchParams;
 
@@ -29,7 +29,7 @@ export default async function SignInPage({
         </p>
       </div>
 
-      <SignInForm callbackUrl={callbackUrl ?? "/live-operations"} />
+      <SignInForm callbackUrl={callbackUrl ?? "/overview"} />
 
       <p className="mt-6 text-center text-xs text-muted-foreground/60">
         لوحة عمليات هيئة الهلال الأحمر · سري

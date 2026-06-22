@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
 import { ChevronDown, ChevronRight, ShieldCheck } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { WidgetEmpty } from "@/components/widgets/widget"
@@ -8,7 +8,9 @@ import type { CaregiverCaseRow } from "@/lib/queries/intelligence"
 
 const PROXY_LABELS: Record<string, { label: string; color: string }> = {
   CONFIRMED: { label: "مؤكد", color: "var(--status-green-fg)" },
+  YES: { label: "مؤكد", color: "var(--status-green-fg)" },
   DENIED: { label: "مرفوض", color: "var(--status-red-fg)" },
+  NO: { label: "مرفوض", color: "var(--status-red-fg)" },
   AMBIGUOUS: { label: "غامض", color: "var(--status-amber-fg)" },
 }
 
@@ -83,10 +85,10 @@ export function CaregiverAuditClient({ rows }: Props) {
               const action = ACTION_LABELS[row.action]
 
               return (
-                <>
+                <React.Fragment key={row.id}>
                   <tr
-                    key={row.id}
                     className="border-b last:border-0 hover:bg-muted/30 transition-colors cursor-pointer"
+
                     onClick={() => setExpandedId(isExpanded ? null : row.id)}
                     aria-expanded={isExpanded}
                   >
@@ -166,7 +168,7 @@ export function CaregiverAuditClient({ rows }: Props) {
                       </td>
                     </tr>
                   )}
-                </>
+                </React.Fragment>
               )
             })}
           </tbody>

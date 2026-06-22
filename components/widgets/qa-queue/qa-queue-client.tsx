@@ -185,10 +185,10 @@ export function QaQueueClient({ items: initialItems }: Props) {
         <p className="text-xs text-muted-foreground">مرتب حسب الأولوية · أسوأ شعور أولاً</p>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-border">
+      <div className="overflow-x-auto overflow-y-auto max-h-120 rounded-lg border border-border">
         <table className="w-full text-sm min-w-[520px]">
-          <thead>
-            <tr className="border-b border-border bg-muted/40">
+          <thead className="sticky top-0 z-10">
+            <tr className="border-b border-border bg-muted">
               <th className="py-2 ps-3 pe-1 w-8" />
               <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap">التفاعل</th>
               <th className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap hidden sm:table-cell">التجمع</th>

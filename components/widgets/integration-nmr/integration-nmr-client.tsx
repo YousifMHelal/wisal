@@ -48,20 +48,18 @@ export function IntegrationNmrClient({ rows }: Props) {
           <div
             key={row.id}
             className={[
-              "flex flex-col sm:flex-row sm:items-center gap-3 rounded-lg border border-s-4 bg-muted/30 p-3 transition-colors hover:bg-muted/50",
+              "flex flex-row items-center gap-2 rounded-lg border border-s-4 bg-muted/30 px-3 py-2.5 transition-colors hover:bg-muted/50",
               stateBg(row.state),
               isNmr ? "ring-1 ring-primary/30" : "",
             ].join(" ")}
           >
             {/* System name */}
-            <div className="flex items-center gap-2 min-w-0 sm:w-44 shrink-0">
-              <div className="flex items-center gap-1.5">
-                <StateIcon state={row.state} />
-                <span className="font-medium text-sm text-foreground">
-                  <span lang="en" className="[html[dir=rtl]_&]:hidden">{labels.label}</span>
-                  <span lang="ar" className="hidden [html[dir=rtl]_&]:inline">{labels.labelAr}</span>
-                </span>
-              </div>
+            <div className="flex items-center gap-1.5 min-w-0 flex-1">
+              <StateIcon state={row.state} />
+              <span className="font-medium text-sm text-foreground truncate">
+                <span lang="en" className="[html[dir=rtl]_&]:hidden">{labels.label}</span>
+                <span lang="ar" className="hidden [html[dir=rtl]_&]:inline">{labels.labelAr}</span>
+              </span>
               {isNmr && (
                 <Badge className="text-[10px] px-1.5 py-0 bg-primary/20 text-primary border-primary/30 gap-0.5 shrink-0">
                   <Zap className="size-2.5" aria-hidden="true" />
@@ -71,42 +69,29 @@ export function IntegrationNmrClient({ rows }: Props) {
             </div>
 
             {/* Status */}
-            <div className="flex items-center gap-1.5 sm:w-24 shrink-0">
-              <StateLabel state={row.state} />
-            </div>
+            <StateLabel state={row.state} />
 
             {/* Pattern */}
-            <div className="sm:w-20 shrink-0">
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-1">
-                <RefreshCw className="size-2.5" aria-hidden="true" />
-                {row.pattern}
-              </Badge>
-            </div>
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-1 shrink-0">
+              <RefreshCw className="size-2.5" aria-hidden="true" />
+              {row.pattern}
+            </Badge>
 
             {/* Latency */}
-            <div className="text-xs text-muted-foreground sm:w-24 shrink-0">
+            <span className="text-xs tabular-nums shrink-0 text-muted-foreground w-16 text-end">
               {row.latencyMs != null ? (
-                <span>
-                  <span className={row.latencyMs > 300 ? "text-[var(--status-amber-fg)]" : "text-foreground"}>
-                    {row.latencyMs}ms
-                  </span>
-                  {" زمن استجابة"}
+                <span className={row.latencyMs > 300 ? "text-status-amber-fg" : ""}>
+                  {row.latencyMs}ms
                 </span>
-              ) : (
-                "—"
-              )}
-            </div>
+              ) : "—"}
+            </span>
 
             {/* Last sync */}
-            <div className="flex items-center gap-1 text-xs text-muted-foreground ms-auto">
+            <div className="flex items-center gap-1 text-xs text-muted-foreground shrink-0 w-20 justify-end" title={row.lastSyncAt?.toISOString()}>
               <Clock className="size-3 shrink-0" aria-hidden="true" />
-              {row.lastSyncAt ? (
-                <span title={row.lastSyncAt.toISOString()}>
-                  {formatDistanceToNow(row.lastSyncAt, { addSuffix: true })}
-                </span>
-              ) : (
-                <span>لم يتزامن مطلقًا</span>
-              )}
+              <span className="truncate">
+                {row.lastSyncAt ? formatDistanceToNow(row.lastSyncAt) : "—"}
+              </span>
             </div>
           </div>
         )

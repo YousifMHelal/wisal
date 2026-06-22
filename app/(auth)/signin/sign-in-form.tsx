@@ -112,7 +112,7 @@ function DevRoleSwitcher() {
         redirect: false,
       });
       if (!result?.error) {
-        router.push("/live-operations");
+        router.push("/overview");
         router.refresh();
       }
     });

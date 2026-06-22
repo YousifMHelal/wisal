@@ -8,43 +8,49 @@ import { resolveShiftSwap } from "@/lib/actions/workforce"
 import type { HourSlot, ShiftSwapRow } from "@/lib/queries/workforce"
 
 function hourLabel(h: number): string {
-  const ampm = h < 12 ? "AM" : "PM"
+  const ampm = h < 12 ? "ص" : "م"
   const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h
   return `${h12}${ampm}`
 }
 
 interface CoverageBarProps {
   slot: HourSlot
+  showLabel: boolean
 }
 
-function CoverageBar({ slot }: CoverageBarProps) {
+function CoverageBar({ slot, showLabel }: CoverageBarProps) {
   if (slot.forecastDemand === 0) {
     return (
-      <div className="h-12 flex items-end justify-center">
-        <div className="w-full h-1 rounded-sm bg-muted/30" />
+      <div className="flex flex-col items-end gap-1 flex-1 min-w-0">
+        <div className="w-full bg-muted/10 rounded-sm" style={{ height: 68 }} />
+        <span className="h-3" />
       </div>
     )
   }
-  const pct = Math.min((slot.staffed / slot.forecastDemand) * 100, 150)
+
+  const pct = Math.min((slot.staffed / slot.forecastDemand) * 100, 100)
   const isOver = slot.staffed > slot.forecastDemand
   const isUnder = slot.staffed < slot.forecastDemand * 0.85
+
   const barColor = isOver
     ? "bg-[var(--status-green)]"
     : isUnder
     ? "bg-[var(--status-red)]"
     : "bg-[var(--status-amber)]"
 
+  const label = `${hourLabel(slot.hour)}: ${slot.staffed}/${slot.forecastDemand}`
+
   return (
-    <div className="h-12 flex flex-col items-center justify-end gap-0.5">
-      <span className="text-[9px] text-muted-foreground tabular-nums leading-none">
-        {slot.staffed}/{slot.forecastDemand}
-      </span>
-      <div className="w-full bg-muted/30 rounded-sm overflow-hidden h-8 flex items-end">
+    <div className="flex flex-col items-end gap-1 flex-1 min-w-0 group" title={label}>
+      <div className="w-full bg-muted/10 rounded-sm overflow-hidden flex flex-col justify-end" style={{ height: 68 }}>
         <div
-          className={`w-full rounded-sm transition-all duration-300 ${barColor}`}
-          style={{ height: `${Math.min(pct, 100)}%` }}
+          className={`w-full ${barColor} rounded-sm transition-all duration-300 group-hover:brightness-110`}
+          style={{ height: `${pct}%` }}
         />
       </div>
+      <span className="text-[9px] text-muted-foreground tabular-nums leading-none h-3 flex items-center self-center">
+        {showLabel ? hourLabel(slot.hour) : ""}
+      </span>
     </div>
   )
 }
@@ -136,28 +142,28 @@ export function ScheduleCoverageClient({ slots, swaps }: Props) {
   return (
     <div className="flex flex-col gap-4">
       {/* Summary + toggle */}
-      <div className="flex flex-wrap items-center gap-3 justify-between">
-        <div className="flex items-center gap-4 text-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-5">
           <div>
-            <span className="text-muted-foreground text-xs uppercase tracking-wide">التغطية</span>
-            <p className="text-lg font-semibold tabular-nums text-foreground">{coveragePct}%</p>
+            <p className="text-[11px] text-muted-foreground">التغطية</p>
+            <p className="text-xl font-bold tabular-nums text-foreground leading-tight">{coveragePct}%</p>
           </div>
           <div>
-            <span className="text-muted-foreground text-xs uppercase tracking-wide">الموظفون</span>
-            <p className="text-lg font-semibold tabular-nums text-foreground">{totalStaffed}</p>
+            <p className="text-[11px] text-muted-foreground">الموظفون</p>
+            <p className="text-xl font-bold tabular-nums text-foreground leading-tight">{totalStaffed}</p>
           </div>
           <div>
-            <span className="text-muted-foreground text-xs uppercase tracking-wide">التوقع</span>
-            <p className="text-lg font-semibold tabular-nums text-muted-foreground">{totalForecast}</p>
+            <p className="text-[11px] text-muted-foreground">التوقع</p>
+            <p className="text-xl font-bold tabular-nums text-muted-foreground leading-tight">{totalForecast}</p>
           </div>
         </div>
-        <div className="flex rounded-md border border-border overflow-hidden text-xs">
+        <div className="flex rounded-lg border border-border overflow-hidden text-xs">
           {(["day", "peak"] as const).map((v) => (
             <button
               key={v}
               type="button"
               onClick={() => setView(v)}
-              className={`px-3 py-1.5 transition-colors duration-150 cursor-pointer capitalize ${
+              className={`px-3 py-1.5 transition-colors duration-150 cursor-pointer ${
                 view === v
                   ? "bg-primary text-primary-foreground font-medium"
                   : "bg-card text-muted-foreground hover:bg-muted"
@@ -172,31 +178,28 @@ export function ScheduleCoverageClient({ slots, swaps }: Props) {
       {/* Legend */}
       <div className="flex items-center gap-4 text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5">
-          <span className="size-2.5 rounded-sm bg-[var(--status-green)] inline-block" />
+          <span className="size-2 rounded-full bg-status-green inline-block" />
           فائض توظيف
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="size-2.5 rounded-sm bg-[var(--status-amber)] inline-block" />
+          <span className="size-2 rounded-full bg-status-amber inline-block" />
           في الهدف
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="size-2.5 rounded-sm bg-[var(--status-red)] inline-block" />
+          <span className="size-2 rounded-full bg-status-red inline-block" />
           نقص توظيف
         </span>
       </div>
 
-      {/* Gantt bars */}
-      <div className="overflow-x-auto">
-        <div className="flex items-end gap-0.5 min-w-[320px]" style={{ minHeight: "80px" }}>
-          {displaySlots.map((slot) => (
-            <div key={slot.hour} className="flex flex-col items-center flex-1 min-w-0 gap-1">
-              <CoverageBar slot={slot} />
-              <span className="text-[9px] text-muted-foreground tabular-nums leading-none">
-                {hourLabel(slot.hour)}
-              </span>
-            </div>
-          ))}
-        </div>
+      {/* Bar chart */}
+      <div className="flex items-end gap-px">
+        {displaySlots.map((slot, i) => (
+          <CoverageBar
+            key={slot.hour}
+            slot={slot}
+            showLabel={slot.hour % 4 === 0}
+          />
+        ))}
       </div>
 
       {/* Shift swap requests */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { StatusBadge } from "@/components/ui/status-badge";
+import * as React from "react";
 import type { KpiStatus } from "@/lib/kpi";
 import type { ModuleId } from "@/lib/module-status";
 import { cn } from "@/lib/utils";
@@ -249,41 +249,54 @@ function NavModuleItem({
   return (
     <div className="space-y-0.5">
       {collapsed ? (
-        <Link
-          href={mod.children![0].href}
-          title={label}
-          className={cn(
-            "flex items-center justify-center rounded-lg px-2 py-2 transition-colors duration-150 cursor-pointer min-h-10 w-full",
-            isModuleActive
-              ? "bg-sidebar-accent text-sidebar-primary"
-              : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-          )}
-        >
-          <span className="relative shrink-0">
+        <div className="flex flex-col items-center gap-0.5">
+          {/* parent icon — non-clickable section divider */}
+          <span
+            title={label}
+            className="flex items-center justify-center rounded-md px-2 py-1.5 w-full text-primary/60">
             {mod.icon}
-            {dotStatus && (
-              <StatusBadge
-                status={dotStatus}
-                dot
-                className="absolute -top-0.5 -inset-e-0.5 size-2"
-              />
-            )}
           </span>
-        </Link>
+          {/* child icon links */}
+          {mod.children!.map((child) => {
+            const childActive = pathname === child.href;
+            const childLabel = isAr ? child.labelAr : child.labelEn;
+            return (
+              <Link
+                key={child.href}
+                href={child.href}
+                title={childLabel}
+                aria-current={childActive ? "page" : undefined}
+                className={cn(
+                  "flex items-center justify-center rounded-md px-2 py-1.5 transition-colors duration-150 w-full min-h-8",
+                  childActive
+                    ? "bg-sidebar-accent text-sidebar-primary"
+                    : "text-sidebar-foreground/50 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                )}>
+                {child.icon}
+              </Link>
+            );
+          })}
+        </div>
       ) : (
         <>
           <div className="flex items-center gap-2 px-2 pt-1 pb-1.5">
-            <span className={cn("shrink-0 p-1 rounded-md bg-primary/10 text-primary")}>
+            <span
+              className={cn(
+                "shrink-0 p-1 rounded-md bg-primary/10 text-primary",
+              )}>
               {mod.icon}
             </span>
-            <span className={cn("text-[14px] font-bold tracking-widest uppercase truncate text-primary")}>
+            <span
+              className={cn(
+                "text-[13px] font-bold tracking-widest uppercase truncate text-primary",
+              )}>
               {label}
             </span>
           </div>
           <div className="space-y-0.5 ms-2 border-s border-sidebar-border/60 ps-2">
             {mod.children!.map((child) => {
-              const childActive = pathname === child.href
-              const childLabel = isAr ? child.labelAr : child.labelEn
+              const childActive = pathname === child.href;
+              const childLabel = isAr ? child.labelAr : child.labelEn;
               return (
                 <Link
                   key={child.href}
@@ -294,25 +307,25 @@ function NavModuleItem({
                     childActive
                       ? "bg-sidebar-accent text-sidebar-primary font-medium"
                       : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                  )}
-                >
+                  )}>
                   <span
                     className={cn(
                       "shrink-0",
-                      childActive ? "text-primary" : "text-sidebar-foreground/40",
-                    )}
-                  >
+                      childActive
+                        ? "text-primary"
+                        : "text-sidebar-foreground/40",
+                    )}>
                     {child.icon}
                   </span>
                   <span className="flex-1 truncate">{childLabel}</span>
                 </Link>
-              )
+              );
             })}
           </div>
         </>
       )}
     </div>
-  )
+  );
 }
 
 interface SidebarRailProps {
@@ -385,11 +398,11 @@ export function SidebarRail({
           )}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}>
           {collapsed ? (
-            <ChevronRight className="size-4" />
+            <ChevronLeft className="size-4" />
           ) : (
             <>
-              <ChevronLeft className="size-4" />
-              <span>{isAr ? "طي" : "Collapse"}</span>
+              <ChevronRight className="size-4" />
+              <span>{isAr ? "طي القائمة" : "Collapse"}</span>
             </>
           )}
         </button>

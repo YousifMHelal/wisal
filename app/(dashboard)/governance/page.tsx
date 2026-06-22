@@ -29,8 +29,8 @@ export default async function GovernancePage({ searchParams }: PageProps) {
       <div className="space-y-4 md:space-y-6">
         <ComplianceScorecardWidget filters={filters} />
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
-          <MedicalApprovalLogWidget filters={filters} />
-          <ConsentAuditWidget filters={filters} />
+          <div id="medical-approval-log"><MedicalApprovalLogWidget filters={filters} /></div>
+          <div id="consent-audit"><ConsentAuditWidget filters={filters} /></div>
         </div>
       </div>
     </>

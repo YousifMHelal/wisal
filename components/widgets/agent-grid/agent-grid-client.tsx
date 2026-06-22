@@ -164,10 +164,10 @@ export function AgentGridClient({ agents, trainingMap }: Props) {
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto rounded-lg border border-border">
+      <div className="overflow-x-auto overflow-y-auto max-h-120 rounded-lg border border-border">
         <table className="w-full text-sm min-w-[720px]">
-          <thead>
-            <tr className="border-b border-border bg-muted/40">
+          <thead className="sticky top-0 z-10">
+            <tr className="border-b border-border bg-muted">
               <th className="py-2 ps-3 pe-2 w-8" />
               <th
                 className="py-2 px-2 text-start text-xs font-medium text-muted-foreground uppercase tracking-wide cursor-pointer hover:text-foreground transition-colors select-none whitespace-nowrap"
