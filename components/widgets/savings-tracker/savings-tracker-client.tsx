@@ -2,10 +2,10 @@
 
 import { useState, useTransition } from "react"
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, Legend,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, Cell,
 } from "recharts"
-import { Download, Loader2 } from "lucide-react"
+import { Download, Loader2, Clock, Bot } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { exportSavingsReport } from "@/lib/actions/executive"
 import type { SavingsPoint } from "@/lib/queries/executive"
@@ -25,44 +25,33 @@ interface CustomTooltipProps {
   active?: boolean
   payload?: Array<{ name: string; value: number; color: string }>
   label?: string
+  isAr: boolean
 }
 
-function SavingsTooltipAr({ active, payload, label }: CustomTooltipProps) {
+function SavingsTooltip({ active, payload, label, isAr }: CustomTooltipProps) {
   if (!active || !payload?.length) return null
-  const agentHrs = payload.find((p) => p.name === "agentHoursSaved")?.value ?? 0
-  const volume = payload.find((p) => p.name === "aiResolvedVolume")?.value ?? 0
-  const ahtSaved = payload.find((p) => p.name === "estimatedHoursSaved")?.value ?? 0
   return (
-    <div className="rounded-lg border border-border bg-card p-3 shadow-xl text-xs space-y-1.5 min-w-[200px]">
+    <div className="rounded-lg border border-border bg-card p-3 shadow-xl text-xs space-y-1.5 min-w-48">
       <p className="font-medium text-foreground">{label}</p>
-      <div className="space-y-1 text-muted-foreground">
-        <p>ساعات الموظفين الموفرة: <span className="tabular-nums text-foreground font-medium">{agentHrs.toFixed(1)} ساعة</span></p>
-        <p>حجم ما حله الذكاء الاصطناعي: <span className="tabular-nums text-foreground font-medium">{volume.toLocaleString()}</span></p>
-        <p>الساعات المقدرة الموفرة (حجم × AHT): <span className="tabular-nums text-foreground font-medium">{ahtSaved.toFixed(1)} ساعة</span></p>
+      <div className="space-y-1">
+        {payload.map((p) => {
+          const labelText = isAr
+            ? p.name === "agentHoursSaved"
+              ? "ساعات الموظفين الموفرة"
+              : "الساعات المقدرة (حجم × AHT)"
+            : p.name === "agentHoursSaved"
+              ? "Agent hours saved"
+              : "Est. hours (vol × AHT)"
+          return (
+            <p key={p.name} className="flex justify-between gap-4">
+              <span className="text-muted-foreground">{labelText}</span>
+              <span className="tabular-nums font-medium text-foreground">
+                {p.value.toFixed(1)} {isAr ? "س" : "h"}
+              </span>
+            </p>
+          )
+        })}
       </div>
-      <p className="text-[10px] text-muted-foreground border-t border-border pt-1">
-        الحساب: حجم ما حله الذكاء الاصطناعي × متوسط وقت المعالجة الموفر ÷ 3600
-      </p>
-    </div>
-  )
-}
-
-function SavingsTooltipEn({ active, payload, label }: CustomTooltipProps) {
-  if (!active || !payload?.length) return null
-  const agentHrs = payload.find((p) => p.name === "agentHoursSaved")?.value ?? 0
-  const volume = payload.find((p) => p.name === "aiResolvedVolume")?.value ?? 0
-  const ahtSaved = payload.find((p) => p.name === "estimatedHoursSaved")?.value ?? 0
-  return (
-    <div className="rounded-lg border border-border bg-card p-3 shadow-xl text-xs space-y-1.5 min-w-[200px]">
-      <p className="font-medium text-foreground">{label}</p>
-      <div className="space-y-1 text-muted-foreground">
-        <p>Agent hours saved: <span className="tabular-nums text-foreground font-medium">{agentHrs.toFixed(1)} hrs</span></p>
-        <p>AI resolved volume: <span className="tabular-nums text-foreground font-medium">{volume.toLocaleString()}</span></p>
-        <p>Est. hours saved (vol × AHT): <span className="tabular-nums text-foreground font-medium">{ahtSaved.toFixed(1)} hrs</span></p>
-      </div>
-      <p className="text-[10px] text-muted-foreground border-t border-border pt-1">
-        Calc: AI resolved volume × avg handle time saved ÷ 3600
-      </p>
     </div>
   )
 }
@@ -76,6 +65,7 @@ interface Props {
 export function SavingsTrackerClient({ data, filters, locale = "ar" }: Props) {
   const isAr = locale === "ar"
   const [isPending, startTransition] = useTransition()
+  const [activeBar, setActiveBar] = useState<string | null>(null)
 
   const chartData = data.map((d) => ({
     date: d.date instanceof Date ? d.date.toISOString().slice(0, 10) : String(d.date).slice(0, 10),
@@ -84,6 +74,11 @@ export function SavingsTrackerClient({ data, filters, locale = "ar" }: Props) {
     estimatedHoursSaved: +d.estimatedHoursSaved.toFixed(1),
   }))
 
+  // Totals for KPI cards
+  const totalAgentHrs = chartData.reduce((s, d) => s + d.agentHoursSaved, 0)
+  const totalEstHrs = chartData.reduce((s, d) => s + d.estimatedHoursSaved, 0)
+  const totalAiVolume = chartData.reduce((s, d) => s + d.aiResolvedVolume, 0)
+
   function handleExport() {
     startTransition(async () => {
       const fd = new FormData()
@@ -91,7 +86,6 @@ export function SavingsTrackerClient({ data, filters, locale = "ar" }: Props) {
       fd.set("range", filters.range)
       if (filters.from) fd.set("from", filters.from.toISOString().slice(0, 10))
       if (filters.to) fd.set("to", filters.to.toISOString().slice(0, 10))
-
       const result = await exportSavingsReport(fd)
       if (result?.csv) {
         downloadCsv(result.csv, `savings-report-${new Date().toISOString().slice(0, 10)}.csv`)
@@ -110,85 +104,113 @@ export function SavingsTrackerClient({ data, filters, locale = "ar" }: Props) {
   }
 
   return (
-    <div className="space-y-3">
-      {/* export button */}
-      <div className="flex justify-end">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleExport}
-          disabled={isPending}
-          className="gap-2 cursor-pointer"
-        >
-          {isPending ? <Loader2 className="size-3.5 animate-spin" /> : <Download className="size-3.5" />}
-          {isAr ? "تصدير للمجلس" : "Export for Board"}
-        </Button>
+    <div className="space-y-4">
+      {/* KPI summary cards */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="rounded-lg border border-border bg-card p-3 space-y-1">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Clock className="size-3.5 shrink-0" />
+            {isAr ? "ساعات موظفين موفرة" : "Agent hrs saved"}
+          </div>
+          <p className="text-xl font-semibold tabular-nums text-primary">
+            {totalAgentHrs.toFixed(0)}
+            <span className="text-xs font-normal text-muted-foreground ms-1">{isAr ? "س" : "h"}</span>
+          </p>
+        </div>
+        <div className="rounded-lg border border-border bg-card p-3 space-y-1">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Clock className="size-3.5 shrink-0" />
+            {isAr ? "ساعات مقدرة (×AHT)" : "Est. hrs (×AHT)"}
+          </div>
+          <p className="text-xl font-semibold tabular-nums text-status-green-fg">
+            {totalEstHrs.toFixed(0)}
+            <span className="text-xs font-normal text-muted-foreground ms-1">{isAr ? "س" : "h"}</span>
+          </p>
+        </div>
+        <div className="rounded-lg border border-border bg-card p-3 space-y-1">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Bot className="size-3.5 shrink-0" />
+            {isAr ? "حجم ذكاء اصطناعي" : "AI resolved"}
+          </div>
+          <p className="text-xl font-semibold tabular-nums text-foreground">
+            {totalAiVolume.toLocaleString()}
+          </p>
+        </div>
       </div>
 
-      {/* chart */}
-      <ResponsiveContainer width="100%" height={260}>
-        <AreaChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
-          <defs>
-            <linearGradient id="grad-agent" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0} />
-            </linearGradient>
-            <linearGradient id="grad-est" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="var(--status-green)" stopOpacity={0.25} />
-              <stop offset="95%" stopColor="var(--status-green)" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" strokeOpacity={0.5} />
+      {/* Grouped bar chart */}
+      <ResponsiveContainer width="100%" height={220}>
+        <BarChart
+          data={chartData}
+          margin={{ top: 4, right: 8, bottom: 0, left: -8 }}
+          barCategoryGap="30%"
+          barGap={4}
+        >
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.5} />
           <XAxis
             dataKey="date"
-            tick={{ fontSize: 11, fill: "var(--color-muted-foreground)" }}
+            tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
             tickLine={false}
             axisLine={false}
             interval="preserveStartEnd"
           />
           <YAxis
-            tick={{ fontSize: 11, fill: "var(--color-muted-foreground)" }}
+            tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
             tickLine={false}
             axisLine={false}
-            width={40}
+            width={36}
+            tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)}
           />
-          <Tooltip content={isAr ? <SavingsTooltipAr /> : <SavingsTooltipEn />} />
-          <Legend
-            wrapperStyle={{ fontSize: 11, color: "var(--color-muted-foreground)" }}
-            formatter={(value) =>
-              isAr
-                ? value === "agentHoursSaved"
-                  ? "ساعات الموظفين الموفرة"
-                  : value === "estimatedHoursSaved"
-                  ? "الساعات المقدرة (حجم × AHT)"
-                  : value
-                : value === "agentHoursSaved"
-                  ? "Agent Hours Saved"
-                  : value === "estimatedHoursSaved"
-                  ? "Est. Hours (vol × AHT)"
-                  : value
-            }
+          <Tooltip
+            content={<SavingsTooltip isAr={isAr} />}
+            cursor={{ fill: "var(--muted-foreground)", opacity: 0.08 }}
           />
-          <Area
-            type="monotone"
+          <Bar
             dataKey="agentHoursSaved"
-            stroke="var(--color-primary)"
-            strokeWidth={2}
-            fill="url(#grad-agent)"
-            dot={false}
-            activeDot={{ r: 4 }}
+            name="agentHoursSaved"
+            fill="var(--primary)"
+            radius={[4, 4, 0, 0]}
+            maxBarSize={40}
+            onMouseEnter={() => setActiveBar("agent")}
+            onMouseLeave={() => setActiveBar(null)}
+            opacity={activeBar === "est" ? 0.35 : 1}
           />
-          <Area
-            type="monotone"
+          <Bar
             dataKey="estimatedHoursSaved"
-            stroke="var(--status-green)"
-            strokeWidth={2}
-            fill="url(#grad-est)"
-            dot={false}
-            activeDot={{ r: 4 }}
+            name="estimatedHoursSaved"
+            fill="var(--status-green)"
+            radius={[4, 4, 0, 0]}
+            maxBarSize={40}
+            onMouseEnter={() => setActiveBar("est")}
+            onMouseLeave={() => setActiveBar(null)}
+            opacity={activeBar === "agent" ? 0.35 : 1}
           />
-        </AreaChart>
+        </BarChart>
       </ResponsiveContainer>
+
+      {/* Legend + export */}
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div className="flex items-center gap-4 text-[11px] text-muted-foreground">
+          <span className="flex items-center gap-1.5">
+            <span className="size-2.5 rounded-sm shrink-0" style={{ background: "var(--primary)" }} />
+            {isAr ? "ساعات الموظفين" : "Agent Hours"}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="size-2.5 rounded-sm shrink-0" style={{ background: "var(--status-green)" }} />
+            {isAr ? "الساعات المقدرة (×AHT)" : "Est. Hours (×AHT)"}
+          </span>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleExport}
+          disabled={isPending}
+          className="gap-2 cursor-pointer h-7 text-xs"
+        >
+          {isPending ? <Loader2 className="size-3.5 animate-spin" /> : <Download className="size-3.5" />}
+          {isAr ? "تصدير للمجلس" : "Export for Board"}
+        </Button>
+      </div>
     </div>
   )
 }

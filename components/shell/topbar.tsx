@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { prisma } from "@/lib/prisma"
 import { requireAuth } from "@/lib/auth"
 import { ROLE_LABELS } from "@/lib/auth"
@@ -23,12 +24,14 @@ export async function TopBar({ locale, statuses }: TopBarProps) {
   const userRole = ROLE_LABELS[session.user.role]
 
   return (
-    <TopBarClient
-      clusters={clusters}
-      locale={locale}
-      userName={userName}
-      userRole={userRole}
-      statuses={statuses}
-    />
+    <Suspense fallback={<div className="h-14 border-b border-border bg-background/95" />}>
+      <TopBarClient
+        clusters={clusters}
+        locale={locale}
+        userName={userName}
+        userRole={userRole}
+        statuses={statuses}
+      />
+    </Suspense>
   )
 }

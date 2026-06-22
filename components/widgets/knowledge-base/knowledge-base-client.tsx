@@ -4,7 +4,7 @@ import { useState, useMemo, useTransition } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Search, ChevronDown, ChevronRight, Globe } from "lucide-react"
+import { Search, ChevronDown, ChevronRight } from "lucide-react"
 import { format } from "date-fns"
 import { setArticleStatus } from "@/lib/actions/governance"
 import type { KnowledgeArticleRow } from "@/lib/queries/governance"
@@ -25,7 +25,6 @@ export function KnowledgeBaseClient({ rows, canPublish, locale = "ar" }: Props) 
   const isAr = locale === "ar"
   const [search, setSearch] = useState("")
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
-  const [previewLang, setPreviewLang] = useState<Record<string, "en" | "ar">>({})
   const [pending, startTransition] = useTransition()
   const [actionResult, setActionResult] = useState<Record<string, string>>({})
 
@@ -46,10 +45,6 @@ export function KnowledgeBaseClient({ rows, canPublish, locale = "ar" }: Props) 
       next.has(id) ? next.delete(id) : next.add(id)
       return next
     })
-  }
-
-  const toggleLang = (id: string) => {
-    setPreviewLang((prev) => ({ ...prev, [id]: prev[id] === "ar" ? "en" : "ar" }))
   }
 
   const handleAction = (articleId: string, action: "PUBLISH" | "UNPUBLISH" | "DRAFT") => {
@@ -86,7 +81,7 @@ export function KnowledgeBaseClient({ rows, canPublish, locale = "ar" }: Props) 
         )}
         {filtered.map((article) => {
           const isExpanded = expanded.has(article.id)
-          const lang = previewLang[article.id] ?? "en"
+          const lang = isAr ? "ar" : "en"
           const cfg = STATUS_CONFIG[article.status]
           const result = actionResult[article.id]
 
@@ -174,14 +169,6 @@ export function KnowledgeBaseClient({ rows, canPublish, locale = "ar" }: Props) 
                       {article.publisherName && <span>{isAr ? "نشر بواسطة" : "Published by"} {article.publisherName}</span>}
                       <span>{isAr ? "تحديث" : "Updated"} {format(article.updatedAt, "dd MMM yyyy")}</span>
                     </div>
-                    <button
-                      onClick={() => toggleLang(article.id)}
-                      className="inline-flex items-center gap-1 text-xs text-primary hover:underline cursor-pointer"
-                      aria-label={lang === "en" ? "Switch preview to Arabic" : "Switch preview to English"}
-                    >
-                      <Globe className="size-3" aria-hidden />
-                      {lang === "en" ? "AR" : "EN"}
-                    </button>
                   </div>
 
                   {/* Body preview */}

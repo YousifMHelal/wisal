@@ -169,8 +169,24 @@ async function main() {
   // ── Incidents — page: /live-operations ───────────────────────────────────
   console.log("  incidents…")
   const INCIDENT_TYPES = ["SLA Breach", "High Abandon Rate", "AHT Spike", "System Latency", "Agent Shortage", "NLU Confidence Drop", "Forbidden Intent Detected"]
+  // First 10: unacknowledged today (always visible on live/today filter)
+  for (let i = 0; i < 10; i++) {
+    await prisma.incident.create({
+      data: {
+        severity: i < 3 ? "CRITICAL" : "WARNING",
+        type: pick(INCIDENT_TYPES),
+        description: `Auto-detected ${pick(INCIDENT_TYPES).toLowerCase()} event requiring attention.`,
+        clusterId: pick(clusterIds),
+        channelId: Math.random() > 0.5 ? pick(Object.values(channelMap) as string[]) : null,
+        triggeredAt: hoursAgo(randInt(0, 6)),
+        acknowledgedAt: null,
+        metricTrend: Array.from({ length: 8 }, (_, j) => ({ t: j, v: rand(60, 95) })),
+      },
+    })
+  }
+  // Next 15: mix of acknowledged/unacknowledged across last 7 days
   for (let i = 0; i < 15; i++) {
-    const ackd = Math.random() > 0.5
+    const ackd = Math.random() > 0.4
     await prisma.incident.create({
       data: {
         severity: Math.random() > 0.4 ? "WARNING" : "CRITICAL",
@@ -178,7 +194,7 @@ async function main() {
         description: `Auto-detected ${pick(INCIDENT_TYPES).toLowerCase()} event requiring attention.`,
         clusterId: pick(clusterIds),
         channelId: Math.random() > 0.5 ? pick(Object.values(channelMap) as string[]) : null,
-        triggeredAt: hoursAgo(randInt(0, 72)),
+        triggeredAt: hoursAgo(randInt(6, 168)),
         acknowledgedAt: ackd ? hoursAgo(randInt(0, 24)) : null,
         metricTrend: Array.from({ length: 8 }, (_, j) => ({ t: j, v: rand(60, 95) })),
       },
@@ -189,7 +205,7 @@ async function main() {
   // 7 days × 5 clusters (representative sample)
   console.log("  tier snapshots…")
   for (let day = 6; day >= 0; day--) {
-    const ts = daysAgo(day)
+    const ts = daysAgo(day); ts.setHours(12, 0, 0, 0)
     for (const cid of clusterIds.slice(0, 5)) {
       const t1 = rand(55, 75), t2 = rand(15, 25)
       await prisma.tierSnapshot.create({
@@ -302,13 +318,31 @@ async function main() {
   // ── Forbidden Intent Events — page: /governance/forbidden-intent ──────────
   console.log("  forbidden intent events…")
   const PATTERNS = ["Self-harm inquiry", "Medication overdose", "Unauthorized prescription", "Privacy breach attempt", "System exploit probe"]
-  for (let i = 0; i < 15; i++) {
+  const PATTERN_RESPONSES = [
+    "Interaction terminated and escalated to human agent per policy.",
+    "Session closed. Mandatory escalation to clinical supervisor triggered.",
+    "Blocked by NLU policy layer. Incident logged for compliance review.",
+    "Forwarded to on-call supervisor. Case flagged in audit trail.",
+  ]
+  // First 8: today — always visible on live/today filter
+  for (let i = 0; i < 8; i++) {
     await prisma.forbiddenIntentEvent.create({
       data: {
         caseId: `FI-${String(i + 1).padStart(5, "0")}`,
         pattern: pick(PATTERNS),
-        wisalResponse: "Interaction terminated and escalated to human agent per policy.",
-        timestamp: daysAgo(randInt(0, 14)),
+        wisalResponse: pick(PATTERN_RESPONSES),
+        timestamp: hoursAgo(randInt(0, 8)),
+      },
+    })
+  }
+  // Next 22: spread across last 14 days
+  for (let i = 8; i < 30; i++) {
+    await prisma.forbiddenIntentEvent.create({
+      data: {
+        caseId: `FI-${String(i + 1).padStart(5, "0")}`,
+        pattern: pick(PATTERNS),
+        wisalResponse: pick(PATTERN_RESPONSES),
+        timestamp: daysAgo(randInt(1, 14)),
       },
     })
   }
@@ -587,17 +621,36 @@ async function main() {
   // ── Penalty Records — page: /executive/insights ───────────────────────────
   console.log("  penalty records…")
   const PENALTY_KPIS = ["SERVICE_LEVEL", "ABANDONED_CALLS", "FCR", "ASA"]
-  for (const cid of clusterIds.slice(0, 8)) {
+  // Today's records for all clusters — always visible on live/today
+  for (const cid of clusterIds) {
     for (const kpi of PENALTY_KPIS) {
-      const fail = rand(0.01, 0.15), tolerance = 0.05, breached = fail > tolerance
+      const fail = rand(0.01, 0.18), tolerance = 0.05, breached = fail > tolerance
+      const todayPeriod = daysAgo(0); todayPeriod.setHours(0, 0, 0, 0)
       await prisma.penaltyRecord.create({
         data: {
-          clusterId: cid, period: daysAgo(randInt(0, 14)), kpi,
+          clusterId: cid, period: todayPeriod, kpi,
           failurePct: fail * 100, permissibleTolerance: tolerance * 100,
           breached, penaltyAmount: breached ? fail * 500_000 : 0,
           basis: "Avg failure % × SAR 500,000 operating cost base (RFP §6)",
         },
       })
+    }
+  }
+  // Historical: last 14 days for first 10 clusters
+  for (const cid of clusterIds.slice(0, 10)) {
+    for (let day = 1; day <= 14; day++) {
+      for (const kpi of PENALTY_KPIS) {
+        const fail = rand(0.01, 0.15), tolerance = 0.05, breached = fail > tolerance
+        const period = daysAgo(day); period.setHours(0, 0, 0, 0)
+        await prisma.penaltyRecord.create({
+          data: {
+            clusterId: cid, period, kpi,
+            failurePct: fail * 100, permissibleTolerance: tolerance * 100,
+            breached, penaltyAmount: breached ? fail * 500_000 : 0,
+            basis: "Avg failure % × SAR 500,000 operating cost base (RFP §6)",
+          },
+        })
+      }
     }
   }
 

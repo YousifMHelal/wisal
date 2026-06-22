@@ -151,14 +151,14 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
             <ChevronDown className="size-3.5 text-muted-foreground" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-56 max-h-80">
-            <DropdownMenuItem onSelect={() => updateParam("cluster", "")}>
+            <DropdownMenuItem onClick={() => updateParam("cluster", "")}>
               {allClustersLabel}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             {clusters.map((c) => (
               <DropdownMenuItem
                 key={c.id}
-                onSelect={() => updateParam("cluster", c.id)}>
+                onClick={() => updateParam("cluster", c.id)}>
                 {isAr ? c.nameAr : c.name}
               </DropdownMenuItem>
             ))}
@@ -176,7 +176,7 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
             {DATE_RANGES.map((r) => (
               <DropdownMenuItem
                 key={r.value}
-                onSelect={() => updateParam("range", r.value)}>
+                onClick={() => updateParam("range", r.value)}>
                 {isAr ? r.ar : r.en}
               </DropdownMenuItem>
             ))}

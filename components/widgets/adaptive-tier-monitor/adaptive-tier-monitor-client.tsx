@@ -56,16 +56,16 @@ export function AdaptiveTierMonitorClient({ data, locale = "ar" }: Props) {
   const chartData = useMemo(
     () =>
       trend.map((p) => ({
-        time: new Date(p.timestamp).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
+        time: new Date(p.timestamp).toLocaleDateString(isAr ? "ar-SA" : "en", {
+          month: "numeric",
+          day: "numeric",
         }),
         T1: p.tier1Pct,
         T2: p.tier2Pct,
         T3: p.tier3Pct,
         autocorrect: p.tier1AutocorrectRate,
       })),
-    [trend]
+    [trend, isAr]
   )
 
   if (!trend.length) return <WidgetEmpty message="No tier data for this period." messageAr="لا توجد بيانات مستويات لهذه الفترة." />
@@ -144,7 +144,7 @@ export function AdaptiveTierMonitorClient({ data, locale = "ar" }: Props) {
               tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(v: number) => `${v}%`}
+              tickFormatter={(v: number) => `${Math.round(v)}%`}
               domain={[0, 100]}
             />
             <Tooltip
