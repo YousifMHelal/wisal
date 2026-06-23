@@ -12,7 +12,10 @@ interface PageProps {
 
 export default async function TrainingImpactPage({ searchParams }: PageProps) {
   const params = await searchParams
-  const filters = parseFilters(params)
+  // Training impact is historical — default to 30d so production data is always visible.
+  // "live"/"today" would show nothing if the seed ran more than a day ago.
+  const filtersRaw = parseFilters(params)
+  const filters = filtersRaw.range === "live" ? { ...filtersRaw, range: "30d" as const } : filtersRaw
   const moduleFilter = typeof params.module === "string" ? params.module : undefined
   return (
     <>
