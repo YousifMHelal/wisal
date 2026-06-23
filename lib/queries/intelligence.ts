@@ -33,28 +33,42 @@ export async function getTierMonitorData(filters: Filters): Promise<TierMonitorD
       ...(filters.cluster ? { clusterId: filters.cluster } : {}),
     },
     orderBy: { timestamp: "asc" },
-    take: 100,
+    take: 500,
   })
 
-  const trend: TierPoint[] = snaps.map((s) => ({
-    timestamp: s.timestamp.toISOString(),
-    tier1Pct: Math.round(s.tier1Pct * 100) / 100,
-    tier2Pct: Math.round(s.tier2Pct * 100) / 100,
-    tier3Pct: Math.round(s.tier3Pct * 100) / 100,
-    tier1AutocorrectRate: Math.round(s.tier1AutocorrectRate * 100) / 100,
+  // Aggregate by calendar day (avg across clusters when no cluster filter)
+  const dayMap = new Map<string, { tier1: number[]; tier2: number[]; tier3: number[]; autocorrect: number[]; ts: string }>()
+  for (const s of snaps) {
+    const day = s.timestamp.toISOString().split("T")[0]
+    if (!dayMap.has(day)) dayMap.set(day, { tier1: [], tier2: [], tier3: [], autocorrect: [], ts: `${day}T12:00:00.000Z` })
+    const bucket = dayMap.get(day)!
+    bucket.tier1.push(s.tier1Pct)
+    bucket.tier2.push(s.tier2Pct)
+    bucket.tier3.push(s.tier3Pct)
+    bucket.autocorrect.push(s.tier1AutocorrectRate)
+  }
+
+  const avg = (arr: number[]) => Math.round((arr.reduce((a, b) => a + b, 0) / arr.length) * 100) / 100
+
+  const trend: TierPoint[] = Array.from(dayMap.values()).map((b) => ({
+    timestamp: b.ts,
+    tier1Pct: avg(b.tier1),
+    tier2Pct: avg(b.tier2),
+    tier3Pct: avg(b.tier3),
+    tier1AutocorrectRate: avg(b.autocorrect),
   }))
 
-  const latest = snaps[snaps.length - 1] ?? null
+  const lastDay = trend[trend.length - 1] ?? null
+
   return {
     trend,
-    latest: latest
+    latest: lastDay
       ? {
-          tier1Pct: latest.tier1Pct,
-          tier2Pct: latest.tier2Pct,
-          tier3Pct: latest.tier3Pct,
-          tier1AutocorrectRate: latest.tier1AutocorrectRate,
-          // Autocorrect status: green ≥ 80%, amber ≥ 60%, red below
-          autocorrectStatus: status("AI_COMPLETION_RATE", latest.tier1AutocorrectRate),
+          tier1Pct: lastDay.tier1Pct,
+          tier2Pct: lastDay.tier2Pct,
+          tier3Pct: lastDay.tier3Pct,
+          tier1AutocorrectRate: lastDay.tier1AutocorrectRate,
+          autocorrectStatus: status("AI_COMPLETION_RATE", lastDay.tier1AutocorrectRate),
         }
       : null,
   }

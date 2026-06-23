@@ -2,13 +2,14 @@
 
 import { useState, useMemo, useCallback } from "react"
 import {
-  AreaChart,
-  Area,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Cell,
 } from "recharts"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -24,11 +25,12 @@ interface Props {
 
 interface CustomTooltipProps {
   active?: boolean
-  payload?: Array<{ value: number }>
+  payload?: Array<{ value: number; name?: string }>
   label?: string
+  isAr?: boolean
 }
 
-function ChartTooltip({ active, payload, label }: CustomTooltipProps) {
+function ChartTooltip({ active, payload, label, isAr }: CustomTooltipProps) {
   if (!active || !payload?.length) return null
   return (
     <div className="rounded-lg border border-border bg-card px-3 py-2 text-xs shadow-lg">
@@ -41,6 +43,7 @@ function ChartTooltip({ active, payload, label }: CustomTooltipProps) {
     </div>
   )
 }
+
 
 export function ForbiddenIntentClient({ data, exportUrl, locale = "ar" }: Props) {
   const isAr = locale === "ar"
@@ -78,6 +81,18 @@ export function ForbiddenIntentClient({ data, exportUrl, locale = "ar" }: Props)
     rawDate: p.date,
   }))
 
+  // Pattern frequency breakdown — top 8 by count
+  const patternData = useMemo(() => {
+    const map = new Map<string, number>()
+    for (const e of data.events) {
+      map.set(e.pattern, (map.get(e.pattern) ?? 0) + 1)
+    }
+    return Array.from(map.entries())
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 8)
+      .map(([pattern, count]) => ({ pattern, count }))
+  }, [data.events])
+
   return (
     <div className="flex flex-col gap-4">
       {/* Summary row */}
@@ -99,21 +114,16 @@ export function ForbiddenIntentClient({ data, exportUrl, locale = "ar" }: Props)
         )}
       </div>
 
-      {/* Trend chart */}
-      <div className="h-40 sm:h-52 w-full" role="img" aria-label="Forbidden intent events trend">
+      {/* Daily volume — bar chart, click to filter */}
+      <div className="h-36 sm:h-44 w-full" role="img" aria-label="Forbidden intent daily volume">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart
+          <BarChart
             data={chartData}
             margin={{ top: 4, right: 4, left: -20, bottom: 0 }}
             onClick={handleChartClick as never}
             style={{ cursor: "pointer" }}
+            barCategoryGap="30%"
           >
-            <defs>
-              <linearGradient id="forbiddenGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--color-status-red)" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="var(--color-status-red)" stopOpacity={0.02} />
-              </linearGradient>
-            </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
             <XAxis
               dataKey="date"
@@ -128,19 +138,50 @@ export function ForbiddenIntentClient({ data, exportUrl, locale = "ar" }: Props)
               tickLine={false}
               allowDecimals={false}
             />
-            <Tooltip content={<ChartTooltip />} />
-            <Area
-              type="monotone"
-              dataKey="count"
-              stroke="var(--color-status-red)"
-              strokeWidth={2}
-              fill="url(#forbiddenGrad)"
-              dot={false}
-              activeDot={{ r: 4, fill: "var(--color-status-red)", strokeWidth: 0 }}
-            />
-          </AreaChart>
+            <Tooltip content={<ChartTooltip isAr={isAr} />} cursor={{ fill: "var(--color-muted)", opacity: 0.4 }} />
+            <Bar dataKey="count" radius={[3, 3, 0, 0]}>
+              {chartData.map((entry) => (
+                <Cell
+                  key={entry.rawDate}
+                  fill={entry.rawDate === selectedDate ? "var(--color-status-red)" : "color-mix(in srgb, var(--color-status-red) 45%, transparent)"}
+                />
+              ))}
+            </Bar>
+          </BarChart>
         </ResponsiveContainer>
       </div>
+
+      {/* Pattern breakdown — horizontal bars, top 8 */}
+      {patternData.length > 0 && (
+        <div>
+          <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">
+            {isAr ? "تكرار الأنماط" : "Pattern frequency"}
+          </p>
+          <div className="flex flex-col gap-1.5">
+            {patternData.map(({ pattern, count }) => {
+              const pct = Math.round((count / patternData[0].count) * 100)
+              const isSelected = filteredEvents.length > 0 && filteredEvents.some((e) => e.pattern === pattern)
+              return (
+                <div key={pattern} className="flex items-center gap-2 text-xs">
+                  <span className="w-36 sm:w-48 shrink-0 truncate text-muted-foreground" title={pattern}>{pattern}</span>
+                  <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-300"
+                      style={{
+                        width: `${pct}%`,
+                        background: isSelected
+                          ? "var(--color-status-red)"
+                          : "color-mix(in srgb, var(--color-status-red) 50%, transparent)",
+                      }}
+                    />
+                  </div>
+                  <span className="w-6 text-end tabular-nums text-foreground font-medium shrink-0">{count}</span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {selectedDate && (
         <p className="text-xs text-primary font-medium">
@@ -216,7 +257,7 @@ export function ForbiddenIntentClient({ data, exportUrl, locale = "ar" }: Props)
           : filteredEvents.length > 100
             ? `Showing 100 of ${filteredEvents.length} events`
             : `${filteredEvents.length} event${filteredEvents.length !== 1 ? "s" : ""}`}
-        {!selectedDate && (isAr ? " · انقر على شريط الرسم للفلترة بالتاريخ" : " · click chart bar to filter by date")}
+        {!selectedDate && (isAr ? " · انقر على عمود للفلترة بالتاريخ" : " · click a bar to filter by date")}
       </p>
     </div>
   )

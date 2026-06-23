@@ -2,8 +2,8 @@
 
 import { useState, useMemo } from "react"
 import {
-  AreaChart,
-  Area,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -114,25 +114,11 @@ export function AdaptiveTierMonitorClient({ data, locale = "ar" }: Props) {
         )}
       </div>
 
-      {/* Stacked area chart */}
+      {/* Stacked bar chart — tier composition per day */}
       <div className="h-48 md:h-56 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={filteredData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-            <defs>
-              <linearGradient id="gradT1" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={TIER_COLORS.T1} stopOpacity={0.25} />
-                <stop offset="95%" stopColor={TIER_COLORS.T1} stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="gradT2" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={TIER_COLORS.T2} stopOpacity={0.25} />
-                <stop offset="95%" stopColor={TIER_COLORS.T2} stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="gradT3" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={TIER_COLORS.T3} stopOpacity={0.25} />
-                <stop offset="95%" stopColor={TIER_COLORS.T3} stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+          <BarChart data={filteredData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }} barCategoryGap="28%">
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
             <XAxis
               dataKey="time"
               tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
@@ -155,36 +141,16 @@ export function AdaptiveTierMonitorClient({ data, locale = "ar" }: Props) {
                 fontSize: 12,
               }}
               labelStyle={{ color: "var(--foreground)" }}
+              cursor={{ fill: "var(--muted)", opacity: 0.4 }}
               formatter={(value, name) => [
                 `${(value as number).toFixed(1)}%`,
                 TIER_LABELS[name as string] ?? name,
               ]}
             />
-            <Area
-              type="monotone"
-              dataKey="T1"
-              stackId="1"
-              stroke={TIER_COLORS.T1}
-              fill="url(#gradT1)"
-              strokeWidth={2}
-            />
-            <Area
-              type="monotone"
-              dataKey="T2"
-              stackId="1"
-              stroke={TIER_COLORS.T2}
-              fill="url(#gradT2)"
-              strokeWidth={2}
-            />
-            <Area
-              type="monotone"
-              dataKey="T3"
-              stackId="1"
-              stroke={TIER_COLORS.T3}
-              fill="url(#gradT3)"
-              strokeWidth={2}
-            />
-          </AreaChart>
+            <Bar dataKey="T1" stackId="s" fill={TIER_COLORS.T1} radius={[0, 0, 0, 0]} maxBarSize={48} />
+            <Bar dataKey="T2" stackId="s" fill={TIER_COLORS.T2} maxBarSize={48} />
+            <Bar dataKey="T3" stackId="s" fill={TIER_COLORS.T3} radius={[3, 3, 0, 0]} maxBarSize={48} />
+          </BarChart>
         </ResponsiveContainer>
       </div>
 

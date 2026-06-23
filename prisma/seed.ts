@@ -202,9 +202,9 @@ async function main() {
   }
 
   // ── Tier Snapshots — page: /intelligence ─────────────────────────────────
-  // 7 days × 5 clusters (representative sample)
+  // 30 days × 5 clusters (representative sample)
   console.log("  tier snapshots…")
-  for (let day = 6; day >= 0; day--) {
+  for (let day = 29; day >= 0; day--) {
     const ts = daysAgo(day); ts.setHours(12, 0, 0, 0)
     for (const cid of clusterIds.slice(0, 5)) {
       const t1 = rand(55, 75), t2 = rand(15, 25)
@@ -229,7 +229,8 @@ async function main() {
     // First 5 land today so "live" filter always shows data
     const ts = i < 5 ? hoursAgo(randInt(0, 6)) : daysAgo(randInt(1, 14))
     await prisma.caregiverCase.upsert({
-      where: { caseId: cgCaseId }, update: {},
+      where: { caseId: cgCaseId },
+      update: { timestamp: ts },
       create: {
         caseId: cgCaseId, clusterId: pick(clusterIds),
         proxyConfirmed: pick(PROXY), action: pick(CG_ACTIONS),
