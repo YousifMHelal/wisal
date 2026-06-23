@@ -161,7 +161,7 @@ export function DriftWatchClient({ data, assignableUsers, locale = "ar" }: Props
               dataKey="nlu"
               radius={[0, 4, 4, 0]}
               onClick={(entry) =>
-                setHighlightedId((prev) => (prev === entry.id ? null : entry.id))
+                setHighlightedId((prev) => (prev === entry.id ? null : entry.id ?? null))
               }
               style={{ cursor: "pointer" }}
             >
