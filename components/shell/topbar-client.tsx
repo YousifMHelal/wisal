@@ -57,8 +57,7 @@ const DATE_RANGES = [
   { value: "today", en: "Today", ar: "اليوم" },
   { value: "7d", en: "7 Days", ar: "٧ أيام" },
   { value: "30d", en: "30 Days", ar: "٣٠ يوم" },
-  { value: "custom", en: "Custom", ar: "مخصص" },
-]
+];
 
 export function TopBarClient({ clusters, locale, userName, userRole, statuses }: TopBarClientProps) {
   const router = useRouter()
@@ -79,7 +78,7 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
   const searchRef = useRef<HTMLDivElement>(null)
 
   const currentCluster = searchParams.get("cluster") ?? ""
-  const currentRange = searchParams.get("range") ?? "live"
+  const currentRange = searchParams.get("range") ?? "7d"
 
   function updateParam(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString())
@@ -121,10 +120,13 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
     ? (() => { const c = clusters.find((c) => c.id === currentCluster); return c ? (isAr ? c.nameAr : c.name) : currentCluster })()
     : allClustersLabel
 
-  const rangeLabel = (() => { const r = DATE_RANGES.find((r) => r.value === currentRange); return r ? (isAr ? r.ar : r.en) : (isAr ? "مباشر" : "Live") })()
+  const rangeLabel = (() => {
+    const r = DATE_RANGES.find((r) => r.value === currentRange);
+    return r ? (isAr ? r.ar : r.en) : isAr ? "7 أيام" : "7 Days";
+  })();
 
   return (
-    <header className="h-14 flex items-center border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-30 gap-2 ps-3 pe-3">
+    <header suppressHydrationWarning className="h-14 flex items-center border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-30 gap-2 ps-3 pe-3">
       {/* Mobile: hamburger */}
       <button
         className="lg:hidden flex items-center justify-center size-9 rounded-md hover:bg-accent text-foreground transition-colors cursor-pointer min-h-11 min-w-11"
@@ -304,7 +306,7 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
 
       {/* Mobile nav drawer */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetContent side="left" className="w-72 p-0">
+        <SheetContent side={isAr ? "right" : "left"} className="w-72 p-0">
           <SheetHeader className="p-4 border-b border-border">
             <SheetTitle>
               {isAr ? "مركز وصال" : "Wisal Command Center"}

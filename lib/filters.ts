@@ -13,7 +13,7 @@ const VALID_RANGES: DateRange[] = ["live", "today", "7d", "30d", "custom"]
 
 function parseRange(raw: string | null | undefined): DateRange {
   if (raw && VALID_RANGES.includes(raw as DateRange)) return raw as DateRange
-  return "live"
+  return "7d"
 }
 
 function parseDate(raw: string | null | undefined): Date | null {
@@ -73,7 +73,7 @@ export function resolveDateBounds(filters: Filters): { from: Date; to: Date } {
 export function filtersToParams(filters: Partial<Filters>): string {
   const params = new URLSearchParams()
   if (filters.cluster) params.set("cluster", filters.cluster)
-  if (filters.range && filters.range !== "live") params.set("range", filters.range)
+  if (filters.range && filters.range !== "7d") params.set("range", filters.range)
   if (filters.from) params.set("from", filters.from.toISOString().slice(0, 10))
   if (filters.to) params.set("to", filters.to.toISOString().slice(0, 10))
   const qs = params.toString()

@@ -28,9 +28,9 @@ export default async function LiveOperationsPage({ searchParams }: PageProps) {
         ]}
       />
       <div className="space-y-4 md:space-y-6">
-        <ActiveIncidentsWidget filters={filters} />
         <ChannelPulseWidget filters={filters} />
+        <ActiveIncidentsWidget filters={filters} />
       </div>
     </>
-  )
+  );
 }

@@ -61,7 +61,7 @@ export function ChannelPulseClient({ data, locale }: Props) {
               "min-h-[44px]"
             )}
             role="listitem"
-            aria-label={`${isAr ? meta.labelAr : meta.label}: ${ch.volume.toLocaleString()} contacts, ${formatWait(ch.avgWaitSec)} wait`}
+            aria-label={`${isAr ? meta.labelAr : meta.label}: ${ch.volume.toLocaleString()} interactions, ${formatWait(ch.avgWaitSec)} avg wait`}
           >
             <div className="flex items-center justify-between gap-1">
               <span className="text-primary">{meta.icon}</span>

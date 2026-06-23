@@ -1,6 +1,6 @@
-// Wisal Command Center — Lean Seed (all pages covered, minimal rows)
+// Wisal Command Center — Realistic Seed (time-spread data for all date filters)
 
-import { PrismaClient } from "../lib/generated/prisma/client"
+import { PrismaClient, Prisma } from "../lib/generated/prisma/client"
 import { PrismaPg } from "@prisma/adapter-pg"
 import pg from "pg"
 import bcrypt from "bcryptjs"
@@ -34,16 +34,62 @@ const CLUSTERS = [
   { name: "Yanbu",            nameAr: "ينبع",                region: "Medina",     population:   210_000, agents: 15, lat: 24.089, lng: 38.063, svgId: "SA-20" },
 ]
 
+// Volume baselines per cluster — proportional to agents/population so per-cluster vs all-clusters makes sense
+const CLUSTER_VOLUME_FACTOR = CLUSTERS.map((c) => c.agents / 10)  // e.g. Riyadh Central = 8.5x, Al Baha = 1.0x
+
 const CHANNELS = ["VOICE", "WHATSAPP", "LIVE_CHAT", "EMAIL", "SIGN_LANGUAGE_VIDEO", "SOCIAL"] as const
+
+// Channel baseline volumes (active contacts at a snapshot moment, realistic for a regional HHC)
+const CHANNEL_VOLUME_BASE: Record<typeof CHANNELS[number], number> = {
+  VOICE:               55,
+  WHATSAPP:            40,
+  LIVE_CHAT:           30,
+  EMAIL:               18,
+  SIGN_LANGUAGE_VIDEO:  8,
+  SOCIAL:              20,
+}
+
+// Channel wait-time baselines (seconds), higher = worse
+const CHANNEL_WAIT_BASE: Record<typeof CHANNELS[number], number> = {
+  VOICE:               28,
+  WHATSAPP:            35,
+  LIVE_CHAT:           32,
+  EMAIL:               38,
+  SIGN_LANGUAGE_VIDEO: 30,
+  SOCIAL:              12,
+}
 
 function rand(min: number, max: number) { return Math.random() * (max - min) + min }
 function randInt(min: number, max: number) { return Math.floor(rand(min, max + 1)) }
 function pick<T>(arr: readonly T[]): T { return arr[Math.floor(Math.random() * arr.length)] }
-function daysAgo(n: number) { const d = new Date(); d.setDate(d.getDate() - n); return d }
+
+/** Returns a Date exactly `n` whole days before midnight today */
+function daysAgo(n: number, hour = 0, minute = 0) {
+  const d = new Date()
+  d.setHours(hour, minute, 0, 0)
+  d.setDate(d.getDate() - n)
+  return d
+}
+
 function hoursAgo(n: number) { return new Date(Date.now() - n * 3_600_000) }
 
+/** Realistic intra-day load curve — peaks at 10:00 and 14:00, troughs at 02:00 */
+function hourlyLoadFactor(hour: number): number {
+  // smooth double-peak curve
+  const morning = Math.exp(-0.5 * Math.pow((hour - 10) / 2.5, 2))
+  const afternoon = Math.exp(-0.5 * Math.pow((hour - 14) / 2.5, 2))
+  const base = 0.15
+  return base + 0.85 * Math.max(morning, afternoon)
+}
+
+/** Slight upward trend over 30 days to make 7d vs 30d averages visibly different */
+function dayTrendFactor(daysBack: number): number {
+  // older days = slightly lower volume/performance (growth trend)
+  return 0.80 + 0.20 * (1 - daysBack / 30)
+}
+
 async function main() {
-  console.log("🌱 Seeding Wisal Command Center (lean)…")
+  console.log("🌱 Seeding Wisal Command Center (realistic time-spread)…")
 
   // ── Channels ─────────────────────────────────────────────────────────────
   console.log("  channels…")
@@ -112,7 +158,7 @@ async function main() {
     }
   }
 
-  // ── Agent Status (live) — page: /live-operations/agent-status ────────────
+  // ── Agent Status (live snapshot) ──────────────────────────────────────────
   console.log("  agent statuses…")
   const STATES = ["AVAILABLE", "ON_CALL", "WRAP", "AFTER_CALL", "BREAK", "OFFLINE"] as const
   const STATE_WEIGHTS = [30, 35, 10, 8, 10, 7]
@@ -130,50 +176,77 @@ async function main() {
     })
   }
 
-  // ── SLA Snapshots — page: /live-operations, /live-operations/sla-heatmap ─
-  // 7 days × 20 clusters (one snapshot/day) = 140 rows
-  console.log("  SLA snapshots…")
-  for (const cid of clusterIds) {
-    for (let day = 6; day >= 0; day--) {
-      const ts = daysAgo(day); ts.setHours(9, 0, 0, 0)
-      await prisma.slaSnapshot.create({
-        data: {
-          clusterId: cid,
-          serviceLevelPct: rand(72, 95),
-          callVolume: randInt(200, 1400),
-          abandonedPct: rand(3, 11),
-          aht: rand(240, 420),
-          fcr: rand(0.78, 0.98),
-          asa: rand(12, 35),
-          timestamp: ts,
-        },
-      })
+  // ── SLA Snapshots ─────────────────────────────────────────────────────────
+  // 30 days × 20 clusters × 4 snapshots/day (08:00, 12:00, 16:00, 20:00)
+  // Older days have slightly lower service level → visible difference between 7d and 30d
+  console.log("  SLA snapshots (30d × 20 clusters × 4/day)…")
+  const SLA_HOURS = [8, 12, 16, 20]
+  {
+    const rows: Prisma.SlaSnapshotCreateManyInput[] = []
+    for (const cid of clusterIds) {
+      for (let day = 29; day >= 0; day--) {
+        const trend = dayTrendFactor(day)
+        for (const hour of SLA_HOURS) {
+          const load = hourlyLoadFactor(hour)
+          rows.push({
+            clusterId: cid,
+            serviceLevelPct: Math.min(99, rand(68, 90) * trend + load * 4),
+            callVolume: Math.round(randInt(80, 400) * load * trend),
+            abandonedPct: rand(2, 12) * (2 - trend),
+            aht: rand(220, 430) * (2 - trend * 0.5),
+            fcr: Math.min(0.99, rand(0.75, 0.97) * trend),
+            asa: rand(10, 38) * (2 - trend),
+            timestamp: daysAgo(day, hour),
+          })
+        }
+      }
     }
+    await prisma.slaSnapshot.createMany({ data: rows, skipDuplicates: true })
   }
 
-  // ── Channel Pulses — page: /live-operations ────────────────────────────────
-  console.log("  channel pulses…")
-  for (const cid of clusterIds) {
-    for (const [, chId] of Object.entries(channelMap)) {
-      if (!chId) continue
-      await prisma.channelPulse.create({
-        data: {
-          channelId: chId, clusterId: cid,
-          volume: randInt(40, 600), avgWaitSec: rand(8, 45),
-          timestamp: hoursAgo(randInt(0, 2)),
-        },
-      })
+  // ── Channel Pulses ────────────────────────────────────────────────────────
+  // 30 days × 20 clusters × 6 channels × 4 snapshots/day
+  // Volume per cluster proportional to cluster size; varies by hour and day
+  // → "All Clusters" sums correctly; 7d vs 30d show different totals
+  console.log("  channel pulses (30d × 20 clusters × 6 channels × 4/day)…")
+  {
+    const rows: Prisma.ChannelPulseCreateManyInput[] = []
+    for (let day = 29; day >= 0; day--) {
+      const trend = dayTrendFactor(day)
+      for (const hour of SLA_HOURS) {
+        const load = hourlyLoadFactor(hour)
+        for (let ci = 0; ci < clusterIds.length; ci++) {
+          const cid = clusterIds[ci]
+          const volFactor = CLUSTER_VOLUME_FACTOR[ci]
+          const ts = daysAgo(day, hour)
+          for (const ch of CHANNELS) {
+            const chId = channelMap[ch]
+            if (!chId) continue
+            rows.push({
+              channelId: chId,
+              clusterId: cid,
+              volume: Math.max(1, Math.round(CHANNEL_VOLUME_BASE[ch] * volFactor * load * trend * rand(0.85, 1.15))),
+              avgWaitSec: Math.max(5, CHANNEL_WAIT_BASE[ch] * (2 - trend) * (0.7 + 0.6 * load) * rand(0.9, 1.1)),
+              timestamp: ts,
+            })
+          }
+        }
+      }
     }
+    await prisma.channelPulse.createMany({ data: rows, skipDuplicates: true })
   }
 
-  // ── Incidents — page: /live-operations ───────────────────────────────────
+  // ── Incidents ─────────────────────────────────────────────────────────────
+  // Today: 10 unacknowledged (always on live/today)
+  // Last 7d: 20 mixed
+  // 8–30d ago: 25 mostly acknowledged (only visible on 30d filter)
   console.log("  incidents…")
   const INCIDENT_TYPES = ["SLA Breach", "High Abandon Rate", "AHT Spike", "System Latency", "Agent Shortage", "NLU Confidence Drop", "Forbidden Intent Detected"]
-  // First 10: unacknowledged today (always visible on live/today filter)
+
   for (let i = 0; i < 10; i++) {
     await prisma.incident.create({
       data: {
-        severity: i < 3 ? "CRITICAL" : "WARNING",
+        severity: i < 4 ? "CRITICAL" : "WARNING",
         type: pick(INCIDENT_TYPES),
         description: `Auto-detected ${pick(INCIDENT_TYPES).toLowerCase()} event requiring attention.`,
         clusterId: pick(clusterIds),
@@ -184,9 +257,9 @@ async function main() {
       },
     })
   }
-  // Next 15: mix of acknowledged/unacknowledged across last 7 days
-  for (let i = 0; i < 15; i++) {
-    const ackd = Math.random() > 0.4
+  for (let i = 0; i < 20; i++) {
+    const ackd = Math.random() > 0.5
+    const hoursBack = randInt(6, 167)
     await prisma.incident.create({
       data: {
         severity: Math.random() > 0.4 ? "WARNING" : "CRITICAL",
@@ -194,40 +267,61 @@ async function main() {
         description: `Auto-detected ${pick(INCIDENT_TYPES).toLowerCase()} event requiring attention.`,
         clusterId: pick(clusterIds),
         channelId: Math.random() > 0.5 ? pick(Object.values(channelMap) as string[]) : null,
-        triggeredAt: hoursAgo(randInt(6, 168)),
-        acknowledgedAt: ackd ? hoursAgo(randInt(0, 24)) : null,
-        metricTrend: Array.from({ length: 8 }, (_, j) => ({ t: j, v: rand(60, 95) })),
+        triggeredAt: hoursAgo(hoursBack),
+        acknowledgedAt: ackd ? hoursAgo(Math.max(0, hoursBack - randInt(1, 12))) : null,
+        metricTrend: Array.from({ length: 8 }, (_, j) => ({ t: j, v: rand(55, 95) })),
+      },
+    })
+  }
+  for (let i = 0; i < 25; i++) {
+    const daysBack = randInt(8, 29)
+    await prisma.incident.create({
+      data: {
+        severity: Math.random() > 0.3 ? "WARNING" : "CRITICAL",
+        type: pick(INCIDENT_TYPES),
+        description: `Auto-detected ${pick(INCIDENT_TYPES).toLowerCase()} event requiring attention.`,
+        clusterId: pick(clusterIds),
+        channelId: Math.random() > 0.5 ? pick(Object.values(channelMap) as string[]) : null,
+        triggeredAt: daysAgo(daysBack, randInt(6, 20)),
+        acknowledgedAt: daysAgo(daysBack, randInt(0, 5)),
+        metricTrend: Array.from({ length: 8 }, (_, j) => ({ t: j, v: rand(50, 90) })),
       },
     })
   }
 
-  // ── Tier Snapshots — page: /intelligence ─────────────────────────────────
-  // 30 days × 5 clusters (representative sample)
-  console.log("  tier snapshots…")
-  for (let day = 29; day >= 0; day--) {
-    const ts = daysAgo(day); ts.setHours(12, 0, 0, 0)
-    for (const cid of clusterIds.slice(0, 5)) {
-      const t1 = rand(55, 75), t2 = rand(15, 25)
-      await prisma.tierSnapshot.create({
-        data: {
+  // ── Tier Snapshots ────────────────────────────────────────────────────────
+  // 30 days × all 20 clusters (was 5 — expand for cluster filter to work)
+  console.log("  tier snapshots (30d × 20 clusters)…")
+  {
+    const rows: Prisma.TierSnapshotCreateManyInput[] = []
+    for (let day = 29; day >= 0; day--) {
+      const ts = daysAgo(day, 12)
+      const trend = dayTrendFactor(day)
+      for (const cid of clusterIds) {
+        const t1 = rand(52, 72) * trend, t2 = rand(12, 22)
+        rows.push({
           clusterId: cid,
           tier1Pct: t1, tier2Pct: t2,
           tier3Pct: Math.max(0, 100 - t1 - t2),
-          tier1AutocorrectRate: rand(5, 18),
+          tier1AutocorrectRate: rand(4, 20) * (2 - trend),
           timestamp: ts,
-        },
-      })
+        })
+      }
     }
+    await prisma.tierSnapshot.createMany({ data: rows, skipDuplicates: true })
   }
 
-  // ── Caregiver Cases — page: /intelligence/caregiver-audit ─────────────────
+  // ── Caregiver Cases ───────────────────────────────────────────────────────
   console.log("  caregiver cases…")
   const PROXY = ["YES", "NO", "AMBIGUOUS"] as const
   const CG_ACTIONS = ["COMPLETED_WITH_CONSENT", "FAILCLOSED_HANDOFF"] as const
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 40; i++) {
     const cgCaseId = `CG-${String(i + 1).padStart(5, "0")}`
-    // First 5 land today so "live" filter always shows data
-    const ts = i < 5 ? hoursAgo(randInt(0, 6)) : daysAgo(randInt(1, 14))
+    let ts: Date
+    if (i < 5)        ts = hoursAgo(randInt(0, 6))        // today
+    else if (i < 15)  ts = daysAgo(randInt(1, 6), randInt(6, 20))  // last 7d
+    else if (i < 25)  ts = daysAgo(randInt(7, 29), randInt(6, 20)) // 8–30d
+    else              ts = daysAgo(randInt(1, 29), randInt(6, 20))  // mixed
     await prisma.caregiverCase.upsert({
       where: { caseId: cgCaseId },
       update: { timestamp: ts },
@@ -242,7 +336,7 @@ async function main() {
       },
     })
   }
-  const cgCases = await prisma.caregiverCase.findMany({ select: { id: true } })
+  const cgCases = await prisma.caregiverCase.findMany({ select: { id: true, timestamp: true } })
   for (const cgc of cgCases) {
     await prisma.consentDisclosure.upsert({
       where: { caregiverCaseId: cgc.id }, update: {},
@@ -250,60 +344,71 @@ async function main() {
         caseId: `CD-${cgc.id.slice(-6)}`,
         caregiverCaseId: cgc.id,
         consentOnFile: Math.random() > 0.2,
-        timestamp: daysAgo(randInt(0, 14)),
+        timestamp: cgc.timestamp,
       },
     })
   }
 
-  // ── Resolution Splits — page: /intelligence ───────────────────────────────
-  // 7 days × 5 clusters
-  console.log("  resolution splits…")
-  for (let day = 6; day >= 0; day--) {
-    for (const cid of clusterIds.slice(0, 5)) {
-      const ai = rand(40, 82), partial = rand(8, 20)
-      await prisma.resolutionSplit.create({
-        data: {
+  // ── Resolution Splits ─────────────────────────────────────────────────────
+  // 30 days × all 20 clusters
+  console.log("  resolution splits (30d × 20 clusters)…")
+  {
+    const rows: Prisma.ResolutionSplitCreateManyInput[] = []
+    for (let day = 29; day >= 0; day--) {
+      const trend = dayTrendFactor(day)
+      for (const cid of clusterIds) {
+        const ai = rand(35, 80) * trend, partial = rand(7, 18)
+        rows.push({
           clusterId: cid,
           aiFullPct: ai, aiPartialPct: partial,
           humanPct: Math.max(0, 100 - ai - partial),
-          volume: randInt(300, 1200),
-          timestamp: daysAgo(day),
-        },
-      })
+          volume: Math.round(randInt(150, 900) * trend),
+          timestamp: daysAgo(day, 12),
+        })
+      }
     }
+    await prisma.resolutionSplit.createMany({ data: rows, skipDuplicates: true })
   }
 
-  // ── Drift Snapshots — page: /intelligence/risk-safety ─────────────────────
-  // 7 days × 5 clusters
-  console.log("  drift snapshots…")
+  // ── Drift Snapshots ───────────────────────────────────────────────────────
+  // 30 days × all 20 clusters
+  console.log("  drift snapshots (30d × 20 clusters)…")
   const DIALECTS = ["Najdi", "Hijazi", "Gulf", "Southern", "Northern"]
-  for (let day = 6; day >= 0; day--) {
-    for (const cid of clusterIds.slice(0, 5)) {
-      const nlu = rand(0.72, 0.99)
-      await prisma.driftSnapshot.create({
-        data: {
+  {
+    const rows: Prisma.DriftSnapshotCreateManyInput[] = []
+    for (let day = 29; day >= 0; day--) {
+      const trend = dayTrendFactor(day)
+      for (const cid of clusterIds) {
+        const nlu = Math.min(0.99, rand(0.70, 0.98) * trend)
+        rows.push({
           clusterId: cid, dialect: pick(DIALECTS),
-          date: daysAgo(day), nluConfidence: nlu,
-          intentConfidence: rand(0.70, 0.98),
+          date: daysAgo(day, 0),
+          nluConfidence: nlu,
+          intentConfidence: Math.min(0.99, rand(0.68, 0.97) * trend),
           flagged: nlu < 0.80,
           message: nlu < 0.80 ? "الثقة أقل من الحد المسموح — تم رصد انحراف لهجي" : null,
-        },
-      })
+        })
+      }
     }
+    await prisma.driftSnapshot.createMany({ data: rows, skipDuplicates: true })
   }
 
-  // ── Kill Switch — page: /intelligence/risk-safety ─────────────────────────
+  // ── Kill Switch ───────────────────────────────────────────────────────────
   console.log("  kill switch…")
   await prisma.killSwitch.upsert({
     where: { id: "singleton" }, update: {},
     create: { id: "singleton", state: "ARMED", scope: "ALL" },
   })
 
-  // ── Medical Content Approvals — page: /governance ─────────────────────────
+  // ── Medical Content Approvals ─────────────────────────────────────────────
   console.log("  medical approvals…")
   const APPROVAL_STATUSES = ["APPROVED", "PENDING", "REJECTED"] as const
   const MEDICAL_TOPICS = ["diabetes management", "hypertension medication", "post-op care", "chronic pain", "vaccination schedule"]
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 40; i++) {
+    let ts: Date
+    if (i < 5)        ts = hoursAgo(randInt(0, 8))
+    else if (i < 18)  ts = daysAgo(randInt(1, 6), randInt(6, 20))
+    else              ts = daysAgo(randInt(7, 29), randInt(6, 20))
     await prisma.medicalContentApproval.create({
       data: {
         caseId: `MC-${String(i + 1).padStart(5, "0")}`,
@@ -311,12 +416,12 @@ async function main() {
         content: `Medical query regarding ${pick(MEDICAL_TOPICS)}.`,
         status: pick(APPROVAL_STATUSES),
         approvedBy: Math.random() > 0.4 ? "Dr. Compliance Officer" : null,
-        timestamp: daysAgo(randInt(0, 14)),
+        timestamp: ts,
       },
     })
   }
 
-  // ── Forbidden Intent Events — page: /governance/forbidden-intent ──────────
+  // ── Forbidden Intent Events ───────────────────────────────────────────────
   console.log("  forbidden intent events…")
   const PATTERNS = ["Self-harm inquiry", "Medication overdose", "Unauthorized prescription", "Privacy breach attempt", "System exploit probe"]
   const PATTERN_RESPONSES = [
@@ -325,30 +430,22 @@ async function main() {
     "Blocked by NLU policy layer. Incident logged for compliance review.",
     "Forwarded to on-call supervisor. Case flagged in audit trail.",
   ]
-  // First 8: today — always visible on live/today filter
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 60; i++) {
+    let ts: Date
+    if (i < 8)        ts = hoursAgo(randInt(0, 8))
+    else if (i < 25)  ts = daysAgo(randInt(1, 6), randInt(6, 22))
+    else              ts = daysAgo(randInt(7, 29), randInt(6, 22))
     await prisma.forbiddenIntentEvent.create({
       data: {
         caseId: `FI-${String(i + 1).padStart(5, "0")}`,
         pattern: pick(PATTERNS),
         wisalResponse: pick(PATTERN_RESPONSES),
-        timestamp: hoursAgo(randInt(0, 8)),
-      },
-    })
-  }
-  // Next 22: spread across last 14 days
-  for (let i = 8; i < 30; i++) {
-    await prisma.forbiddenIntentEvent.create({
-      data: {
-        caseId: `FI-${String(i + 1).padStart(5, "0")}`,
-        pattern: pick(PATTERNS),
-        wisalResponse: pick(PATTERN_RESPONSES),
-        timestamp: daysAgo(randInt(1, 14)),
+        timestamp: ts,
       },
     })
   }
 
-  // ── Compliance Scores — page: /governance ─────────────────────────────────
+  // ── Compliance Scores ─────────────────────────────────────────────────────
   console.log("  compliance scores…")
   const FRAMEWORKS = ["NCA", "PDPL", "DGA", "NDMO"] as const
   for (const framework of FRAMEWORKS) {
@@ -364,7 +461,7 @@ async function main() {
     })
   }
 
-  // ── Knowledge Articles — page: /governance/knowledge-base ─────────────────
+  // ── Knowledge Articles ────────────────────────────────────────────────────
   console.log("  knowledge articles…")
   const ARTICLES = [
     { en: "Hypertension Management Guide",   ar: "دليل إدارة ضغط الدم" },
@@ -389,36 +486,43 @@ async function main() {
     })
   }
 
-  // ── Shift Coverage — page: /workforce/scheduling ──────────────────────────
-  // 7 days × 5 clusters × 24 hours — bulk insert, skipDuplicates
-  console.log("  shift coverage…")
-  for (let day = 6; day >= 0; day--) {
-    const date = daysAgo(day); date.setHours(0, 0, 0, 0)
-    const rows = clusterIds.slice(0, 5).flatMap((cid) =>
+  // ── Shift Coverage ────────────────────────────────────────────────────────
+  // 30 days × all 20 clusters × 24 hours
+  console.log("  shift coverage (30d × 20 clusters × 24h)…")
+  for (let day = 29; day >= 0; day--) {
+    const date = daysAgo(day, 0)
+    const rows = clusterIds.flatMap((cid, ci) =>
       Array.from({ length: 24 }, (_, hour) => {
-        const forecast = randInt(5, 30)
-        return { clusterId: cid, date, hour, forecastDemand: forecast, staffed: Math.max(0, forecast + randInt(-5, 3)) }
+        const load = hourlyLoadFactor(hour)
+        const agentBase = CLUSTERS[ci].agents
+        const forecast = Math.max(1, Math.round(agentBase * load * rand(0.3, 0.6)))
+        return { clusterId: cid, date, hour, forecastDemand: forecast, staffed: Math.max(0, forecast + randInt(-4, 2)) }
       })
     )
     await prisma.shiftCoverage.createMany({ data: rows, skipDuplicates: true })
   }
 
-  // ── Shift Swap Requests — page: /workforce ─────────────────────────────────
+  // ── Shift Swap Requests ───────────────────────────────────────────────────
   console.log("  shift swaps…")
-  for (const ag of allAgents.slice(0, 8)) {
+  for (const ag of allAgents.slice(0, 15)) {
+    const dBack = randInt(0, 29)
     await prisma.shiftSwapRequest.create({
       data: {
         agentId: ag.id,
-        fromShift: daysAgo(randInt(1, 5)),
-        toShift: daysAgo(-randInt(1, 3)),
+        fromShift: daysAgo(dBack + 1, randInt(6, 14)),
+        toShift: daysAgo(dBack - randInt(0, 3), randInt(6, 14)),
         status: pick(["PENDING", "APPROVED", "REJECTED"] as const),
       },
     })
   }
 
-  // ── QA Sample Items — page: /workforce ────────────────────────────────────
+  // ── QA Sample Items ───────────────────────────────────────────────────────
   console.log("  QA samples…")
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 50; i++) {
+    let ts: Date
+    if (i < 8)        ts = hoursAgo(randInt(0, 8))
+    else if (i < 25)  ts = daysAgo(randInt(1, 6), randInt(6, 20))
+    else              ts = daysAgo(randInt(7, 29), randInt(6, 20))
     await prisma.qaSampleItem.create({
       data: {
         interactionId: `INT-${String(i + 1).padStart(6, "0")}`,
@@ -427,36 +531,40 @@ async function main() {
         botConfidence: rand(0.40, 0.99),
         priority: randInt(1, 10),
         reviewed: Math.random() > 0.6,
-        createdAt: daysAgo(randInt(0, 7)),
+        createdAt: ts,
       },
     })
   }
 
-  // ── Training Records — page: /workforce/training-impact ───────────────────
+  // ── Training Records ──────────────────────────────────────────────────────
+  // 30-day spread so 7d vs 30d filter shows different counts
   console.log("  training records…")
   const MODULES = ["NLU Basics", "Escalation Protocol", "PDPL Compliance", "Cultural Sensitivity", "Medical Terminology", "Wisal Platform v2"]
-  for (let i = 0; i < allAgents.slice(0, 20).length; i++) {
+  for (let i = 0; i < allAgents.length; i++) {
     const ag = allAgents[i]
-    // First 6 agents completed training today so "live" filter shows data
-    const completedAt = i < 6 ? hoursAgo(randInt(1, 8)) : daysAgo(randInt(1, 30))
+    let completedAt: Date
+    if (i < 6)        completedAt = hoursAgo(randInt(1, 8))
+    else if (i < 20)  completedAt = daysAgo(randInt(1, 6), randInt(6, 18))
+    else if (i < 32)  completedAt = daysAgo(randInt(7, 29), randInt(6, 18))
+    else              completedAt = daysAgo(randInt(1, 29), randInt(6, 18))
+    const trend = dayTrendFactor(Math.min(29, i))
     await prisma.trainingRecord.create({
       data: {
         agentId: ag.id, module: pick(MODULES),
         completedAt,
-        qaScoreBefore: rand(60, 80), qaScoreAfter: rand(78, 99),
+        qaScoreBefore: rand(55, 78),
+        qaScoreAfter: Math.min(99, rand(72, 98) * trend),
       },
     })
   }
 
-  // ── Tickets — page: /workforce ────────────────────────────────────────────
-  // Need beneficiaries first (small set)
+  // ── Beneficiaries ─────────────────────────────────────────────────────────
   console.log("  beneficiaries…")
   const NAMES_EN = ["Faisal", "Maryam", "Khaled", "Noura", "Abdulaziz", "Hessa", "Tariq", "Ruba", "Saad", "Latifa"]
   const NAMES_AR = ["فيصل", "مريم", "خالد", "نورة", "عبدالعزيز", "حصة", "طارق", "ربى", "سعد", "لطيفة"]
   const beneficiaryIds: string[] = []
 
-  // 3 per cluster (first 10 clusters) = 30 beneficiaries
-  for (const cid of clusterIds.slice(0, 10)) {
+  for (const cid of clusterIds) {
     for (let i = 0; i < 3; i++) {
       const idx = randInt(0, NAMES_EN.length - 1)
       const b = await prisma.beneficiary.create({
@@ -476,21 +584,23 @@ async function main() {
     }
   }
 
-  // ── Interactions — page: /operations/beneficiary-360 ─────────────────────
+  // ── Interactions ──────────────────────────────────────────────────────────
+  // Spread across 30 days — visible difference on every filter
   console.log("  interactions…")
   const INTENTS = ["appointment_booking", "medication_inquiry", "test_results", "complaint", "general_inquiry", "referral_request"]
   const RESOLUTIONS = ["resolved_ai", "resolved_human", "escalated", "callback_scheduled", "info_provided"]
   for (const bid of beneficiaryIds) {
     const b = await prisma.beneficiary.findUnique({ where: { id: bid } })
     if (!b) continue
-    for (let i = 0; i < randInt(1, 3); i++) {
+    for (let i = 0; i < randInt(2, 5); i++) {
       const chType = pick(CHANNELS)
+      const dBack = pick([0, 0, 1, 2, 3, 5, 7, 10, 14, 20, 28])
       await prisma.interaction.create({
         data: {
           beneficiaryId: bid, channelId: channelMap[chType]!,
           clusterId: b.clusterId,
           agentId: Math.random() > 0.4 ? pick(agentIds) : null,
-          startedAt: daysAgo(randInt(0, 14)),
+          startedAt: daysAgo(dBack, randInt(6, 22)),
           durationSec: randInt(60, 1200),
           intent: pick(INTENTS), sentiment: rand(-0.8, 0.9),
           resolution: pick(RESOLUTIONS),
@@ -499,6 +609,7 @@ async function main() {
     }
   }
 
+  // ── Tickets ───────────────────────────────────────────────────────────────
   console.log("  tickets…")
   const TICKET_DESC = [
     "Patient unable to book appointment through Mawid portal",
@@ -508,10 +619,11 @@ async function main() {
     "Caregiver access issue — proxy not recognized",
     "Incorrect billing notification received",
   ]
-  for (let i = 0; i < 25; i++) {
+  for (let i = 0; i < 50; i++) {
     const bid = pick(beneficiaryIds)
     const b = await prisma.beneficiary.findUnique({ where: { id: bid } })
     if (!b) continue
+    const dBack = i < 10 ? randInt(0, 1) : i < 28 ? randInt(1, 6) : randInt(7, 29)
     await prisma.ticket.create({
       data: {
         beneficiaryId: bid, clusterId: b.clusterId,
@@ -522,11 +634,12 @@ async function main() {
         slaDueAt: new Date(Date.now() + randInt(1, 7) * 86_400_000),
         escalationPath: Math.random() > 0.6 ? "Supervisor → Compliance" : null,
         assignedAgentId: Math.random() > 0.5 ? pick(agentIds) : null,
+        createdAt: daysAgo(dBack, randInt(6, 20)),
       },
     })
   }
 
-  // ── KPI Scorecards — page: /executive ────────────────────────────────────
+  // ── KPI Scorecards ────────────────────────────────────────────────────────
   console.log("  KPI scorecards…")
   const KPI_DATA = [
     { metric: "SERVICE_LEVEL"     as const, thisWeek: 81.4, target: 80,  lastWeek: 79.2, owner: "live-operations" },
@@ -545,42 +658,57 @@ async function main() {
     })
   }
 
-  // ── Cluster Rankings — page: /executive ──────────────────────────────────
-  console.log("  cluster rankings…")
-  const rankPeriod = daysAgo(0); rankPeriod.setHours(0, 0, 0, 0)
-  for (const cid of clusterIds) {
-    await prisma.clusterRanking.upsert({
-      where: { clusterId_period: { clusterId: cid, period: rankPeriod } },
-      update: {},
-      create: {
-        clusterId: cid, compositeScore: rand(58, 97), period: rankPeriod,
-        perKpi: { SERVICE_LEVEL: rand(72, 95), ABANDONED_CALLS: rand(3, 10), FCR: rand(78, 98), CSAT: rand(75, 99), AHT: rand(240, 420) },
-      },
-    })
+  // ── Cluster Rankings ──────────────────────────────────────────────────────
+  // 30 days of rankings so historical comparison works
+  console.log("  cluster rankings (30d)…")
+  {
+    const rows: Prisma.ClusterRankingCreateManyInput[] = []
+    for (let day = 29; day >= 0; day--) {
+      const period = daysAgo(day, 0)
+      const trend = dayTrendFactor(day)
+      for (const cid of clusterIds) {
+        rows.push({
+          clusterId: cid,
+          compositeScore: Math.min(99, rand(55, 95) * trend),
+          period,
+          perKpi: {
+            SERVICE_LEVEL: rand(70, 95) * trend,
+            ABANDONED_CALLS: rand(3, 10) * (2 - trend),
+            FCR: rand(76, 98) * trend,
+            CSAT: rand(72, 99) * trend,
+            AHT: rand(220, 430),
+          },
+        })
+      }
+    }
+    await prisma.clusterRanking.createMany({ data: rows, skipDuplicates: true })
   }
 
-  // ── Savings Points — page: /executive ────────────────────────────────────
-  // 30 days
-  console.log("  savings points…")
-  for (let day = 29; day >= 0; day--) {
-    await prisma.savingsPoint.create({
-      data: {
-        date: daysAgo(day),
-        agentHoursSaved: rand(120, 480),
-        aiResolvedVolume: randInt(800, 3200),
-        avgHandleTimeSaved: rand(30, 90),
-      },
+  // ── Savings Points ────────────────────────────────────────────────────────
+  // 30 days — older days show lower AI savings (growth trend)
+  console.log("  savings points (30d)…")
+  {
+    const rows = Array.from({ length: 30 }, (_, i) => {
+      const day = 29 - i
+      const trend = dayTrendFactor(day)
+      return {
+        date: daysAgo(day, 0),
+        agentHoursSaved: rand(100, 480) * trend,
+        aiResolvedVolume: Math.round(randInt(600, 3200) * trend),
+        avgHandleTimeSaved: rand(25, 90) * trend,
+      }
     })
+    await prisma.savingsPoint.createMany({ data: rows, skipDuplicates: true })
   }
 
-  // ── Beneficiary Voice Themes — page: /executive ───────────────────────────
+  // ── Beneficiary Voice Themes ──────────────────────────────────────────────
   console.log("  voice themes…")
   const THEMES = [
-    { en: "Long Wait Times",          ar: "أوقات انتظار طويلة",     sentiment: -0.6 },
-    { en: "Helpful Agent Interactions",ar: "تفاعلات وكيل مفيدة",    sentiment:  0.8 },
-    { en: "Appointment Confusion",    ar: "التباس في المواعيد",      sentiment: -0.4 },
-    { en: "Easy Digital Access",      ar: "سهولة الوصول الرقمي",     sentiment:  0.7 },
-    { en: "Language Barriers",        ar: "حواجز لغوية",             sentiment: -0.3 },
+    { en: "Long Wait Times",           ar: "أوقات انتظار طويلة",     sentiment: -0.6 },
+    { en: "Helpful Agent Interactions", ar: "تفاعلات وكيل مفيدة",    sentiment:  0.8 },
+    { en: "Appointment Confusion",     ar: "التباس في المواعيد",      sentiment: -0.4 },
+    { en: "Easy Digital Access",       ar: "سهولة الوصول الرقمي",     sentiment:  0.7 },
+    { en: "Language Barriers",         ar: "حواجز لغوية",             sentiment: -0.3 },
   ]
   for (const t of THEMES) {
     await prisma.beneficiaryVoiceTheme.create({
@@ -590,12 +718,15 @@ async function main() {
         plainSummaryAr: `يذكر المستفيدون في كثير من الأحيان ${t.ar} كعامل تجربة رئيسي.`,
         sentiment: t.sentiment,
         weekTrend: Array.from({ length: 7 }, (_, i) => ({ day: i, score: t.sentiment + rand(-0.1, 0.1) })),
-        examples: [`"${t.en} made the biggest difference in my experience."`, `"I noticed ${t.en.toLowerCase()} during my last 3 interactions."`],
+        examples: [
+          `"${t.en} made the biggest difference in my experience."`,
+          `"I noticed ${t.en.toLowerCase()} during my last 3 interactions."`,
+        ],
       },
     })
   }
 
-  // ── Campaigns — page: /executive/insights ────────────────────────────────
+  // ── Campaigns ─────────────────────────────────────────────────────────────
   console.log("  campaigns…")
   const CAMPAIGN_DATA = [
     { en: "Flu Vaccination Reminder Q1",   ar: "تذكير تطعيم الإنفلونزا ربع 1",  type: "REMINDER"   as const },
@@ -613,49 +744,37 @@ async function main() {
         status: pick(["ACTIVE", "COMPLETED", "PAUSED"] as const),
         sent, delivered, responded,
         outcomeMetrics: { positiveOutcome: Math.floor(responded * rand(0.6, 0.9)), noResponse: sent - delivered, bounced: sent - delivered },
-        startedAt: daysAgo(randInt(7, 30)),
-        completedAt: Math.random() > 0.5 ? daysAgo(randInt(0, 7)) : null,
+        startedAt: daysAgo(randInt(7, 29), 9),
+        completedAt: Math.random() > 0.5 ? daysAgo(randInt(0, 6), 17) : null,
       },
     })
   }
 
-  // ── Penalty Records — page: /executive/insights ───────────────────────────
-  console.log("  penalty records…")
+  // ── Penalty Records ───────────────────────────────────────────────────────
+  // 30 days × all 20 clusters
+  console.log("  penalty records (30d × 20 clusters)…")
   const PENALTY_KPIS = ["SERVICE_LEVEL", "ABANDONED_CALLS", "FCR", "ASA"]
-  // Today's records for all clusters — always visible on live/today
-  for (const cid of clusterIds) {
-    for (const kpi of PENALTY_KPIS) {
-      const fail = rand(0.01, 0.18), tolerance = 0.05, breached = fail > tolerance
-      const todayPeriod = daysAgo(0); todayPeriod.setHours(0, 0, 0, 0)
-      await prisma.penaltyRecord.create({
-        data: {
-          clusterId: cid, period: todayPeriod, kpi,
-          failurePct: fail * 100, permissibleTolerance: tolerance * 100,
-          breached, penaltyAmount: breached ? fail * 500_000 : 0,
-          basis: "Avg failure % × SAR 500,000 operating cost base (RFP §6)",
-        },
-      })
-    }
-  }
-  // Historical: last 14 days for first 10 clusters
-  for (const cid of clusterIds.slice(0, 10)) {
-    for (let day = 1; day <= 14; day++) {
-      for (const kpi of PENALTY_KPIS) {
-        const fail = rand(0.01, 0.15), tolerance = 0.05, breached = fail > tolerance
-        const period = daysAgo(day); period.setHours(0, 0, 0, 0)
-        await prisma.penaltyRecord.create({
-          data: {
+  {
+    const rows: Prisma.PenaltyRecordCreateManyInput[] = []
+    for (let day = 29; day >= 0; day--) {
+      const trend = dayTrendFactor(day)
+      const period = daysAgo(day, 0)
+      for (const cid of clusterIds) {
+        for (const kpi of PENALTY_KPIS) {
+          const fail = rand(0.01, 0.18) * (2 - trend), tolerance = 0.05, breached = fail > tolerance
+          rows.push({
             clusterId: cid, period, kpi,
             failurePct: fail * 100, permissibleTolerance: tolerance * 100,
             breached, penaltyAmount: breached ? fail * 500_000 : 0,
             basis: "Avg failure % × SAR 500,000 operating cost base (RFP §6)",
-          },
-        })
+          })
+        }
       }
     }
+    await prisma.penaltyRecord.createMany({ data: rows, skipDuplicates: true })
   }
 
-  // ── Integration Status — page: /operations ───────────────────────────────
+  // ── Integration Status ────────────────────────────────────────────────────
   console.log("  integration statuses…")
   const INTEGRATIONS = [
     { system: "NAFATH"  as const, state: "UP"       as const, latency:  42, pattern: "EVENT" as const },
@@ -672,7 +791,7 @@ async function main() {
     })
   }
 
-  // ── System Health — page: /operations ────────────────────────────────────
+  // ── System Health ─────────────────────────────────────────────────────────
   console.log("  system health…")
   await prisma.systemHealth.create({
     data: {
@@ -683,16 +802,17 @@ async function main() {
         EMAIL:     { rtoMin: 60, rpoMin: 30 },
         LIVE_CHAT: { rtoMin: 10, rpoMin: 2  },
       },
-      lastDrTestAt: daysAgo(7),
+      lastDrTestAt: daysAgo(7, 10),
       region: "KSA",
     },
   })
 
-  // ── Audit Logs (sample mutations) ────────────────────────────────────────
+  // ── Audit Logs ────────────────────────────────────────────────────────────
   console.log("  audit logs…")
   const AUDIT_ACTIONS = ["ACKNOWLEDGE_INCIDENT", "APPROVE_SHIFT_SWAP", "REJECT_SHIFT_SWAP", "ASSIGN_TICKET", "RESOLVE_TICKET", "PUBLISH_ARTICLE", "UPDATE_KILL_SWITCH"]
   const AUDIT_ENTITIES = ["Incident", "ShiftSwapRequest", "Ticket", "KnowledgeArticle", "KillSwitch"]
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 40; i++) {
+    const dBack = i < 8 ? 0 : i < 20 ? randInt(1, 6) : randInt(7, 29)
     await prisma.auditLog.create({
       data: {
         actor: pick(userIds),
@@ -700,12 +820,12 @@ async function main() {
         entity: pick(AUDIT_ENTITIES),
         entityId: `SEED-${randInt(1000, 9999)}`,
         meta: { reason: "Seeded audit trail entry", automated: false },
-        timestamp: daysAgo(randInt(0, 14)),
+        timestamp: daysAgo(dBack, randInt(6, 22)),
       },
     })
   }
 
-  console.log("✅ Lean seed complete!")
+  console.log("✅ Realistic seed complete!")
 }
 
 main()

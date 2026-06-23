@@ -194,21 +194,25 @@ export async function getChannelPulseData(filters: Filters): Promise<ChannelPuls
           timestamp: { gte: from, lte: to },
           ...(filters.cluster ? { clusterId: filters.cluster } : {}),
         },
-        orderBy: { timestamp: "desc" },
-        take: 1,
       },
     },
   })
 
   return channels.map((ch) => {
-    const pulse = ch.channelPulses[0]
-    const waitSec = pulse?.avgWaitSec ?? 0
+    const pulses = ch.channelPulses
+    if (!pulses.length) {
+      return { channelId: ch.id, channelType: ch.type, volume: 0, avgWaitSec: 0, status: status("ASA", 0) }
+    }
+
+    const totalVolume = pulses.reduce((s, p) => s + p.volume, 0)
+    const avgWait = pulses.reduce((s, p) => s + p.avgWaitSec, 0) / pulses.length
+
     return {
       channelId: ch.id,
       channelType: ch.type,
-      volume: pulse?.volume ?? 0,
-      avgWaitSec: waitSec,
-      status: status("ASA", waitSec),
+      volume: totalVolume,
+      avgWaitSec: avgWait,
+      status: status("ASA", avgWait),
     }
   })
 }

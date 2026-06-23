@@ -219,7 +219,7 @@ export function ActiveIncidentsClient({ data, locale = "ar" }: Props) {
 
   return (
     <ul
-      className="space-y-2"
+      className="space-y-2 max-h-128 overflow-y-auto pe-1"
       aria-label={isAr ? "الحوادث النشطة مرتبة حسب الخطورة" : "Active incidents sorted by severity"}
     >
       {sorted.map((inc) => (
