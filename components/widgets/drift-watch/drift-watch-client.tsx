@@ -133,7 +133,7 @@ export function DriftWatchClient({ data, assignableUsers, locale = "ar" }: Props
               width={isAr ? 170 : 140}
               tickLine={false}
               axisLine={false}
-              tick={(props) => <RtlYTick {...props} x={typeof props.x === "number" ? props.x : undefined} width={isAr ? 165 : 135} isAr={isAr} />}
+              tick={(props) => <RtlYTick x={typeof props.x === "number" ? props.x : undefined} y={typeof props.y === "number" ? props.y : undefined} payload={props.payload as { value: string } | undefined} width={isAr ? 165 : 135} isAr={isAr} />}
             />
             <Tooltip
               contentStyle={{
