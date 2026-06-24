@@ -64,26 +64,35 @@ export function KnowledgeBaseClient({ rows, canPublish, locale = "ar" }: Props) 
     <div className="flex flex-col gap-3">
       {/* Toolbar */}
       <div className="relative">
-        <Search className="absolute start-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" aria-hidden />
+        <Search
+          className="absolute inset-s-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none"
+          aria-hidden
+        />
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder={isAr ? "ابحث في المقالات (عربي أو إنجليزي)…" : "Search articles (Arabic or English)…"}
+          placeholder={
+            isAr
+              ? "ابحث في المقالات (عربي أو إنجليزي)…"
+              : "Search articles (Arabic or English)…"
+          }
           className="ps-9 h-8 text-sm"
           aria-label="Search knowledge base articles"
         />
       </div>
 
       {/* Article list */}
-      <div className="rounded-lg border border-border divide-y divide-border overflow-hidden">
+      <div className="rounded-lg border border-border divide-y divide-border overflow-hidden overflow-y-auto max-h-112.5">
         {filtered.length === 0 && (
-          <p className="py-8 text-center text-sm text-muted-foreground">{isAr ? "لم يتم العثور على مقالات." : "No articles found."}</p>
+          <p className="py-8 text-center text-sm text-muted-foreground">
+            {isAr ? "لم يتم العثور على مقالات." : "No articles found."}
+          </p>
         )}
         {filtered.map((article) => {
-          const isExpanded = expanded.has(article.id)
-          const lang = isAr ? "ar" : "en"
-          const cfg = STATUS_CONFIG[article.status]
-          const result = actionResult[article.id]
+          const isExpanded = expanded.has(article.id);
+          const lang = isAr ? "ar" : "en";
+          const cfg = STATUS_CONFIG[article.status];
+          const result = actionResult[article.id];
 
           return (
             <div key={article.id} className="bg-card">
@@ -92,9 +101,16 @@ export function KnowledgeBaseClient({ rows, canPublish, locale = "ar" }: Props) 
                 <button
                   onClick={() => toggleExpand(article.id)}
                   className="shrink-0 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                  aria-label={isExpanded ? (isAr ? "طي المقالة" : "Collapse article") : (isAr ? "توسيع المقالة" : "Expand article")}
-                  aria-expanded={isExpanded}
-                >
+                  aria-label={
+                    isExpanded
+                      ? isAr
+                        ? "طي المقالة"
+                        : "Collapse article"
+                      : isAr
+                        ? "توسيع المقالة"
+                        : "Expand article"
+                  }
+                  aria-expanded={isExpanded}>
                   {isExpanded ? (
                     <ChevronDown className="size-4" aria-hidden />
                   ) : (
@@ -110,13 +126,18 @@ export function KnowledgeBaseClient({ rows, canPublish, locale = "ar" }: Props) 
 
                 {/* Meta */}
                 <div className="hidden sm:flex items-center gap-2 shrink-0">
-                  <span className="text-xs text-muted-foreground tabular-nums">v{article.version}</span>
-                  <Badge variant="outline" className={`text-xs font-medium ${cfg.className}`}>
+                  <span className="text-xs text-muted-foreground tabular-nums">
+                    v{article.version}
+                  </span>
+                  <Badge
+                    variant="outline"
+                    className={`text-xs font-medium ${cfg.className}`}>
                     {isAr ? cfg.labelAr : cfg.labelEn}
                   </Badge>
                   {article.publishAt && article.status === "DRAFT" && (
                     <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {isAr ? "مجدول" : "Scheduled"} {format(article.publishAt, "dd MMM")}
+                      {isAr ? "مجدول" : "Scheduled"}{" "}
+                      {format(article.publishAt, "dd MMM")}
                     </span>
                   )}
                 </div>
@@ -131,8 +152,7 @@ export function KnowledgeBaseClient({ rows, canPublish, locale = "ar" }: Props) 
                         className="h-6 px-2 text-xs gap-1"
                         onClick={() => handleAction(article.id, "PUBLISH")}
                         disabled={pending}
-                        aria-label={`${isAr ? "نشر" : "Publish"} ${article.titleEn}`}
-                      >
+                        aria-label={`${isAr ? "نشر" : "Publish"} ${article.titleEn}`}>
                         {isAr ? "نشر" : "Publish"}
                       </Button>
                     )}
@@ -143,16 +163,19 @@ export function KnowledgeBaseClient({ rows, canPublish, locale = "ar" }: Props) 
                         className="h-6 px-2 text-xs text-muted-foreground"
                         onClick={() => handleAction(article.id, "UNPUBLISH")}
                         disabled={pending}
-                        aria-label={`${isAr ? "إلغاء نشر" : "Unpublish"} ${article.titleEn}`}
-                      >
+                        aria-label={`${isAr ? "إلغاء نشر" : "Unpublish"} ${article.titleEn}`}>
                         {isAr ? "إلغاء النشر" : "Unpublish"}
                       </Button>
                     )}
                     {result && result !== "ok" && (
-                      <span className="text-xs text-status-red-fg">{result}</span>
+                      <span className="text-xs text-status-red-fg">
+                        {result}
+                      </span>
                     )}
                     {result === "ok" && (
-                      <span className="text-xs text-status-green-fg">{isAr ? "تم الحفظ" : "Saved"}</span>
+                      <span className="text-xs text-status-green-fg">
+                        {isAr ? "تم الحفظ" : "Saved"}
+                      </span>
                     )}
                   </div>
                 )}
@@ -165,9 +188,21 @@ export function KnowledgeBaseClient({ rows, canPublish, locale = "ar" }: Props) 
                   <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground flex-wrap gap-y-1">
                     <div className="flex items-center gap-3">
                       <span>v{article.version}</span>
-                      <Badge variant="outline" className={`${cfg.className} sm:hidden`}>{isAr ? cfg.labelAr : cfg.labelEn}</Badge>
-                      {article.publisherName && <span>{isAr ? "نشر بواسطة" : "Published by"} {article.publisherName}</span>}
-                      <span>{isAr ? "تحديث" : "Updated"} {format(article.updatedAt, "dd MMM yyyy")}</span>
+                      <Badge
+                        variant="outline"
+                        className={`${cfg.className} sm:hidden`}>
+                        {isAr ? cfg.labelAr : cfg.labelEn}
+                      </Badge>
+                      {article.publisherName && (
+                        <span>
+                          {isAr ? "نشر بواسطة" : "Published by"}{" "}
+                          {article.publisherName}
+                        </span>
+                      )}
+                      <span>
+                        {isAr ? "تحديث" : "Updated"}{" "}
+                        {format(article.updatedAt, "dd MMM yyyy")}
+                      </span>
                     </div>
                   </div>
 
@@ -175,14 +210,13 @@ export function KnowledgeBaseClient({ rows, canPublish, locale = "ar" }: Props) 
                   <div
                     className="text-sm text-foreground/80 line-clamp-6 leading-relaxed whitespace-pre-wrap"
                     lang={lang}
-                    dir={lang === "ar" ? "rtl" : "ltr"}
-                  >
+                    dir={lang === "ar" ? "rtl" : "ltr"}>
                     {lang === "en" ? article.bodyEn : article.bodyAr}
                   </div>
                 </div>
               )}
             </div>
-          )
+          );
         })}
       </div>
 
@@ -190,8 +224,11 @@ export function KnowledgeBaseClient({ rows, canPublish, locale = "ar" }: Props) 
         {isAr
           ? `${filtered.length} من ${rows.length} مقالة`
           : `${filtered.length} of ${rows.length} articles`}
-        {!canPublish && (isAr ? " · للقراءة فقط (النشر يتطلب دور الامتثال)" : " · read-only (publishing requires Compliance role)")}
+        {!canPublish &&
+          (isAr
+            ? " · للقراءة فقط (النشر يتطلب دور الامتثال)"
+            : " · read-only (publishing requires Compliance role)")}
       </p>
     </div>
-  )
+  );
 }

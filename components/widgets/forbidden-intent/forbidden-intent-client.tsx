@@ -214,7 +214,7 @@ export function ForbiddenIntentClient({ data, exportUrl, locale = "ar" }: Props)
       </div>
 
       {/* Event log */}
-      <div className="overflow-x-auto rounded-lg border border-border">
+      <div className="overflow-x-auto overflow-y-auto max-h-96 rounded-lg border border-border">
         <table className="w-full text-sm min-w-[580px]">
           <thead>
             <tr className="border-b border-border bg-muted/40">

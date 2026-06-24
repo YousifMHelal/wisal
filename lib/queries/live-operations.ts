@@ -259,7 +259,10 @@ export async function getActiveIncidents(filters: Filters): Promise<IncidentRow[
     channelType: inc.channel?.type ?? null,
     triggeredAt: inc.triggeredAt,
     acknowledgedAt: inc.acknowledgedAt,
-    metricTrend: (inc.metricTrend as { label: string; value: number }[]) ?? [],
+    metricTrend: ((inc.metricTrend as { label?: string; value?: number; t?: number; v?: number }[]) ?? []).map((p) => ({
+      label: String(p.label ?? p.t ?? ""),
+      value: p.value ?? p.v ?? 0,
+    })),
   }))
 }
 

@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { useTheme } from "next-themes"
-import { useState, useTransition, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react";
 import {
   Search,
   Sun,
@@ -73,9 +73,9 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
   useEffect(() => { setMounted(true) }, [])
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
-  const [searchOpen, setSearchOpen] = useState(false)
-  const [, startTransition] = useTransition()
+  const [searchOpen, setSearchOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const currentCluster = searchParams.get("cluster") ?? ""
   const currentRange = searchParams.get("range") ?? "7d"
@@ -88,14 +88,30 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
     router.replace(`${pathname}${qs ? `?${qs}` : ""}`)
   }
 
-  async function handleSearch(q: string) {
-    setSearchQuery(q)
-    if (q.length < 2) { setSearchResults([]); return }
-    const fd = new FormData()
-    fd.set("query", q)
-    const { results } = await globalSearch(undefined, fd)
-    setSearchResults(results)
-    setSearchOpen(results.length > 0)
+  const runSearch = useCallback(async (q: string) => {
+    if (q.length < 2) {
+      setSearchResults([]);
+      setSearchOpen(false);
+      return;
+    }
+    try {
+      const fd = new FormData();
+      fd.set("query", q);
+      const { results } = await globalSearch(undefined, fd);
+      setSearchResults(results);
+      setSearchOpen(results.length > 0);
+    } catch {
+      setSearchResults([]);
+      setSearchOpen(false);
+    }
+  }, []);
+
+  function handleSearch(q: string) {
+    setSearchQuery(q);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      void runSearch(q);
+    }, 300);
   }
 
   function handleSearchSelect(result: SearchResult) {
@@ -126,7 +142,9 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
   })();
 
   return (
-    <header suppressHydrationWarning className="h-14 flex items-center border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-30 gap-2 ps-3 pe-3">
+    <header
+      suppressHydrationWarning
+      className="h-14 flex items-center border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-30 gap-2 ps-3 pe-3">
       {/* Mobile: hamburger */}
       <button
         className="lg:hidden flex items-center justify-center size-9 rounded-md hover:bg-accent text-foreground transition-colors cursor-pointer min-h-11 min-w-11"
@@ -137,7 +155,11 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
 
       {/* Brand (mobile only) */}
       <span className="lg:hidden flex items-center gap-2 flex-1 min-w-0">
-        <img src="/logo.png" alt="Wisal" className="size-6 object-contain shrink-0" />
+        <img
+          src="/logo.png"
+          alt="Wisal"
+          className="size-6 object-contain shrink-0"
+        />
         <span className="text-sm font-semibold text-foreground truncate">
           {isAr ? "وصال" : "Wisal CC"}
         </span>
@@ -192,13 +214,13 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
             <input
               type="search"
               value={searchQuery}
-              onChange={(e) =>
-                startTransition(() => {
-                  void handleSearch(e.target.value);
-                })
-              }
+              onChange={(e) => handleSearch(e.target.value)}
               onFocus={() => searchResults.length > 0 && setSearchOpen(true)}
-              placeholder={isAr ? "بحث عن حالات أو وكلاء أو مجموعات…" : "Search cases, agents, clusters…"}
+              placeholder={
+                isAr
+                  ? "بحث عن حالات أو وكلاء أو مجموعات…"
+                  : "Search cases, agents, clusters…"
+              }
               className="w-full h-8 rounded-lg border border-input bg-transparent ps-8 pe-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/30 transition-colors"
               aria-label={isAr ? "بحث عالمي" : "Global search"}
               aria-expanded={searchOpen}
@@ -324,7 +346,9 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
       <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
         <SheetContent side="top" className="h-auto pb-6">
           <SheetHeader className="mb-4">
-            <SheetTitle>{isAr ? "البحث والفلاتر" : "Search & Filters"}</SheetTitle>
+            <SheetTitle>
+              {isAr ? "البحث والفلاتر" : "Search & Filters"}
+            </SheetTitle>
           </SheetHeader>
           <div className="flex flex-col gap-3 px-4">
             {/* Search */}
@@ -333,12 +357,12 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
               <input
                 type="search"
                 value={searchQuery}
-                onChange={(e) =>
-                  startTransition(() => {
-                    void handleSearch(e.target.value);
-                  })
+                onChange={(e) => handleSearch(e.target.value)}
+                placeholder={
+                  isAr
+                    ? "بحث عن حالات أو وكلاء أو مجموعات…"
+                    : "Search cases, agents, clusters…"
                 }
-                placeholder={isAr ? "بحث عن حالات أو وكلاء أو مجموعات…" : "Search cases, agents, clusters…"}
                 className="w-full h-10 rounded-lg border border-input bg-transparent ps-9 pe-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/30 transition-colors"
               />
               {searchOpen && searchResults.length > 0 && (

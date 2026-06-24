@@ -253,7 +253,7 @@ async function main() {
         channelId: Math.random() > 0.5 ? pick(Object.values(channelMap) as string[]) : null,
         triggeredAt: hoursAgo(randInt(0, 6)),
         acknowledgedAt: null,
-        metricTrend: Array.from({ length: 8 }, (_, j) => ({ t: j, v: rand(60, 95) })),
+        metricTrend: Array.from({ length: 8 }, (_, j) => ({ label: String(j), value: rand(60, 95) })),
       },
     })
   }
@@ -269,7 +269,7 @@ async function main() {
         channelId: Math.random() > 0.5 ? pick(Object.values(channelMap) as string[]) : null,
         triggeredAt: hoursAgo(hoursBack),
         acknowledgedAt: ackd ? hoursAgo(Math.max(0, hoursBack - randInt(1, 12))) : null,
-        metricTrend: Array.from({ length: 8 }, (_, j) => ({ t: j, v: rand(55, 95) })),
+        metricTrend: Array.from({ length: 8 }, (_, j) => ({ label: String(j), value: rand(55, 95) })),
       },
     })
   }
@@ -284,7 +284,7 @@ async function main() {
         channelId: Math.random() > 0.5 ? pick(Object.values(channelMap) as string[]) : null,
         triggeredAt: daysAgo(daysBack, randInt(6, 20)),
         acknowledgedAt: daysAgo(daysBack, randInt(0, 5)),
-        metricTrend: Array.from({ length: 8 }, (_, j) => ({ t: j, v: rand(50, 90) })),
+        metricTrend: Array.from({ length: 8 }, (_, j) => ({ label: String(j), value: rand(50, 90) })),
       },
     })
   }
