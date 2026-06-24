@@ -119,12 +119,12 @@ const NAV_MODULES: NavModule[] = [
     labelAr: "الحوكمة والامتثال",
     icon: <ShieldCheck className="size-4 shrink-0" />,
     children: [
-      {
-        href: "/governance",
-        labelEn: "Compliance & Audit",
-        labelAr: "الامتثال والتدقيق",
-        icon: <Award className="size-3.5 shrink-0" />,
-      },
+      // {
+      //   href: "/governance",
+      //   labelEn: "Compliance & Audit",
+      //   labelAr: "الامتثال والتدقيق",
+      //   icon: <Award className="size-3.5 shrink-0" />,
+      // },
       {
         href: "/governance/forbidden-intent",
         labelEn: "Forbidden Intent",

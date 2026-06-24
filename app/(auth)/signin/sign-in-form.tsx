@@ -17,6 +17,8 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -54,6 +56,8 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
               required
               placeholder="you@hms.gov.sa"
               disabled={isPending}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
@@ -67,6 +71,8 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
               required
               placeholder="••••••••"
               disabled={isPending}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
@@ -90,33 +96,16 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
         </form>
 
         {/* Dev role switcher — seeded users */}
-        <DevRoleSwitcher />
+        <DevRoleSwitcher onFill={(e: string, p: string) => { setEmail(e); setPassword(p); }} />
       </CardContent>
     </Card>
   );
 }
 
-function DevRoleSwitcher() {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-
+function DevRoleSwitcher({ onFill }: { onFill: (email: string, password: string) => void }) {
   const devUsers = [
-    { label: "Admin", email: "admin@wisal.sa", password: "password123" },
+    { label: "Auto Fill / ملء تلقائي", email: "admin@wisal.sa", password: "password123" },
   ];
-
-  async function loginAs(email: string, password: string) {
-    startTransition(async () => {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
-      if (!result?.error) {
-        router.push("/overview");
-        router.refresh();
-      }
-    });
-  }
 
   return (
     <div className="mt-6 border-t pt-4">
@@ -128,9 +117,8 @@ function DevRoleSwitcher() {
           <button
             key={u.email}
             type="button"
-            disabled={isPending}
-            onClick={() => loginAs(u.email, u.password)}
-            className="text-xs px-2 py-1 rounded border border-border bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50"
+            onClick={() => onFill(u.email, u.password)}
+            className="text-xs px-2 py-1 rounded border border-border bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
           >
             {u.label}
           </button>
