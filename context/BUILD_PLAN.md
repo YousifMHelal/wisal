@@ -154,6 +154,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 ## Post-Phase-10 Additions
 
 - [x] **PP-1** Dashboard Overview page `/overview` — hero KPI cards, SLA 7-day trend, AI resolution donut, active incidents mini, cluster health top/bottom 5, channel volume bar, module quick links. Added to sidebar (LayoutDashboard, no status dot).
+- [x] **PP-2** Call Emotion Heatmap widget — audio player + thermal heatmap bar showing emotion per call segment (CALM→NEUTRAL→CONCERN→FRUSTRATION→ANGER→DISTRESS), intensity-modulated color, hover tooltip, summary strip. Mounted on workforce page. Schema: `CallRecording`, `CallSegment`, `EmotionLabel` enum.
 
 ## Build Order Summary
 P0 → P1 → P2 → **P3 (Live Ops slice proves the pattern)** → P4 → P5 → P6 → P7 → P8 (Mod 06) → P9 (Hardening) → **P10 (Polish)** → **PP (Post-polish additions)**.

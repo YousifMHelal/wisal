@@ -170,6 +170,15 @@ enum BeneficiaryTier {
   T3
 }
 
+enum EmotionLabel {
+  CALM
+  NEUTRAL
+  CONCERN
+  FRUSTRATION
+  ANGER
+  DISTRESS
+}
+
 // ── Core Reference ───────────────────────────────────────────────────────────
 
 model User {
@@ -636,10 +645,11 @@ model Interaction {
   sentiment   Float       // -1 to 1
   resolution  String
 
-  beneficiary Beneficiary @relation(fields: [beneficiaryId], references: [id])
-  channel     Channel     @relation(fields: [channelId], references: [id])
-  cluster     Cluster     @relation(fields: [clusterId], references: [id])
-  agent       Agent?      @relation(fields: [agentId], references: [id])
+  beneficiary Beneficiary    @relation(fields: [beneficiaryId], references: [id])
+  channel     Channel        @relation(fields: [channelId], references: [id])
+  cluster     Cluster        @relation(fields: [clusterId], references: [id])
+  agent       Agent?         @relation(fields: [agentId], references: [id])
+  recording   CallRecording?
 
   @@index([beneficiaryId, startedAt])
   @@index([clusterId, startedAt])
@@ -749,4 +759,36 @@ model AuditLog {
   @@index([entity, entityId])
   @@index([actor, timestamp])
   @@map("audit_logs")
+}
+
+// ── Call Heatmap ─────────────────────────────────────────────────────────────
+
+model CallRecording {
+  id            String   @id @default(cuid())
+  interactionId String   @unique
+  audioUrl      String
+  durationSec   Int
+  analyzedAt    DateTime @default(now())
+
+  interaction Interaction   @relation(fields: [interactionId], references: [id])
+  segments    CallSegment[]
+
+  @@index([interactionId])
+  @@map("call_recordings")
+}
+
+model CallSegment {
+  id          String       @id @default(cuid())
+  recordingId String
+  startSec    Float
+  endSec      Float
+  emotion     EmotionLabel
+  intensity   Float        // 0-1: how strong the emotion is
+  label       String       // human-readable, e.g. "Elevated frustration"
+  labelAr     String
+
+  recording CallRecording @relation(fields: [recordingId], references: [id])
+
+  @@index([recordingId, startSec])
+  @@map("call_segments")
 }

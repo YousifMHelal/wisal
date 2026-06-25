@@ -825,6 +825,114 @@ async function main() {
     })
   }
 
+  // ── Call Recordings + Heatmap Segments ───────────────────────────────────
+  console.log("  call recordings + emotion segments…")
+  const VOICE_CHANNEL_ID = channelMap["VOICE"]!
+
+  // Pick 5 voice interactions to attach recordings to
+  const voiceInteractions = await prisma.interaction.findMany({
+    where: { channelId: VOICE_CHANNEL_ID },
+    take: 5,
+    orderBy: { startedAt: "desc" },
+  })
+
+  type EmotionLabel = "CALM" | "NEUTRAL" | "CONCERN" | "FRUSTRATION" | "ANGER" | "DISTRESS"
+
+  const EMOTION_LABELS: Record<EmotionLabel, { en: string; ar: string }> = {
+    CALM:        { en: "Calm",                    ar: "هادئ" },
+    NEUTRAL:     { en: "Neutral",                 ar: "محايد" },
+    CONCERN:     { en: "Concern detected",        ar: "قلق ملحوظ" },
+    FRUSTRATION: { en: "Frustration detected",    ar: "إحباط ملحوظ" },
+    ANGER:       { en: "Elevated anger",          ar: "غضب مرتفع" },
+    DISTRESS:    { en: "Distress signal",         ar: "إشارة ضائقة" },
+  }
+
+  // Realistic emotion arc per call — each is an array of [startSec, endSec, emotion, intensity]
+  const CALL_ARCS: [number, number, EmotionLabel, number][][] = [
+    // Call 1: escalates to anger then calms
+    [
+      [0,   25,  "CALM",        0.15],
+      [25,  55,  "NEUTRAL",     0.20],
+      [55,  90,  "CONCERN",     0.45],
+      [90,  130, "FRUSTRATION", 0.72],
+      [130, 165, "ANGER",       0.91],
+      [165, 200, "FRUSTRATION", 0.60],
+      [200, 240, "CONCERN",     0.40],
+      [240, 280, "NEUTRAL",     0.22],
+    ],
+    // Call 2: brief frustration spike, resolved quickly
+    [
+      [0,   40,  "NEUTRAL",     0.18],
+      [40,  80,  "NEUTRAL",     0.20],
+      [80,  110, "FRUSTRATION", 0.65],
+      [110, 145, "CONCERN",     0.48],
+      [145, 190, "NEUTRAL",     0.25],
+      [190, 220, "CALM",        0.12],
+    ],
+    // Call 3: mostly calm, one distress spike
+    [
+      [0,   50,  "CALM",        0.10],
+      [50,  100, "NEUTRAL",     0.18],
+      [100, 135, "CONCERN",     0.38],
+      [135, 170, "DISTRESS",    0.88],
+      [170, 210, "FRUSTRATION", 0.55],
+      [210, 260, "CONCERN",     0.35],
+      [260, 300, "NEUTRAL",     0.20],
+      [300, 340, "CALM",        0.12],
+    ],
+    // Call 4: entirely calm, green across board
+    [
+      [0,   60,  "CALM",        0.08],
+      [60,  130, "NEUTRAL",     0.15],
+      [130, 200, "NEUTRAL",     0.18],
+      [200, 260, "CALM",        0.10],
+    ],
+    // Call 5: slow build to anger, never fully resolved
+    [
+      [0,   30,  "NEUTRAL",     0.22],
+      [30,  70,  "CONCERN",     0.42],
+      [70,  110, "CONCERN",     0.55],
+      [110, 150, "FRUSTRATION", 0.70],
+      [150, 185, "ANGER",       0.85],
+      [185, 220, "ANGER",       0.92],
+      [220, 255, "FRUSTRATION", 0.68],
+    ],
+  ]
+
+  for (let i = 0; i < voiceInteractions.length; i++) {
+    const interaction = voiceInteractions[i]
+    const arc = CALL_ARCS[i % CALL_ARCS.length]
+    const totalSec = arc[arc.length - 1][1]
+
+    // Skip if recording already exists (idempotent)
+    const existing = await prisma.callRecording.findUnique({ where: { interactionId: interaction.id } })
+    if (existing) continue
+
+    const recording = await prisma.callRecording.create({
+      data: {
+        interactionId: interaction.id,
+        audioUrl: `/mock-audio/call-${i + 1}.mp3`,
+        durationSec: totalSec,
+        analyzedAt: interaction.startedAt,
+      },
+    })
+
+    for (const [startSec, endSec, emotion, intensity] of arc) {
+      const info = EMOTION_LABELS[emotion]
+      await prisma.callSegment.create({
+        data: {
+          recordingId: recording.id,
+          startSec,
+          endSec,
+          emotion,
+          intensity,
+          label: info.en,
+          labelAr: info.ar,
+        },
+      })
+    }
+  }
+
   console.log("✅ Realistic seed complete!")
 }
 

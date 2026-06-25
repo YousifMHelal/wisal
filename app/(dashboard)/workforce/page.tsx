@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { parseFilters } from "@/lib/filters"
 import { TicketQueueWidget } from "@/components/widgets/ticket-queue"
 import { AgentGridWidget } from "@/components/widgets/agent-grid"
+import { CallHeatmapWidget } from "@/components/widgets/call-heatmap"
 import { PageHeader } from "@/components/shell/page-header"
 
 export const metadata: Metadata = { title: "Tickets & Agents — Wisal Command Center" }
@@ -27,6 +28,7 @@ export default async function WorkforcePage({ searchParams }: PageProps) {
       />
       <div className="space-y-4 md:space-y-6">
         <TicketQueueWidget filters={filters} />
+        <CallHeatmapWidget filters={filters} />
         <AgentGridWidget filters={filters} />
       </div>
     </>

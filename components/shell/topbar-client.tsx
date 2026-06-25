@@ -328,17 +328,19 @@ export function TopBarClient({ clusters, locale, userName, userRole, statuses }:
 
       {/* Mobile nav drawer */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetContent side={isAr ? "right" : "left"} className="w-72 p-0">
-          <SheetHeader className="p-4 border-b border-border">
+        <SheetContent side={isAr ? "right" : "left"} className="w-72 p-0 flex flex-col">
+          <SheetHeader className="p-4 border-b border-border shrink-0">
             <SheetTitle>
               {isAr ? "مركز وصال" : "Wisal Command Center"}
             </SheetTitle>
           </SheetHeader>
-          <MobileNav
-            statuses={statuses}
-            locale={locale}
-            onClose={() => setMobileOpen(false)}
-          />
+          <div className="flex-1 min-h-0 overflow-y-auto">
+            <MobileNav
+              statuses={statuses}
+              locale={locale}
+              onClose={() => setMobileOpen(false)}
+            />
+          </div>
         </SheetContent>
       </Sheet>
 
