@@ -292,8 +292,9 @@ export function CallHeatmapClient({ recordings, locale }: Props) {
   function handleHeatmapClick(e: React.MouseEvent<HTMLDivElement>) {
     if (!recording || !heatmapRef.current) return
     const rect = heatmapRef.current.getBoundingClientRect()
-    const ratio = (e.clientX - rect.left) / rect.width
-    const seekTo = ratio * recording.durationSec
+    let ratio = (e.clientX - rect.left) / rect.width
+    if (isAr) ratio = 1 - ratio
+    const seekTo = Math.max(0, Math.min(1, ratio)) * recording.durationSec
     setCurrentSec(seekTo)
   }
 
