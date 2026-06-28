@@ -339,7 +339,7 @@ export function CallHeatmapClient({ recordings, locale }: Props) {
         >
           {recordings.map((r) => (
             <option key={r.id} value={r.id}>
-              {r.beneficiaryName ?? r.fileName} — {format(new Date(r.startedAt ?? r.analyzedAt), "dd MMM yyyy, HH:mm")}
+              {r.beneficiaryName ?? r.fileName} — {format(new Date(r.startedAt ?? r.analyzedAt), "dd MMM yyyy, HH:mm", { timeZone: "UTC" })}
               {r.agentName ? ` · ${r.agentName}` : ""}
             </option>
           ))}
