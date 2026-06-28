@@ -25,10 +25,7 @@ async function CallHeatmapBody({ filters }: Props) {
         title="Call Emotion Heatmap"
         titleAr="خريطة المشاعر الحرارية للمكالمات"
       >
-        <WidgetEmpty
-          message="No analysed call recordings for the selected period."
-          messageAr="لا توجد تسجيلات محللة للفترة المحددة."
-        />
+        <CallHeatmapClient recordings={[]} locale={locale} />
       </Widget>
     )
   }

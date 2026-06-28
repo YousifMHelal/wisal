@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect, useCallback, useTransition } from "react"
+import { useState, useRef, useEffect, useTransition } from "react"
 import { Play, Pause, Volume2, PhoneCall, TrendingDown, AlertTriangle, CheckCircle, Upload, Loader2, X } from "lucide-react"
 import { format } from "date-fns"
 import type { CallRecordingData, CallSegmentData } from "@/lib/queries/call-heatmap"
@@ -241,7 +241,6 @@ export function CallHeatmapClient({ recordings, locale }: Props) {
   const [tooltip, setTooltip] = useState<TooltipState | null>(null)
   const audioRef = useRef<HTMLAudioElement>(null)
   const heatmapRef = useRef<HTMLDivElement>(null)
-  const tickRef = useRef<number | null>(null)
 
   const recording = recordings.find((r) => r.id === selectedId) ?? recordings[0]
 
@@ -255,38 +254,34 @@ export function CallHeatmapClient({ recordings, locale }: Props) {
     }
   }, [selectedId])
 
-  // Fake playback ticker (mock audio won't load)
-  const stopTick = useCallback(() => {
-    if (tickRef.current) {
-      clearInterval(tickRef.current)
-      tickRef.current = null
-    }
-  }, [])
-
+  // Sync currentSec from real audio element — no dep array so it re-runs after key-remount
   useEffect(() => {
-    if (isPlaying && recording) {
-      tickRef.current = window.setInterval(() => {
-        setCurrentSec((s) => {
-          if (s >= recording.durationSec) {
-            stopTick()
-            setIsPlaying(false)
-            return recording.durationSec
-          }
-          return s + 0.5
-        })
-      }, 500)
-    } else {
-      stopTick()
+    const audio = audioRef.current
+    if (!audio) return
+    const onTimeUpdate = () => setCurrentSec(audio.currentTime)
+    const onEnded = () => { setIsPlaying(false); setCurrentSec(0) }
+    const onError = (e: Event) => console.error("[audio] error", (e.target as HTMLAudioElement).error)
+    audio.addEventListener("timeupdate", onTimeUpdate)
+    audio.addEventListener("ended", onEnded)
+    audio.addEventListener("error", onError)
+    return () => {
+      audio.removeEventListener("timeupdate", onTimeUpdate)
+      audio.removeEventListener("ended", onEnded)
+      audio.removeEventListener("error", onError)
     }
-    return stopTick
-  }, [isPlaying, recording, stopTick])
+  })
 
   function togglePlay() {
-    if (!recording) return
-    if (currentSec >= recording.durationSec) {
-      setCurrentSec(0)
+    const audio = audioRef.current
+    if (!audio || !recording) return
+    if (isPlaying) {
+      audio.pause()
+      setIsPlaying(false)
+    } else {
+      if (audio.currentTime >= recording.durationSec) audio.currentTime = 0
+      audio.play().catch(() => {})
+      setIsPlaying(true)
     }
-    setIsPlaying((p) => !p)
   }
 
   function handleHeatmapClick(e: React.MouseEvent<HTMLDivElement>) {
@@ -296,6 +291,7 @@ export function CallHeatmapClient({ recordings, locale }: Props) {
     if (isAr) ratio = 1 - ratio
     const seekTo = Math.max(0, Math.min(1, ratio)) * recording.durationSec
     setCurrentSec(seekTo)
+    if (audioRef.current) audioRef.current.currentTime = seekTo
   }
 
   function handleSegmentHover(e: React.MouseEvent<HTMLDivElement>, segment: CallSegmentData) {
@@ -305,9 +301,24 @@ export function CallHeatmapClient({ recordings, locale }: Props) {
 
   if (!recording) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-muted-foreground text-sm">
-        <PhoneCall className="size-8 mb-3 opacity-40" />
-        <p>{isAr ? "لا توجد تسجيلات" : "No call recordings available"}</p>
+      <div className="space-y-4">
+        <div className="flex justify-end">
+          <button
+            onClick={() => setShowUpload((s) => !s)}
+            className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border bg-muted/40 hover:bg-muted/70 text-xs text-muted-foreground transition-colors cursor-pointer"
+            aria-label={isAr ? "تحليل مكالمة جديدة" : "Analyze new call"}
+          >
+            <Upload className="size-3.5" />
+            {isAr ? "تحليل" : "Analyze"}
+          </button>
+        </div>
+        {showUpload && <UploadPanel isAr={isAr} onDone={() => setShowUpload(false)} />}
+        {!showUpload && (
+          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground text-sm">
+            <PhoneCall className="size-8 mb-3 opacity-40" />
+            <p>{isAr ? "لا توجد تسجيلات" : "No call recordings available"}</p>
+          </div>
+        )}
       </div>
     )
   }
@@ -350,8 +361,8 @@ export function CallHeatmapClient({ recordings, locale }: Props) {
 
       {/* Audio player */}
       <div className="flex items-center gap-3 bg-muted/30 rounded-xl px-4 py-3 border border-border">
-        {/* Hidden real audio element */}
-        <audio ref={audioRef} src={recording.audioUrl} preload="none" />
+        {/* Hidden real audio element — key forces remount on recording change */}
+        <audio key={recording.audioUrl} ref={audioRef} src={recording.audioUrl} preload="auto" />
 
         <button
           onClick={togglePlay}
@@ -435,8 +446,8 @@ export function CallHeatmapClient({ recordings, locale }: Props) {
           />
         </div>
 
-        {/* Time axis labels */}
-        <div className="flex justify-between text-[10px] tabular-nums text-muted-foreground/60 font-mono px-0.5">
+        {/* Time axis labels — always LTR regardless of page direction */}
+        <div className="flex justify-between text-[10px] tabular-nums text-muted-foreground/60 font-mono px-0.5" dir="ltr">
           <span>0:00</span>
           <span>{formatTime(recording.durationSec / 4)}</span>
           <span>{formatTime(recording.durationSec / 2)}</span>
