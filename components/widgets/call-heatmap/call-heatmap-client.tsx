@@ -1,9 +1,10 @@
 "use client"
 
-import { useState, useRef, useEffect, useCallback } from "react"
-import { Play, Pause, Volume2, PhoneCall, TrendingDown, AlertTriangle, CheckCircle } from "lucide-react"
+import { useState, useRef, useEffect, useCallback, useTransition } from "react"
+import { Play, Pause, Volume2, PhoneCall, TrendingDown, AlertTriangle, CheckCircle, Upload, Loader2, X } from "lucide-react"
 import { format } from "date-fns"
 import type { CallRecordingData, CallSegmentData } from "@/lib/queries/call-heatmap"
+import { analyzeCallAction } from "@/lib/actions/call-heatmap"
 
 // ── Emotion color mapping ────────────────────────────────────────────────────
 
@@ -81,6 +82,148 @@ interface TooltipState {
   y: number
 }
 
+// ── Upload panel ─────────────────────────────────────────────────────────────
+
+interface UploadPanelProps {
+  isAr: boolean
+  onDone: () => void
+}
+
+function UploadPanel({ isAr, onDone }: UploadPanelProps) {
+  const [file, setFile] = useState<File | null>(null)
+  const [status, setStatus] = useState<"idle" | "analyzing" | "done" | "error">("idle")
+  const [error, setError] = useState<string | null>(null)
+  const [result, setResult] = useState<{ segmentCount: number } | null>(null)
+  const [isPending, startTransition] = useTransition()
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    setFile(e.target.files?.[0] ?? null)
+    setError(null)
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!file) return
+    setStatus("analyzing")
+    setError(null)
+
+    const fd = new FormData()
+    fd.set("audio", file)
+
+    startTransition(async () => {
+      const res = await analyzeCallAction(fd)
+      if (res.error) {
+        setError(res.error)
+        setStatus("error")
+      } else {
+        setResult({ segmentCount: res.segmentCount ?? 0 })
+        setStatus("done")
+      }
+    })
+  }
+
+  return (
+    <div className="rounded-xl border border-border bg-muted/20 p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-medium">
+          {isAr ? "تحليل مكالمة جديدة" : "Analyze a call"}
+        </p>
+        <button
+          onClick={onDone}
+          className="size-6 flex items-center justify-center rounded-md hover:bg-muted text-muted-foreground cursor-pointer transition-colors"
+          aria-label="Close"
+        >
+          <X className="size-3.5" />
+        </button>
+      </div>
+
+      {status === "done" && result ? (
+        <div className="flex flex-col items-center gap-2 py-4 text-center">
+          <CheckCircle className="size-8 text-status-green" />
+          <p className="text-sm font-medium">
+            {isAr ? "اكتمل التحليل" : "Analysis complete"}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {isAr
+              ? `${result.segmentCount} مقطع محلَّل`
+              : `${result.segmentCount} segments analysed`}
+          </p>
+          <button
+            onClick={() => { onDone(); window.location.reload() }}
+            className="mt-1 px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium cursor-pointer hover:opacity-90 transition-opacity"
+          >
+            {isAr ? "عرض النتائج" : "View results"}
+          </button>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-3">
+          {/* File picker */}
+          <div className="space-y-1">
+            <label className="text-xs text-muted-foreground">
+              {isAr ? "ملف الصوت (MP3 / WAV / M4A)" : "Audio file (MP3 / WAV / M4A)"}
+            </label>
+            <div
+              className="flex items-center gap-3 border border-dashed border-border rounded-lg px-4 py-3 cursor-pointer hover:bg-muted/30 transition-colors"
+              onClick={() => fileRef.current?.click()}
+            >
+              <Upload className="size-4 text-muted-foreground shrink-0" />
+              <span className="text-sm text-muted-foreground truncate">
+                {file ? file.name : (isAr ? "اختر ملفاً…" : "Choose file…")}
+              </span>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="audio/*"
+                className="hidden"
+                onChange={handleFile}
+                disabled={status === "analyzing"}
+              />
+            </div>
+            {file && (
+              <p className="text-[11px] text-muted-foreground ps-1">
+                {(file.size / (1024 * 1024)).toFixed(1)} MB
+              </p>
+            )}
+          </div>
+
+          {error && (
+            <p className="text-xs text-status-red-fg flex items-center gap-1.5">
+              <AlertTriangle className="size-3 shrink-0" /> {error}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={!file || status === "analyzing" || isPending}
+            className="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {(status === "analyzing" || isPending) ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                {isAr ? "جارٍ التحليل…" : "Analyzing…"}
+              </>
+            ) : (
+              <>
+                <Upload className="size-4" />
+                {isAr ? "رفع وتحليل" : "Upload & analyze"}
+              </>
+            )}
+          </button>
+
+          {(status === "analyzing" || isPending) && (
+            <p className="text-[11px] text-center text-muted-foreground">
+              {isAr
+                ? "يستغرق التحليل ٣٠–٩٠ ثانية حسب طول المكالمة"
+                : "Analysis takes 30–90s depending on call length"}
+            </p>
+          )}
+        </form>
+      )}
+    </div>
+  )
+}
+
 // ── Main component ───────────────────────────────────────────────────────────
 
 interface Props {
@@ -90,6 +233,7 @@ interface Props {
 
 export function CallHeatmapClient({ recordings, locale }: Props) {
   const isAr = locale === "ar"
+  const [showUpload, setShowUpload] = useState(false)
 
   const [selectedId, setSelectedId] = useState<string>(recordings[0]?.id ?? "")
   const [isPlaying, setIsPlaying] = useState(false)
@@ -172,7 +316,7 @@ export function CallHeatmapClient({ recordings, locale }: Props) {
 
   return (
     <div className="space-y-4">
-      {/* Recording selector */}
+      {/* Recording selector + upload toggle */}
       <div className="flex items-center gap-3">
         <PhoneCall className="size-4 text-muted-foreground shrink-0" />
         <select
@@ -183,12 +327,25 @@ export function CallHeatmapClient({ recordings, locale }: Props) {
         >
           {recordings.map((r) => (
             <option key={r.id} value={r.id}>
-              {r.beneficiaryName} — {format(new Date(r.startedAt), "dd MMM yyyy, HH:mm")}
+              {r.beneficiaryName ?? r.fileName} — {format(new Date(r.startedAt ?? r.analyzedAt), "dd MMM yyyy, HH:mm")}
               {r.agentName ? ` · ${r.agentName}` : ""}
             </option>
           ))}
         </select>
+        <button
+          onClick={() => setShowUpload((s) => !s)}
+          className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border bg-muted/40 hover:bg-muted/70 text-xs text-muted-foreground transition-colors cursor-pointer"
+          aria-label={isAr ? "تحليل مكالمة جديدة" : "Analyze new call"}
+        >
+          <Upload className="size-3.5" />
+          {isAr ? "تحليل" : "Analyze"}
+        </button>
       </div>
+
+      {/* Upload panel */}
+      {showUpload && (
+        <UploadPanel isAr={isAr} onDone={() => setShowUpload(false)} />
+      )}
 
       {/* Audio player */}
       <div className="flex items-center gap-3 bg-muted/30 rounded-xl px-4 py-3 border border-border">

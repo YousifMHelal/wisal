@@ -14,13 +14,14 @@ export type CallSegmentData = {
 
 export type CallRecordingData = {
   id: string
-  interactionId: string
+  fileName: string
   audioUrl: string
   durationSec: number
   analyzedAt: Date
+  // optional — only set when linked to an interaction
   agentName: string | null
-  beneficiaryName: string
-  startedAt: Date
+  beneficiaryName: string | null
+  startedAt: Date | null
   segments: CallSegmentData[]
 }
 
@@ -52,13 +53,13 @@ export async function getCallRecordings(filters: Filters): Promise<CallRecording
 
   return recordings.map((r) => ({
     id: r.id,
-    interactionId: r.interactionId,
+    fileName: r.fileName,
     audioUrl: r.audioUrl,
     durationSec: r.durationSec,
     analyzedAt: r.analyzedAt,
-    agentName: r.interaction.agent?.name ?? null,
-    beneficiaryName: r.interaction.beneficiary.name,
-    startedAt: r.interaction.startedAt,
+    agentName: r.interaction?.agent?.name ?? null,
+    beneficiaryName: r.interaction?.beneficiary?.name ?? null,
+    startedAt: r.interaction?.startedAt ?? null,
     segments: r.segments.map((s) => ({
       id: s.id,
       startSec: s.startSec,

@@ -192,25 +192,25 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  cluster              Cluster?            @relation(fields: [clusterId], references: [id])
+  cluster              Cluster?           @relation(fields: [clusterId], references: [id])
   auditLogs            AuditLog[]
-  shiftSwapApprovals   ShiftSwapRequest[]  @relation("SwapApprover")
-  assignedTickets      Ticket[]            @relation("AssignedAgent")
+  shiftSwapApprovals   ShiftSwapRequest[] @relation("SwapApprover")
+  assignedTickets      Ticket[]           @relation("AssignedAgent")
   articlePublishRights KnowledgeArticle[]
 
   @@map("users")
 }
 
 model Cluster {
-  id                String  @id @default(cuid())
-  name              String
-  nameAr            String
-  region            String
+  id                  String @id @default(cuid())
+  name                String
+  nameAr              String
+  region              String
   catchmentPopulation Int
-  agentEstimate     Int
-  lat               Float
-  lng               Float
-  svgRegionId       String  @unique
+  agentEstimate       Int
+  lat                 Float
+  lng                 Float
+  svgRegionId         String @unique
 
   createdAt DateTime @default(now())
 
@@ -251,24 +251,24 @@ model Channel {
 }
 
 model Agent {
-  id           String  @id @default(cuid())
-  name         String
-  nameAr       String
-  team         String
-  clusterId    String
-  aht          Float   // seconds
-  fcr          Float   // 0-1
-  qaScore      Float   // 0-100
-  csat         Float   // 0-100
-  absenteeism  Float   // 0-1
+  id          String @id @default(cuid())
+  name        String
+  nameAr      String
+  team        String
+  clusterId   String
+  aht         Float // seconds
+  fcr         Float // 0-1
+  qaScore     Float // 0-100
+  csat        Float // 0-100
+  absenteeism Float // 0-1
 
   createdAt DateTime @default(now())
 
-  cluster         Cluster          @relation(fields: [clusterId], references: [id])
+  cluster         Cluster            @relation(fields: [clusterId], references: [id])
   agentStatus     AgentStatus?
   trainingRecords TrainingRecord[]
   shiftSwaps      ShiftSwapRequest[]
-  assignedTickets Ticket[]         @relation("TicketAgent")
+  assignedTickets Ticket[]           @relation("TicketAgent")
   interactions    Interaction[]
 
   @@map("agents")
@@ -277,15 +277,15 @@ model Agent {
 // ── Live Operations ──────────────────────────────────────────────────────────
 
 model SlaSnapshot {
-  id               String  @id @default(cuid())
-  clusterId        String
-  serviceLevelPct  Float
-  callVolume       Int
-  abandonedPct     Float
-  aht              Float   // seconds
-  fcr              Float   // 0-1
-  asa              Float   // seconds
-  timestamp        DateTime @default(now())
+  id              String   @id @default(cuid())
+  clusterId       String
+  serviceLevelPct Float
+  callVolume      Int
+  abandonedPct    Float
+  aht             Float // seconds
+  fcr             Float // 0-1
+  asa             Float // seconds
+  timestamp       DateTime @default(now())
 
   cluster Cluster @relation(fields: [clusterId], references: [id])
 
@@ -294,15 +294,15 @@ model SlaSnapshot {
 }
 
 model ChannelPulse {
-  id          String      @id @default(cuid())
-  channelId   String
-  clusterId   String?
-  volume      Int
-  avgWaitSec  Float
-  timestamp   DateTime    @default(now())
+  id         String   @id @default(cuid())
+  channelId  String
+  clusterId  String?
+  volume     Int
+  avgWaitSec Float
+  timestamp  DateTime @default(now())
 
-  channel  Channel  @relation(fields: [channelId], references: [id])
-  cluster  Cluster? @relation(fields: [clusterId], references: [id])
+  channel Channel  @relation(fields: [channelId], references: [id])
+  cluster Cluster? @relation(fields: [clusterId], references: [id])
 
   @@index([channelId, timestamp])
   @@map("channel_pulses")
@@ -319,8 +319,8 @@ model Incident {
   acknowledgedAt DateTime?
   metricTrend    Json             @default("[]")
 
-  cluster  Cluster?  @relation(fields: [clusterId], references: [id])
-  channel  Channel?  @relation(fields: [channelId], references: [id])
+  cluster Cluster? @relation(fields: [clusterId], references: [id])
+  channel Channel? @relation(fields: [channelId], references: [id])
 
   @@index([severity, triggeredAt])
   @@map("incidents")
@@ -358,13 +358,13 @@ model TierSnapshot {
 }
 
 model CaregiverCase {
-  id               String         @id @default(cuid())
-  caseId           String         @unique
-  clusterId        String
-  proxyConfirmed   ProxyConfirmed
-  action           CaregiverAction
-  auditTrail       Json           @default("[]")
-  timestamp        DateTime       @default(now())
+  id             String          @id @default(cuid())
+  caseId         String          @unique
+  clusterId      String
+  proxyConfirmed ProxyConfirmed
+  action         CaregiverAction
+  auditTrail     Json            @default("[]")
+  timestamp      DateTime        @default(now())
 
   cluster           Cluster            @relation(fields: [clusterId], references: [id])
   consentDisclosure ConsentDisclosure?
@@ -374,7 +374,7 @@ model CaregiverCase {
 }
 
 model ResolutionSplit {
-  id           String  @id @default(cuid())
+  id           String   @id @default(cuid())
   clusterId    String?
   channelId    String?
   aiFullPct    Float
@@ -420,13 +420,13 @@ model KillSwitch {
 // ── Governance & Compliance ──────────────────────────────────────────────────
 
 model MedicalContentApproval {
-  id          String         @id @default(cuid())
-  caseId      String
-  clusterId   String?
-  content     String
-  status      ApprovalStatus @default(PENDING)
-  approvedBy  String?
-  timestamp   DateTime       @default(now())
+  id         String         @id @default(cuid())
+  caseId     String
+  clusterId  String?
+  content    String
+  status     ApprovalStatus @default(PENDING)
+  approvedBy String?
+  timestamp  DateTime       @default(now())
 
   cluster Cluster? @relation(fields: [clusterId], references: [id])
 
@@ -435,11 +435,11 @@ model MedicalContentApproval {
 }
 
 model ConsentDisclosure {
-  id               String  @id @default(cuid())
-  caseId           String
-  caregiverCaseId  String  @unique
-  consentOnFile    Boolean
-  timestamp        DateTime @default(now())
+  id              String   @id @default(cuid())
+  caseId          String
+  caregiverCaseId String   @unique
+  consentOnFile   Boolean
+  timestamp       DateTime @default(now())
 
   caregiverCase CaregiverCase @relation(fields: [caregiverCaseId], references: [id])
 
@@ -459,12 +459,12 @@ model ForbiddenIntentEvent {
 }
 
 model ComplianceScore {
-  id          String              @id @default(cuid())
-  framework   ComplianceFramework
-  status      ComplianceStatus
-  score       Float               // 0-100
-  refreshedAt DateTime            @default(now())
-  evidenceRefs Json               @default("[]")
+  id           String              @id @default(cuid())
+  framework    ComplianceFramework
+  status       ComplianceStatus
+  score        Float // 0-100
+  refreshedAt  DateTime            @default(now())
+  evidenceRefs Json                @default("[]")
 
   @@unique([framework])
   @@map("compliance_scores")
@@ -492,12 +492,12 @@ model KnowledgeArticle {
 // ── Workforce & Quality ───────────────────────────────────────────────────────
 
 model ShiftCoverage {
-  id              String   @id @default(cuid())
-  clusterId       String
-  hour            Int      // 0-23
-  date            DateTime
-  forecastDemand  Int
-  staffed         Int
+  id             String   @id @default(cuid())
+  clusterId      String
+  hour           Int // 0-23
+  date           DateTime
+  forecastDemand Int
+  staffed        Int
 
   cluster Cluster @relation(fields: [clusterId], references: [id])
 
@@ -526,9 +526,9 @@ model QaSampleItem {
   id             String   @id @default(cuid())
   interactionId  String
   clusterId      String
-  sentimentScore Float    // -1 to 1
-  botConfidence  Float    // 0-1
-  priority       Int      // higher = more urgent
+  sentimentScore Float // -1 to 1
+  botConfidence  Float // 0-1
+  priority       Int // higher = more urgent
   reviewed       Boolean  @default(false)
   createdAt      DateTime @default(now())
 
@@ -555,13 +555,13 @@ model TrainingRecord {
 // ── Executive Rollup ─────────────────────────────────────────────────────────
 
 model KpiScorecard {
-  id          String     @id @default(cuid())
-  metric      KpiMetric  @unique
+  id          String    @id @default(cuid())
+  metric      KpiMetric @unique
   thisWeek    Float
   target      Float
   lastWeek    Float
   ownerModule String
-  updatedAt   DateTime   @updatedAt
+  updatedAt   DateTime  @updatedAt
 
   @@map("kpi_scorecards")
 }
@@ -581,11 +581,11 @@ model ClusterRanking {
 }
 
 model SavingsPoint {
-  id                String   @id @default(cuid())
-  clusterId         String?
-  date              DateTime
-  agentHoursSaved   Float
-  aiResolvedVolume  Int
+  id                 String   @id @default(cuid())
+  clusterId          String?
+  date               DateTime
+  agentHoursSaved    Float
+  aiResolvedVolume   Int
   avgHandleTimeSaved Float
 
   cluster Cluster? @relation(fields: [clusterId], references: [id])
@@ -595,15 +595,15 @@ model SavingsPoint {
 }
 
 model BeneficiaryVoiceTheme {
-  id           String   @id @default(cuid())
-  theme        String
-  themeAr      String
-  plainSummary String
+  id             String   @id @default(cuid())
+  theme          String
+  themeAr        String
+  plainSummary   String
   plainSummaryAr String
-  sentiment    Float    // -1 to 1
-  weekTrend    Json     @default("[]")
-  examples     Json     @default("[]")
-  updatedAt    DateTime @updatedAt
+  sentiment      Float // -1 to 1
+  weekTrend      Json     @default("[]")
+  examples       Json     @default("[]")
+  updatedAt      DateTime @updatedAt
 
   @@map("beneficiary_voice_themes")
 }
@@ -611,18 +611,18 @@ model BeneficiaryVoiceTheme {
 // ── RFP-Gap Entities ─────────────────────────────────────────────────────────
 
 model Beneficiary {
-  id            String         @id @default(cuid())
+  id            String          @id @default(cuid())
   name          String
   nameAr        String
-  nationalId    String         @unique
+  nationalId    String          @unique
   dateOfBirth   DateTime
   gender        String
   clusterId     String
-  consentStatus ConsentStatus  @default(PENDING)
+  consentStatus ConsentStatus   @default(PENDING)
   tier          BeneficiaryTier @default(T1)
   phone         String?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 
   cluster      Cluster       @relation(fields: [clusterId], references: [id])
   interactions Interaction[]
@@ -634,22 +634,22 @@ model Beneficiary {
 }
 
 model Interaction {
-  id          String      @id @default(cuid())
+  id            String   @id @default(cuid())
   beneficiaryId String
-  channelId   String
-  clusterId   String
-  agentId     String?
-  startedAt   DateTime    @default(now())
-  durationSec Int
-  intent      String
-  sentiment   Float       // -1 to 1
-  resolution  String
+  channelId     String
+  clusterId     String
+  agentId       String?
+  startedAt     DateTime @default(now())
+  durationSec   Int
+  intent        String
+  sentiment     Float // -1 to 1
+  resolution    String
 
   beneficiary Beneficiary    @relation(fields: [beneficiaryId], references: [id])
   channel     Channel        @relation(fields: [channelId], references: [id])
   cluster     Cluster        @relation(fields: [clusterId], references: [id])
   agent       Agent?         @relation(fields: [agentId], references: [id])
-  recording   CallRecording?
+  recording   CallRecording? @relation
 
   @@index([beneficiaryId, startedAt])
   @@index([clusterId, startedAt])
@@ -703,16 +703,16 @@ model Campaign {
 }
 
 model PenaltyRecord {
-  id                  String   @id @default(cuid())
-  clusterId           String
-  period              DateTime
-  kpi                 String
-  failurePct          Float
+  id                   String   @id @default(cuid())
+  clusterId            String
+  period               DateTime
+  kpi                  String
+  failurePct           Float
   permissibleTolerance Float
-  breached            Boolean
-  penaltyAmount       Float
-  basis               String
-  createdAt           DateTime @default(now())
+  breached             Boolean
+  penaltyAmount        Float
+  basis                String
+  createdAt            DateTime @default(now())
 
   cluster Cluster @relation(fields: [clusterId], references: [id])
 
@@ -721,24 +721,24 @@ model PenaltyRecord {
 }
 
 model IntegrationStatus {
-  id          String             @id @default(cuid())
-  system      IntegrationSystem  @unique
-  state       IntegrationState   @default(UP)
-  lastSyncAt  DateTime?
-  latencyMs   Int?
-  pattern     IntegrationPattern @default(SYNC)
-  updatedAt   DateTime           @updatedAt
+  id         String             @id @default(cuid())
+  system     IntegrationSystem  @unique
+  state      IntegrationState   @default(UP)
+  lastSyncAt DateTime?
+  latencyMs  Int?
+  pattern    IntegrationPattern @default(SYNC)
+  updatedAt  DateTime           @updatedAt
 
   @@map("integration_statuses")
 }
 
 model SystemHealth {
-  id              String   @id @default(cuid())
-  availabilityPct Float    // target 99.9999%
-  dr              Json     @default("{}")  // RTO/RPO per channel
+  id              String    @id @default(cuid())
+  availabilityPct Float // target 99.9999%
+  dr              Json      @default("{}") // RTO/RPO per channel
   lastDrTestAt    DateTime?
-  region          String   @default("KSA")
-  updatedAt       DateTime @updatedAt
+  region          String    @default("KSA")
+  updatedAt       DateTime  @updatedAt
 
   @@map("system_health")
 }
@@ -765,12 +765,13 @@ model AuditLog {
 
 model CallRecording {
   id            String   @id @default(cuid())
-  interactionId String   @unique
+  interactionId String?  @unique
   audioUrl      String
-  durationSec   Int
+  fileName      String   @default("")
   analyzedAt    DateTime @default(now())
+  durationSec   Int
 
-  interaction Interaction   @relation(fields: [interactionId], references: [id])
+  interaction Interaction?  @relation(fields: [interactionId], references: [id])
   segments    CallSegment[]
 
   @@index([interactionId])
@@ -783,8 +784,8 @@ model CallSegment {
   startSec    Float
   endSec      Float
   emotion     EmotionLabel
-  intensity   Float        // 0-1: how strong the emotion is
-  label       String       // human-readable, e.g. "Elevated frustration"
+  intensity   Float // 0-1: how strong the emotion is
+  label       String // human-readable, e.g. "Elevated frustration"
   labelAr     String
 
   recording CallRecording @relation(fields: [recordingId], references: [id])
